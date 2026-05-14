@@ -9376,6 +9376,8 @@ BOOL daAlink_c::midnaTalkTrigger() const {
 }
 
 BOOL daAlink_c::swordSwingTrigger() {
+    if (mDoCPd_c::getHoldLockR(PAD_1))
+        return false;
     return swordTrigger();
 }
 
@@ -11893,10 +11895,20 @@ BOOL daAlink_c::checkItemAction() {
             ) && ((mLinkAcch.ChkGroundHit() || checkMagneBootsOn()) && dComIfGp_getRStatus() == 0)
             )
         {
-            setRStatus(BUTTON_STATUS_SHIELD_ATTACK);
+            // Old shield attack handling
 
-            if (spActionTrigger()) {
-                return procGuardAttackInit();
+            // setRStatus(BUTTON_STATUS_SHIELD_ATTACK)
+
+            // if (spActionTrigger()) {
+                // return procGuardAttackInit();
+
+            // New shield attack handling
+            // If R is held,
+            if (mDoCPd_c::getHoldLockR(PAD_1)) {
+                // Let B display the shield attack prompt
+                setBStatus(BUTTON_STATUS_SHIELD_ATTACK);
+                if (mDoCPd_c::getTrigB(PAD_1))
+                    return procGuardAttackInit();
             }
         }
     }
