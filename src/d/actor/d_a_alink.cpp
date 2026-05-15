@@ -15616,6 +15616,11 @@ int daAlink_c::procWaitInit() {
 int daAlink_c::procWait() {
     BOOL isPrevAnmWaitB = checkUnderMove0BckNoArc(ANM_WAIT_B);
 
+    if (checkShieldCrouch()) {
+        setShieldCrouch();
+        return 1;
+    }
+
     if (!checkNextAction(0) && !checkFrontWallTypeAction()) {
         daPy_frameCtrl_c* frameCtrl_p = mUnderFrameCtrl;
         field_0x33f0 = (s16)(shape_angle.y - mPrevAngleY) * 0.005f;
@@ -15664,6 +15669,12 @@ int daAlink_c::procMoveInit() {
 
 int daAlink_c::procMove() {
     setFootEffectProcType(3);
+
+    if (checkShieldCrouch()) {
+        setShieldCrouch();
+        return 1;
+    }
+
     if (!checkNextAction(0) && !checkFrontWallTypeAction()) {
         if (mDemo.getDemoMode() == daPy_demo_c::DEMO_UNK_2_e &&
             mNormalSpeed > mMaxSpeed * mpHIO->mMove.m.mWalkChangeRate)
@@ -17379,7 +17390,6 @@ int daAlink_c::procCrouchInit() {
     if (!commonProcInitNotSameProc(PROC_CROUCH)) {
         return 0;
     }
-
     setSingleAnimeBaseSpeed(ANM_CROUCH, mpHIO->mCrouch.m.mCrouchAnmSpeed,
                             mpHIO->mCrouch.m.mCrouchInterpolation);
     current.angle.y = shape_angle.y;

@@ -183,6 +183,21 @@ void daAlink_c::setUpperGuardAnime(f32 param_0) {
     onNoResetFlg2(FLG2_UNK_8000000);
 }
 
+BOOL daAlink_c::checkShieldCrouch() {
+    return checkShieldGet() &&
+           !checkAttentionLock() &&
+           !checkGrabAnime() &&
+           !checkUpperReadyThrowAnime() &&
+           (mDoCPd_c::getHoldLockR(PAD_1));
+}
+
+void daAlink_c::setShieldCrouch() {
+    mNormalSpeed = 0.0f;
+    setSingleAnimeBaseSpeed(ANM_CROUCH_DEF, mpHIO->mGuard.m.mCrouchGuardAnmSpeed,
+                            mpHIO->mGuard.m.mCrouchGuardInterpolation);
+    onNoResetFlg2(FLG2_UNK_8000000);
+}
+
 void daAlink_c::setShieldGuard() {
     f32 var_f31 = mNowAnmPackUpper[2].getRatio();
 
@@ -190,7 +205,8 @@ void daAlink_c::setShieldGuard() {
         (checkGuardAccept() && !checkGrabAnime() && !checkUpperReadyThrowAnime() &&
          !checkDkCaught2Anime() && !checkKandelaarSwingAnime() && !checkCutDashAnime() &&
          !checkCutDashChargeAnime() && (!checkEquipAnime() || checkUpperGuardAnime()) &&
-         !checkRideOn() && checkGuardActionChange() && mDoCPd_c::getHoldLockR(PAD_1)))
+         !checkRideOn() && checkGuardActionChange() && mDoCPd_c::getHoldLockR(PAD_1) ||
+         checkShieldCrouch()))
     {
         onNoResetFlg2(FLG2_UNK_8000000);
     } else {

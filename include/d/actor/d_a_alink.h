@@ -1989,6 +1989,10 @@ public:
     BOOL checkGuardAccept();
     void setUpperGuardAnime(f32);
     void setShieldGuard();
+    // Shield crouch handling
+    BOOL checkShieldCrouch();
+    void setShieldCrouch();
+    //
     void setGuardSe(dCcD_GObjInf* i_objinf);
     void setSmallGuard(dCcD_GObjInf* i_objinf);
     int procGuardSlipInit(int i_atSpl, dCcD_GObjInf* i_objinf);
