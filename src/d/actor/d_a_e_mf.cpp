@@ -1689,7 +1689,7 @@ static void e_mf_damage(e_mf_class* i_this) {
             i_this->field_0x6d3 = 1;
             i_this->field_0x6c0[1] = l_HIO.field_0x20 + 1;
         }
-    } else if (i_this != NULL && a_this->checkCutDownHitFlg()) {
+    } if (i_this != NULL && a_this->checkCutDownHitFlg()) {
         a_this->offCutDownHitFlg();
         i_this->field_0x5b4 = 3;
         a_this->health = 0;
@@ -1804,7 +1804,7 @@ static void e_mf_damage(e_mf_class* i_this) {
             cLib_addCalcAngleS2(&i_this->field_0x704.x, -0x4000, 1, 0x300);
 
             if (i_this->mObjAcch.ChkGroundHit()) {
-                if (a_this->health > 0 && daPy_py_c::checkNowWolf() == 0) {
+                if (a_this->health > 0) {
                     a_this->onDownFlg();
                 }
 

@@ -1797,6 +1797,8 @@ static s8 e_yr_damage(e_yr_class* i_this) {
         if (actor->health > 0) {
             if (i_this->field_0x6a4[0] == 0 || i_this->mAcch.ChkGroundHit()) {
                 retVal = 1;
+                // Setting this just in case because I have no idea why it's different than everywhere else
+                enemy->onDownFlg();
             }
         } else {
             unkFlag1 = 0;

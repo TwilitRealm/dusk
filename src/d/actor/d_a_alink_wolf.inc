@@ -3139,7 +3139,6 @@ int daAlink_c::procWolfBackJumpLand() {
     } else if (frameCtrl->getFrame() > mpHIO->mWolf.mWlBackJump.m.mBackLandAnm.mCancelFrame) {
         checkNextActionWolf(1);
     }
-
     return 1;
 }
 
@@ -7943,9 +7942,22 @@ int daAlink_c::procWolfDownAtLandInit(fopEn_enemy_c* i_enemy) {
 
     field_0x2f9d = 4;
     setFootEffectProcType(2);
-    i_enemy->onWolfDownStartFlg();
     mNormalSpeed = 0.0f;
-    setWolfBallModel();
+
+    // If the enemy is a Poe, use normal down attack flag
+    if (fopAcM_GetName(i_enemy) == fpcNm_E_PO_e || fopAcM_GetName(i_enemy) == fpcNm_E_HP_e) {
+        i_enemy->onWolfDownStartFlg();
+        setWolfBallModel();
+        }
+    // Otherwise, use finishing blow or custom logic for enemies that human link can use it on
+    if (fopAcM_GetName(i_enemy) == fpcNm_E_RD_e || fopAcM_GetName(i_enemy) == fpcNm_E_RDY_e
+    || fopAcM_GetName(i_enemy) == fpcNm_E_OC_e || fopAcM_GetName(i_enemy) == fpcNm_E_ST_e
+    || fopAcM_GetName(i_enemy) == fpcNm_E_DN_e || fopAcM_GetName(i_enemy) == fpcNm_E_MF_e
+    || fopAcM_GetName(i_enemy) == fpcNm_E_KG_e || fopAcM_GetName(i_enemy) == fpcNm_E_YR_e) {
+        i_enemy->onCutDownHitFlg();
+        i_enemy->speedF = 0.0f;
+        seStartSwordCut(Z2SE_HIT_SWORD);
+    }
 
     voiceStart(Z2SE_WL_V_ATTACK_POU_BITE);
     dComIfGp_getVibration().StartShock(2, 15, cXyz(0.0f, 1.0f, 0.0f));

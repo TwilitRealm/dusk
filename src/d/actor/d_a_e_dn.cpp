@@ -1801,7 +1801,7 @@ static void e_dn_damage(e_dn_class* i_this) {
             }
 
         }
-    } else if (enemy != NULL && enemy->checkCutDownHitFlg()) {
+    } if (enemy != NULL && enemy->checkCutDownHitFlg()) {
         enemy->offCutDownHitFlg();
         i_this->mode = 3;
         actor->health = 0;
@@ -1919,7 +1919,7 @@ static void e_dn_damage(e_dn_class* i_this) {
             cLib_addCalcAngleS2(&i_this->field_0x724.x, -0x4000, 1, BREG_S(4) + 0x300);
 
             if (i_this->objacch.ChkGroundHit()) {
-                if (actor->health > 0 && !daPy_py_c::checkNowWolf()) {
+                if (actor->health > 0) {
                     enemy->onDownFlg();
                 }
 

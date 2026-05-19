@@ -803,12 +803,15 @@ BOOL daAlink_c::checkDownAttackState() {
                 || (checkWolf()
                     && (fopAcM_GetName(mTargetedActor) == fpcNm_E_PO_e
                         || fopAcM_GetName(mTargetedActor) == fpcNm_E_HP_e
+                        // Extend down attack prompt as wolf to more enemies
                         || fopAcM_GetName(mTargetedActor) == fpcNm_E_RD_e
                         || fopAcM_GetName(mTargetedActor) == fpcNm_E_RDY_e
                         || fopAcM_GetName(mTargetedActor) == fpcNm_E_OC_e
                         || fopAcM_GetName(mTargetedActor) == fpcNm_E_ST_e
                         || fopAcM_GetName(mTargetedActor) == fpcNm_E_DN_e
                         || fopAcM_GetName(mTargetedActor) == fpcNm_E_MF_e
+                        || fopAcM_GetName(mTargetedActor) == fpcNm_E_KG_e
+                        || fopAcM_GetName(mTargetedActor) == fpcNm_E_YR_e
                         )
                     && enemy->getDownPos().abs2(current.pos) < SQUARE(800.0f)
                     )

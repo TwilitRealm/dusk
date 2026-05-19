@@ -2857,7 +2857,7 @@ static void e_rd_damage(e_rd_class* i_this) {
             i_this->timer[1] = 16;
             i_this->field_0xafa = 1;
         }
-    } else if (enemy->checkCutDownHitFlg()) {
+    } if (enemy->checkCutDownHitFlg()) {
         enemy->offCutDownHitFlg();
         i_this->mode = 3;
         i_this->timer[0] = 100;
@@ -2977,7 +2977,9 @@ static void e_rd_damage(e_rd_class* i_this) {
             cLib_addCalcAngleS2(&i_this->jump_angle.x, -0x4000, 1, 0x300 + BREG_S(4));
 
             if (i_this->Bgc.ChkGroundHit()) {
-                if (actor->health > 0 && daPy_py_c::checkNowWolf() == 0) {
+                // Old logic that only sets down flag if Link is human
+                // if (actor->health > 0 && daPy_py_c::checkNowWolf() == 0) {
+                if (actor->health > 0) {
                     enemy->onDownFlg();
                 }
 
