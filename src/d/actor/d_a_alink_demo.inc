@@ -3097,7 +3097,17 @@ int daAlink_c::procCoDead() {
                 exitId = mProcVar5.field_0x3012;
                 roomNo = field_0x3198;
             } else {
-                startRestartRoom(mode, 0xC9, 0, 1);
+                // Old respawn logic:
+                // startRestartRoom(mode, 0xC9, 0, 1);
+                //
+                // Reuse game start stuff:
+                dComIfGp_offEnableNextStage();
+                dComIfGp_setNextStage(
+                    g_dComIfG_gameInfo.info.getPlayer().getPlayerReturnPlace().getName(),
+                    g_dComIfG_gameInfo.info.getPlayer().getPlayerReturnPlace().getPlayerStatus(),
+                    g_dComIfG_gameInfo.info.getPlayer().getPlayerReturnPlace().getRoomNo(),
+                    -1, 0.0f, 0, 1, 0, 0, 0, 0
+                    );
                 return 1;
             }
 
