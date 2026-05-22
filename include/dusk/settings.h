@@ -143,6 +143,7 @@ struct UserSettings {
         ConfigVar<bool> enableAchievementToasts;
         ConfigVar<bool> enableControllerToasts;
         ConfigVar<bool> enableDiscordPresence;
+        ConfigVar<bool> wolfGear;
 
         // Graphics
         ConfigVar<BloomMode> bloomMode;

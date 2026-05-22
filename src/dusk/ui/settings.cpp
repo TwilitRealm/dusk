@@ -1106,6 +1106,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Restores patched glitches from Wii USA 1.0, the first released version.");
         addOption("Enable Rotating Link Doll", getSettings().game.enableLinkDollRotation,
             "Enables rotating Link in the collection menu with the C-Stick.");
+        addOption("Always Show Gear As Wolf", getSettings().game.wolfGear,
+            "Makes the sword and shield always visible on Wolf Link.");
 
         leftPane.add_section("Difficulty");
         leftPane.register_control(

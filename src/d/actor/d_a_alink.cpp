@@ -19065,11 +19065,25 @@ void daAlink_c::setDrawHand() {
 }
 
 bool daAlink_c::checkSwordDraw() {
+
+#if TARGET_PC
+    if (dusk::getSettings().game.wolfGear) {
+        return ((checkSwordGet() && mSwordChangeWaitTimer == 0) && !checkNoResetFlg2(FLG2_UNK_2080000));
+    }
+#endif
+
     return ((checkSwordGet() && mSwordChangeWaitTimer == 0) && !checkNoResetFlg2(FLG2_UNK_2080000))
             && (!checkWolf() || !dComIfGs_isEventBit(dSv_event_flag_c::M_068));
 }
 
 bool daAlink_c::checkShieldDraw() {
+
+#if TARGET_PC
+    if (dusk::getSettings().game.wolfGear) {
+        return ((checkShieldGet() && mShieldChangeWaitTimer == 0) && !checkNoResetFlg2(FLG2_UNK_4080000));
+    }
+#endif
+
     return ((checkShieldGet() && mShieldChangeWaitTimer == 0) && !checkNoResetFlg2(FLG2_UNK_4080000)) &&
            (!checkWolf() || !dComIfGs_isEventBit(dSv_event_flag_c::M_068));
 }

@@ -55,6 +55,7 @@ UserSettings g_userSettings = {
         .enableAchievementToasts {"game.enableAchievementToasts", true},
         .enableControllerToasts {"game.enableControllerToasts", true},
         .enableDiscordPresence {"game.enableDiscordPresence", true},
+        .wolfGear {"game.wolfGear", false},
 
         // Graphics
         .bloomMode {"game.bloomMode", BloomMode::Dusk},
@@ -278,6 +279,7 @@ void registerSettings() {
     Register(g_userSettings.game.debugFlyCam);
     Register(g_userSettings.game.debugFlyCamLockEvents);
     Register(g_userSettings.game.allowBackgroundInput);
+    Register(g_userSettings.game.wolfGear);
 
     Register(g_userSettings.backend.isoPath);
     Register(g_userSettings.backend.isoVerification);
