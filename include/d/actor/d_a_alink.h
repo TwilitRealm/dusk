@@ -4568,6 +4568,7 @@ public:
     cXyz mIBChainInterpCurrHandRoot;
     bool mIBChainInterpPrevValid;
     bool mIBChainInterpCurrValid;
+    bool mIsRollstab = false;
 #endif
 };  // Size: 0x385C
 
