@@ -1,3 +1,39 @@
+**Kamilink's Lazy Tweaks**
+
+A custom build of TwilitRealm's PC port of The Legend of Zelda: Twilight Princess, Dusklight. Tested on Fedora Linux (KDE Plasma), Windows 11, iOS, and Android.
+
+This was mainly a fun side project for me as someone who is pretty new to C++ and was, until about two weeks ago, completely unfamiliar with the decomp code. I started this intending just to see what I could do and how much I could do on my own, but I also saw a lot of people in the Dusklight discord asking for some of these features, so I decided to release it as a mod/custom build.
+
+Main features:
+- Option in Dusklight menu difficulty section that allows you to control how much damage Link's sword can do
+
+- Option in Dusklight gameplay menu that will keep the sword and shield visible on Wolf Link's back
+_This will inevitably cause clipping with Midna's model. Will work on an option to toggle her visibility on/off soon._
+
+- Manual shielding (no toggle option yet)
+_Shield attack is now R+B, text changes to reflect this coming soon_
+
+- Crouch shielding (no toggle option yet)
+_Restored an unused animation, applies when holding R and not targeting (same as older games)_
+
+- Restart from the beginning of an area/dungeon upon death rather than beginning of a room (no toggle option yet)
+_Older games in the series already did this, which I thought would be an appropriate change given TP's already_
+
+Planned features:
+- Toggle options for features that do not currently have them
+
+- Lose half or all rupees upon death
+_Optional, obviously_
+
+- Toggle on/off hitstop
+_Game already has hitstop (effect where the game pauses for a handful of frames when an attack lands), but some like the feel of the game without it (I don't personally care, but I want to see if I can figure out how)_
+
+- Toggle on/off Midna visibility on Wolf Link's back
+_Just makes sense to include this with the sword+shield visibility option._
+
+- Whatever else I think of on a whim
+#
+**ORIGINAL DUSKLIGHT README:**
 <div align="center">
   <img src="res/logo.png" alt="Logo" width="640">
 
