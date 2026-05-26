@@ -2,6 +2,8 @@
 
 A custom build of TwilitRealm's PC port of The Legend of Zelda: Twilight Princess, Dusklight. Tested on Fedora Linux (KDE Plasma), Windows 11, iOS, and Android.
 
+[![Demo Video](https://img.youtube.com/vi/hzjTxhaUWG4/0.jpg)](https://www.youtube.com/watch?v=hzjTxhaUWG4)
+
 This was mainly a fun side project for me as someone who is pretty new to C++ and was, until about two weeks ago, completely unfamiliar with the decomp code. I started this intending just to see what I could do and how much I could do on my own, but I also saw a lot of people in the Dusklight discord asking for some of these features, so I decided to release it as a mod/custom build.
 
 Main features:
@@ -40,8 +42,6 @@ Planned features:
 
 - Whatever else I think of on a whim
 
-Other to do:
-- Demo video
 #
 **ORIGINAL DUSKLIGHT README:**
 <div align="center">
