@@ -32,6 +32,9 @@ _Game already has hitstop (effect where the game pauses for a handful of frames 
 _Just makes sense to include this with the sword+shield visibility option._
 
 - Whatever else I think of on a whim
+
+- Other to do:
+_Demo video_
 #
 **ORIGINAL DUSKLIGHT README:**
 <div align="center">
