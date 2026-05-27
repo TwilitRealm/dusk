@@ -1,3 +1,51 @@
+**Kamilink's Lazy Tweaks**
+
+A custom build of TwilitRealm's PC port of The Legend of Zelda: Twilight Princess, Dusklight. Tested on Fedora Linux (KDE Plasma), Windows 11, iOS, and Android.
+
+**Demo Video (Youtube):**
+
+[![Demo Video](https://img.youtube.com/vi/hzjTxhaUWG4/0.jpg)](https://www.youtube.com/watch?v=hzjTxhaUWG4)
+
+This was mainly a fun side project for me as someone who is pretty new to C++ and was, until about two weeks ago, completely unfamiliar with the decomp code. I started this intending just to see what I could do and how much I could do on my own, but I also saw a lot of people in the Dusklight discord asking for some of these features, so I decided to release it as a mod/custom build.
+
+Main features:
+- Option in Dusklight menu difficulty section that allows you to control how much damage Link's sword can do
+
+- Option in Dusklight gameplay menu that will keep the sword and shield visible on Wolf Link's back
+  
+  >_This will inevitably cause clipping with Midna's model. Will work on an option to toggle her visibility on/off soon._
+
+- Manual shielding (no toggle option yet)
+  
+  >_Shield attack is now R+B, text changes to reflect this coming soon_
+
+- Crouch shielding (no toggle option yet)
+  
+  >_Restored an unused animation, applies when holding R and not targeting (same as older games)_
+
+- Restart from the beginning of an area/dungeon upon death rather than beginning of a room (no toggle option yet)
+  
+  >_Older games in the series already did this, which I thought would be an appropriate change given TP's already_
+
+Planned features:
+- Toggle options for features that do not currently have them
+
+- Lose half or all rupees upon death
+  
+  >_Optional, obviously_
+
+- Toggle on/off hitstop
+  
+  >_Game already has hitstop (effect where the game pauses for a handful of frames when an attack lands), but some like the feel of the     game without it (I don't personally care, but I want to see if I can figure out how)_
+
+- Toggle on/off Midna visibility on Wolf Link's back
+  
+  >_Just makes sense to include this with the sword+shield visibility option._
+
+- Whatever else I think of on a whim
+
+#
+**ORIGINAL DUSKLIGHT README:**
 <div align="center">
   <img src="res/logo.png" alt="Logo" width="640">
 
@@ -22,16 +70,11 @@ It aims to be as accurate as possible to the original while also providing new o
 > [!IMPORTANT]
 > At a minimum, Dusklight requires a GPU with support for either D3D12, Vulkan, or Metal. Your experience with specific hardware, operating systems, and drivers may vary. In particular, older Intel iGPUs have a high likelihood of incompatibility. We are also aware of a number of issues on devices with Adreno GPUs and are working to resolve them.
 
-### 1. Verify your dump
+### 1. Dump your game
 
-First, make sure your dump of the game is clean and supported by Dusklight. You can do this by checking the SHA-1 hash of your dump against this list of supported versions:
+You must dump your own copy of the game, please see [this article](https://wiki.dolphin-emu.org/index.php?title=Ripping_Games) for instructions. After dumping, you can use a program like [Dolphin](https://dolphin-emu.org/) or [nodtool](https://github.com/encounter/nod/releases) to convert the `.iso` to a `.rvz` to save space.
 
-| Version      | SHA-1 hash                                 |
-|--------------| ------------------------------------------ |
-| GameCube USA | `75edd3ddff41f125d1b4ce1a40378f1b565519e7` |
-| GameCube EUR | `2601822a488eeb86fb89db16ca8f29c2c953e1ca` |
-
-*Support for other versions of the game is planned in the future.
+Currently, only the GameCube USA and EUR releases are supported. Support for other versions of the game is planned in the future.
 
 ### 2. Download [Dusklight](https://github.com/TwilitRealm/dusklight/releases)
 
