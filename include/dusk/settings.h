@@ -150,6 +150,7 @@ struct UserSettings {
         ConfigVar<int> damageMultiplier;
         ConfigVar<int> swordMultiplier;
         ConfigVar<bool> noHeartDrops;
+        ConfigVar<bool> loseRupees;
         ConfigVar<bool> instantDeath;
         ConfigVar<bool> fastClimbing;
         ConfigVar<bool> noMissClimbing;

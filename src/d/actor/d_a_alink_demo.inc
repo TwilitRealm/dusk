@@ -3108,7 +3108,10 @@ int daAlink_c::procCoDead() {
                     g_dComIfG_gameInfo.info.getPlayer().getPlayerReturnPlace().getRoomNo(),
                     -1, 0.0f, 0, 1, 0, 0, 0, 0
                     );
-                return 1;
+                // Set rupee count to half upon death if lose rupees is on
+                if (dusk::getSettings().game.loseRupees) {
+                    g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().setRupee(g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().getRupee() / 2);
+                }
             }
 
             onNoResetFlg0(FLG0_UNK_4000);

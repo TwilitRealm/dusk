@@ -38,6 +38,7 @@ UserSettings g_userSettings = {
         .damageMultiplier {"game.damageMultiplier", 1},
         .swordMultiplier {"game.swordMultiplier", 100},
         .noHeartDrops {"game.noHeartDrops", false},
+        .loseRupees {"game.loseRupees", false},
         .instantDeath {"game.instantDeath", false},
         .fastClimbing {"game.fastClimbing", false},
         .noMissClimbing {"game.noMissClimbing", false},
@@ -222,6 +223,7 @@ void registerSettings() {
     Register(g_userSettings.game.damageMultiplier);
     Register(g_userSettings.game.swordMultiplier);
     Register(g_userSettings.game.noHeartDrops);
+    Register(g_userSettings.game.loseRupees);
     Register(g_userSettings.game.instantDeath);
     Register(g_userSettings.game.fastClimbing);
     Register(g_userSettings.game.fastTears);
