@@ -40,6 +40,7 @@
 #include "JSystem/JKernel/JKRAramArchive.h"
 
 #if TARGET_PC
+#include "dusk/settings.h"
 #include "dusk/autosave.h"
 #include "dusk/memory.h"
 #include "dusk/ui/ui.hpp"
@@ -139,14 +140,14 @@ void dScnPly_preLoad_HIO_c::genMessage(JORMContext* mctx) {
 #endif
 
 s8 dScnPly_c::calcPauseTimer() {
-    if (nextPauseTimer != 0) {
-        pauseTimer = nextPauseTimer;
+#if TARGET_PC
+    if (dusk::getSettings().game.noHitstop) {
+        pauseTimer = 0;
         nextPauseTimer = 0;
-        return pauseTimer;
-    } else {
-        return cLib_calcTimer<s8>(&pauseTimer);
+        return 0;
     }
-}
+#endif
+    if (nextPauseTimer != 0) {
 
 #if DEBUG
 dScnPly_reg_childHIO_c::dScnPly_reg_childHIO_c() {

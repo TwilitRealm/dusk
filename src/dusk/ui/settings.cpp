@@ -1209,6 +1209,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Always collect Rupees even if your Wallet is too full.");
         addOption("No Sword Recoil", getSettings().game.noSwordRecoil,
             "Link will not recoil when his sword hits walls.");
+        addOption("No Hitstop", getSettings().game.noHitstop,
+        "Removes the brief freeze-frame pause that occurs when attacks connect.");
         addOption("No 2nd Fish for Cat", getSettings().game.no2ndFishForCat,
             "Skip needing to catch a second fish for Sera's cat.");
         addOption("Show Poe Count on Map", getSettings().game.enhancedMapMenus,

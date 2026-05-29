@@ -146,6 +146,7 @@ struct UserSettings {
         ConfigVar<bool> noReturnRupees;
         ConfigVar<bool> disableRupeeCutscenes;
         ConfigVar<bool> noSwordRecoil;
+        ConfigVar<bool> noHitstop;
         ConfigVar<int> damageMultiplier;
         ConfigVar<int> swordMultiplier;
         ConfigVar<bool> noHeartDrops;

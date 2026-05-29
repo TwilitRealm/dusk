@@ -34,6 +34,7 @@ UserSettings g_userSettings = {
         .noReturnRupees {"game.noReturnRupees", false},
         .disableRupeeCutscenes {"game.disableRupeeCutscenes", false},
         .noSwordRecoil {"game.noSwordRecoil", false},
+        .noHitstop {"game.noHitstop", false},
         .damageMultiplier {"game.damageMultiplier", 1},
         .swordMultiplier {"game.swordMultiplier", 100},
         .noHeartDrops {"game.noHeartDrops", false},
@@ -207,6 +208,7 @@ void registerSettings() {
     Register(g_userSettings.game.noReturnRupees);
     Register(g_userSettings.game.disableRupeeCutscenes);
     Register(g_userSettings.game.noSwordRecoil);
+    Register(g_userSettings.game.noHitstop);
     Register(g_userSettings.game.damageMultiplier);
     Register(g_userSettings.game.swordMultiplier);
     Register(g_userSettings.game.noHeartDrops);
