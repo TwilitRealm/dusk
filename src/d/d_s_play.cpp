@@ -148,6 +148,13 @@ s8 dScnPly_c::calcPauseTimer() {
     }
 #endif
     if (nextPauseTimer != 0) {
+        pauseTimer = nextPauseTimer;
+        nextPauseTimer = 0;
+        return pauseTimer;
+    } else {
+        return cLib_calcTimer<s8>(&pauseTimer);
+    }
+}
 
 #if DEBUG
 dScnPly_reg_childHIO_c::dScnPly_reg_childHIO_c() {
