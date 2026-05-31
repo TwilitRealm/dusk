@@ -137,7 +137,7 @@ dMenu_Ring_c::dMenu_Ring_c(JKRExpHeap* i_heap, STControl* i_stick, CSTControl* i
     field_0x6a9 = 0;
     mXButtonSlot = 0xff;
     mYButtonSlot = 0xff;
-    mZButtonSlot = 0xff;
+    field_0x6ac = 0xff;
     field_0x6ad = 0xff;
     field_0x670 = 0;
     field_0x67e = 0;
@@ -248,8 +248,8 @@ dMenu_Ring_c::dMenu_Ring_c(JKRExpHeap* i_heap, STControl* i_stick, CSTControl* i
         if (dComIfGs_getSelectItemIndex(1) == dComIfGs_getLineUpItem(i)) {
             mYButtonSlot = i;
         }
-        if (dComIfGs_getSelectItemIndex(2) == dComIfGs_getLineUpItem(i)) {
-            mZButtonSlot = i;
+        if (dComIfGs_getSelectItemIndex(2) == dComIfGs_getWolfAbility(i)) {
+            field_0x6ac = i;
         }
     }
     mRingRadiusH = g_ringHIO.mRingRadiusH;
@@ -263,7 +263,7 @@ dMenu_Ring_c::dMenu_Ring_c(JKRExpHeap* i_heap, STControl* i_stick, CSTControl* i
             }
         }
         field_0x6be[i] = 0;
-        if (i == MAX_SELECT_ITEM) {
+        if (i == 2) {
             setSelectItem(i, 0);
         } else {
             setSelectItem(i, 0x43);
@@ -1033,8 +1033,8 @@ void dMenu_Ring_c::setItem() {
     } else {
         uVar2 = dItemNo_NONE_e;
     }
-    if (mZButtonSlot != dItemNo_NONE_e) {
-        uVar3 = mItemSlots[mZButtonSlot];
+    if (field_0x6ac != dItemNo_NONE_e) {
+        uVar3 = mItemSlots[field_0x6ac];
     } else {
         uVar3 = dItemNo_NONE_e;
     }
@@ -1114,9 +1114,6 @@ void dMenu_Ring_c::setItem() {
                 mixItemIndex1 = dItemNo_NONE_e;
             }
         }
-    } else if (field_0x6b3 == 2) {
-        mZButtonSlot = mCurrentSlot;
-        uVar3 = mItemSlots[mZButtonSlot];
     }
     field_0x6b4[0] = uVar1;
     field_0x6b4[1] = uVar2;
@@ -1132,7 +1129,7 @@ void dMenu_Ring_c::setItem() {
 
 void dMenu_Ring_c::setJumpItem(bool i_useVibrationM) {
     for (int i = 0; i < 4; i++) {
-        if (i == 4) {
+        if (i == 2) {
             setSelectItem(i, field_0x6b4[i]);
         } else if (i == field_0x6cd) {
             setSelectItem(i, getItem(field_0x6cb, 0));
@@ -1148,9 +1145,9 @@ void dMenu_Ring_c::setJumpItem(bool i_useVibrationM) {
         field_0x518[1] = mItemSlotPosX[mYButtonSlot];
         field_0x528[1] = mItemSlotPosY[mYButtonSlot];
     }
-    if (mZButtonSlot != dItemNo_NONE_e) {
-        field_0x518[2] = mItemSlotPosX[mZButtonSlot];
-        field_0x528[2] = mItemSlotPosY[mZButtonSlot];
+    if (field_0x6ac != dItemNo_NONE_e) {
+        field_0x518[2] = mItemSlotPosX[field_0x6ac];
+        field_0x528[2] = mItemSlotPosY[field_0x6ac];
     }
     if (field_0x6ad != dItemNo_NONE_e) {
         field_0x518[3] = mItemSlotPosX[field_0x6ad];
@@ -1178,19 +1175,7 @@ void dMenu_Ring_c::setJumpItem(bool i_useVibrationM) {
             mSelectItemSlideElapsed[1] = 0.0f;
 #endif
         }
-    } else if (field_0x6b3 == 2) {
-        field_0x538[0] = g_ringHIO.mUnselectItemScale;
-        field_0x538[1] = g_ringHIO.mSelectItemScale;
-        if (field_0x6b4[2] != dComIfGs_getSelectItemIndex(2) ||
-            field_0x6b8[2] != dComIfGs_getMixItemIndex(2))
-        {
-            field_0x674[2] = 1;
-#if TARGET_PC
-            mSelectItemSlideElapsed[2] = 0.0f;
-#endif
-        }
     }
-
     if (field_0x674[0] == 1) {
         if (i_useVibrationM) {
             dMeter2Info_set2DVibrationM();
@@ -1231,7 +1216,7 @@ void dMenu_Ring_c::setScale() {
             }
             setNameString(itemId);
             setItemScale(i, g_ringHIO.mUnselectItemScale);
-            for (int j = 0; j < SELECT_ITEM_NUM; j++) {
+            for (int j = 0; j < 2; j++) {
                 if (j == field_0x6cf) {
                     setButtonScale(j, g_ringHIO.mSelectButtonScale);
                 } else {
@@ -1251,7 +1236,7 @@ void dMenu_Ring_c::setScale() {
             } else {
                 setItemScale(i, g_ringHIO.mUnselectItemScale);
             }
-            for (int j = 0; j < SELECT_ITEM_NUM; j++) {
+            for (int j = 0; j < 2; j++) {
                 setButtonScale(j, g_ringHIO.mUnselectButtonScale);
             }
         }
@@ -1285,7 +1270,6 @@ void dMenu_Ring_c::setNameString(u32 i_stringID) {
 
 void dMenu_Ring_c::setActiveCursor() {
     u8 item = dComIfGs_getItem(mItemSlots[mCurrentSlot], false);
-
     if (mStatus == STATUS_WAIT && mOldStatus != STATUS_EXPLAIN_FORCE && mOldStatus != STATUS_EXPLAIN && mpItemExplain->getStatus() == 0) {
         if (mDoCPd_c::getTrigR(PAD_1) && !mPlayerIsWolf && item != dItemNo_NONE_e) {
             for (int i = 0; i < MAX_SELECT_ITEM; i++) {
@@ -1316,21 +1300,7 @@ void dMenu_Ring_c::setActiveCursor() {
                     (this->*stick_init[mStatus])();
                 }
             }
-        } else if (mDoCPd_c::getTrigZ(PAD_1) && !mPlayerIsWolf && item != dItemNo_NONE_e) {
-            for (int i = 0; i < MAX_SELECT_ITEM; i++) {
-                setSelectItemForce(i);
-            }
-            field_0x6b3 = 2;
-            if (!checkCombineBomb(field_0x6b3)) {
-                setItem();
-                if (mpItemExplain->getStatus() == 0) {
-                    setStatus(STATUS_WAIT);
-                    (this->*stick_init[mStatus])();
-                }
-            }
-        } else if (mDoCPd_c::getTrigX(PAD_1) || mDoCPd_c::getTrigY(PAD_1) ||
-                   mDoCPd_c::getTrigZ(PAD_1))
-        {
+        } else if (mDoCPd_c::getTrigX(PAD_1) || mDoCPd_c::getTrigY(PAD_1)) {
             // If the player is a wolf or somehow manages to access an item slot with no item, error
             Z2GetAudioMgr()->seStart(Z2SE_SYS_ERROR, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
         }
@@ -1848,7 +1818,7 @@ void dMenu_Ring_c::drawSelectItem() {
 }
 
 void dMenu_Ring_c::setSelectItemForce(int i_idx) {
-    if (i_idx == SELECT_ITEM_NUM) {
+    if (i_idx == 2) {
         if (field_0x674[i_idx] != 0) {
             dComIfGs_setSelectItemIndex(i_idx, field_0x6b4[i_idx]);
             field_0x674[i_idx] = 0;
@@ -1857,7 +1827,7 @@ void dMenu_Ring_c::setSelectItemForce(int i_idx) {
 #endif
         }
     } else if (field_0x674[i_idx] != 0) {
-        for (int i = 0; i < SELECT_ITEM_NUM; i++) {
+        for (int i = 0; i < 2; i++) {
             dComIfGs_setMixItemIndex(i, field_0x6b8[i]);
             dComIfGs_setSelectItemIndex(i, field_0x6b4[i]);
         }

@@ -4142,7 +4142,7 @@ int daAlink_c::procDungeonWarpReadyInit() {
     }
 
     fpc_ProcID id;
-    if (checkItemSetButton(dItemNo_DUNGEON_EXIT_e) != 3) {
+    if (checkItemSetButton(dItemNo_DUNGEON_EXIT_e) != 2) {
         id = fopAcM_create(fpcNm_OBJ_TKS_e, 0, &current.pos, fopAcM_GetRoomNo(this), &shape_angle,
                            NULL, -1);
     } else {

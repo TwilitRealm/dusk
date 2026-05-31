@@ -4553,7 +4553,7 @@ void daAlink_c::playerInit() {
     PLAYER_CREATE_ANM_HEAP(mFaceBtkHeap, daPy_anmHeap_c::HEAP_TYPE_2, "daAlink_c::mFaceBtkHeap");
     PLAYER_CREATE_ANM_HEAP(mFaceBckHeap, daPy_anmHeap_c::HEAP_TYPE_3, "daAlink_c::mFaceBckHeap");
 
-    for (i = 0; i < SELECT_ITEM_NUM; i++) {
+    for (i = 0; i < 2; i++) {
         mItemHeap[i].setBufferSize(0x13200);
         PLAYER_CREATE_ANM_HEAP_F(mItemHeap[i], daPy_anmHeap_c::HEAP_TYPE_4, "daAlink_c::mItemHeap[%d]", i);
     }
@@ -9492,7 +9492,7 @@ void daAlink_c::setStickData() {
         if (mDoCPd_c::getTrigY(PAD_1)) {
             mItemTrigger |= (daAlink_ITEM_BTN)BTN_Y;
         }
-        if (mDoCPd_c::getTrigZ(PAD_1) && !mDoCPd_c::getHoldR(PAD_1)) {
+        if (mDoCPd_c::getTrigZ(PAD_1)) {
             mItemTrigger |= (daAlink_ITEM_BTN)BTN_Z;
         }
         if (mDoCPd_c::getTrigL(PAD_1)) {
@@ -11295,8 +11295,8 @@ BOOL daAlink_c::checkUpperItemActionFly() {
 void daAlink_c::checkItemButtonChange() {
     if (mProcID != PROC_CANOE_PADDLE_PUT && mEquipItem != dItemNo_NONE_e && !checkEquipAnime()) {
         u8 temp_r0;
-        for (u8 i = 0; i < SELECT_ITEM_NUM; i++) {
-            temp_r0 = (i + 1) % SELECT_ITEM_NUM;
+        for (u8 i = 0; i < 2; i++) {
+            temp_r0 = (i + 1) % 2;
             if (mEquipItem == dComIfGp_getSelectItem(i) &&
                 (mEquipItem != dComIfGp_getSelectItem(temp_r0) || mSelectItemId != temp_r0))
             {
@@ -11466,8 +11466,8 @@ int daAlink_c::orderTalk(int i_checkZTalk) {
     }
 
     if (!checkWolf() && checkRequestTalkActor(mAttList2, field_0x27f8)) {
-        for (int i = 0; i < 3; i++) {
-            // check if pressed X or Y or Z and if item on button is a trade item
+        for (int i = 0; i < 2; i++) {
+            // check if pressed X or Y and if item on button is a trade item
             if (checkTradeItem(dComIfGp_getSelectItem(i)) && itemTriggerCheck(1 << i)) {
                 fopAcM_orderTalkItemBtnEvent(itemTalkType[i], this, field_0x27f8, 0, 0);
                 return 1;
@@ -12115,7 +12115,7 @@ void daAlink_c::allUnequip(BOOL param_0) {
     if (checkNoResetFlg2(FLG2_UNK_1) && param_0 && !checkCanoeRide() &&
         mEquipItem != dItemNo_KANTERA_e)
     {
-        for (u8 i = 0; i < SELECT_ITEM_NUM; i++) {
+        for (u8 i = 0; i < 2; i++) {
             if (dComIfGp_getSelectItem(i) == dItemNo_KANTERA_e) {
                 mSelectItemId = i;
             }
@@ -12167,7 +12167,7 @@ BOOL daAlink_c::checkItemChangeFromButton() {
             itemEquip(0x105);
         } else {
             u8 i;
-            for (i = 0; i < SELECT_ITEM_NUM; i++) {
+            for (i = 0; i < 2; i++) {
                 int proc_type = checkNewItemChange(i);
                 if (proc_type != 0 && itemTriggerCheck(1 << i)) {
                     BOOL var_r27 = changeItemTriggerKeepProc(i, proc_type);
@@ -12188,7 +12188,7 @@ BOOL daAlink_c::checkItemChangeFromButton() {
             } else if (mEquipItem == dItemNo_NONE_e && mThrowBoomerangAcKeep.getActor() == NULL &&
                        !checkCanoeRide() && checkNoUpperAnime() && checkNoResetFlg2(FLG2_UNK_1))
             {
-                for (i = 0; i < SELECT_ITEM_NUM; i++) {
+                for (i = 0; i < 2; i++) {
                     if (dComIfGp_getSelectItem(i) == dItemNo_KANTERA_e) {
                         mSelectItemId = i;
                     }
@@ -12200,7 +12200,7 @@ BOOL daAlink_c::checkItemChangeFromButton() {
                        mEquipItem != 0x102 && (!checkCanoeRide() || !checkFisingRodLure()))
             {
                 if (!checkEventRun() || strcmp(dComIfGp_getEventManager().getRunEventName(), "ANGER") != 0) {
-                    if (strcmp(dComIfGp_getEventManager().getRunEventName(), "ANGER2") != 0 && checkItemSetButton(mEquipItem) == 3) {
+                    if (strcmp(dComIfGp_getEventManager().getRunEventName(), "ANGER2") != 0 && checkItemSetButton(mEquipItem) == 2) {
                         allUnequip(1);
                     }
                 }
@@ -14406,7 +14406,7 @@ BOOL daAlink_c::checkGroupItem(int i_itemNo, int i_selItem) const {
 }
 
 int daAlink_c::checkSetItemTrigger(int i_itemNo) {
-    for (u8 i = 0; i < SELECT_ITEM_NUM; i++) {
+    for (u8 i = 0; i < 2; i++) {
         if (checkGroupItem(i_itemNo, dComIfGp_getSelectItem(i)) && itemTriggerCheck(1 << i)) {
             if (i_itemNo != dItemNo_HVY_BOOTS_e) {
                 mSelectItemId = i;
@@ -14419,13 +14419,13 @@ int daAlink_c::checkSetItemTrigger(int i_itemNo) {
 }
 
 int daAlink_c::checkItemSetButton(int i_itemNo) {
-    for (u8 i = 0; i < SELECT_ITEM_NUM; i++) {
+    for (u8 i = 0; i < 2; i++) {
         if (checkGroupItem(i_itemNo, dComIfGp_getSelectItem(i))) {
             return i;
         }
     }
 
-    return 3;
+    return 2;
 }
 
 bool daAlink_c::checkField() {
@@ -14625,7 +14625,7 @@ int daAlink_c::checkNewItemChange(u8 i_selItemIdx) {
                 return ITEM_PROC_BOTTLE_DRINK;
             }
 
-            if (checkOilBottleItem(sel_item) && checkItemSetButton(dItemNo_KANTERA_e) != 3) {
+            if (checkOilBottleItem(sel_item) && checkItemSetButton(dItemNo_KANTERA_e) != 2) {
                 return ITEM_PROC_KANDELAAR_POUR;
             }
         } else if (sel_item == dItemNo_HVY_BOOTS_e) {
@@ -14670,7 +14670,7 @@ int daAlink_c::checkNewItemChange(u8 i_selItemIdx) {
                     return ITEM_PROC_SPINNER_READY;
                 } else if (checkDungeonWarpItem(sel_item)) {
                     return ITEM_PROC_DUNGEON_WARP_READY;
-                } else if (checkItemSetButton(0x108) != 3 &&
+                } else if (checkItemSetButton(0x108) != 2 &&
                            (sel_item == dItemNo_WORM_e || sel_item == dItemNo_BEE_CHILD_e))
                 {
                     int itemNo = dComIfGp_getSelectItem(checkItemSetButton(0x108));
@@ -14694,7 +14694,7 @@ int daAlink_c::checkNewItemChange(u8 i_selItemIdx) {
                     return ITEM_PROC_NOT_USE_ITEM;
                 } else if (sel_item == dItemNo_HORSE_FLUTE_e) {
                     return ITEM_PROC_GRASS_WHISTLE;
-                } else if (checkOilBottleItem(sel_item) && checkItemSetButton(0x48) != 3) {
+                } else if (checkOilBottleItem(sel_item) && checkItemSetButton(0x48) != 2) {
                     return ITEM_PROC_KANDELAAR_POUR;
                 } else if (sel_item == dItemNo_HAWK_EYE_e) {
                     if (acceptSubjectModeChange()) {
@@ -17858,7 +17858,7 @@ int daAlink_c::execute() {
 
     if (checkNoResetFlg2(FLG2_UNK_1) != FALSE &&
         mEquipItem != dItemNo_KANTERA_e &&
-        checkItemSetButton(dItemNo_KANTERA_e) == 3) {
+        checkItemSetButton(dItemNo_KANTERA_e) == 2) {
         offKandelaarModel();
     }
 
@@ -18247,7 +18247,7 @@ int daAlink_c::execute() {
 
         if (checkEquipHeavyBoots()) {
             int itemButton = checkItemSetButton(dItemNo_HVY_BOOTS_e);
-            if (itemButton == 3 || checkNotHeavyBootsStage()) {
+            if (itemButton == 2 || checkNotHeavyBootsStage()) {
                 if (!dComIfGp_checkPlayerStatus1(0, 0x10000) || !checkHookshotRoofLv7Boss()) {
                     setHeavyBoots(0);
                 }
@@ -18769,7 +18769,7 @@ int daAlink_c::execute() {
 
             if (!checkWolf()) {
                 u8 tmp;
-                for (u8 i = 0; i < SELECT_ITEM_NUM; i++) {
+                for (u8 i = 0; i < 2; i++) {
                     tmp = (i + 1) % 2;
                     if (dComIfGp_getSelectItem(i) == dItemNo_EMPTY_BOTTLE_e && (mUseButtonFlags & (1 << i)) &&
                         dComIfGp_getSelectItem(tmp) == dItemNo_EMPTY_BOTTLE_e)
@@ -18779,7 +18779,7 @@ int daAlink_c::execute() {
                 }
             }
 
-            for (int i = 0; i < SELECT_ITEM_NUM; i++) {
+            for (int i = 0; i < 2; i++) {
                 if (!(mUseButtonFlags & (1 << i)) && !(field_0x2faf & (1 << i))) {
                     dMeter2Info_offUseButton(METER2_USEBUTTON_X << i);
                 }
