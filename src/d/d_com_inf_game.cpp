@@ -1962,7 +1962,18 @@ u8 dComIfGs_getMixItemIndex(int i_no) {
 }
 
 void dComIfGp_setSelectItem(int i_selItemIdx) {
-    if (dComIfGs_getSelectItemIndex(i_selItemIdx) != 0xFF) {
+    if (i_selItemIdx == SELECT_ITEM_DOWN) {
+        if (dComIfGs_getSelectItemIndex(i_selItemIdx) != 0xFF) {
+            u8 selItem_slotNo = dComIfGs_getSelectItemIndex(i_selItemIdx);
+            g_dComIfG_gameInfo.play.setSelectItem(i_selItemIdx, selItem_slotNo);
+
+            if (selItem_slotNo == 0xFF) {
+                dComIfGs_setSelectItemIndex(i_selItemIdx, 0xFF);
+            }
+        } else {
+            g_dComIfG_gameInfo.play.setSelectItem(i_selItemIdx, dItemNo_NONE_e);
+        }
+    } else if (dComIfGs_getSelectItemIndex(i_selItemIdx) != 0xFF) {
         u8 item = dComIfGs_getItem(dComIfGs_getSelectItemIndex(i_selItemIdx), false);
         g_dComIfG_gameInfo.play.setSelectItem(i_selItemIdx, item);
 
@@ -1977,8 +1988,7 @@ void dComIfGp_setSelectItem(int i_selItemIdx) {
 u8 dComIfGp_getSelectItem(int i_selItemIdx) {
     u8 playItem = g_dComIfG_gameInfo.play.getSelectItem(i_selItemIdx);
 
-    if ((i_selItemIdx == SELECT_ITEM_X || i_selItemIdx == SELECT_ITEM_Y ||
-            i_selItemIdx == SELECT_ITEM_Z) &&
+    if ((i_selItemIdx == SELECT_ITEM_X || i_selItemIdx == SELECT_ITEM_Y) &&
         dComIfGs_getMixItemIndex(i_selItemIdx) != 0xFF)
     {
         u8 saveItem = dComIfGs_getItem(dComIfGs_getMixItemIndex(i_selItemIdx), false);

@@ -4063,7 +4063,7 @@ public:
     /* 0x02180 */ daAlink_matAnm_c* field_0x2180[2];
     /* 0x02188 */ dEyeHL_c mEyeHL1;
     /* 0x0219C */ dEyeHL_c mEyeHL2;
-    /* 0x021B0 */ daPy_anmHeap_c mItemHeap[3];
+    /* 0x021B0 */ daPy_anmHeap_c mItemHeap[2];
     /* 0x021D8 */ daPy_anmHeap_c mAnmHeap9;
     /* 0x021EC */ daAlinkHIO_c* mpHIO;
     /* 0x021F0 */ daAlink_blur_c m_swordBlur;
