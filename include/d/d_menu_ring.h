@@ -172,7 +172,7 @@ private:
     /* 0x6A9 */ u8 field_0x6a9;  // unused
     /* 0x6AA */ u8 mXButtonSlot;
     /* 0x6AB */ u8 mYButtonSlot;
-    /* 0x6AC */ u8 field_0x6ac;
+    /* 0x6AC */ u8 mZButtonSlot;
     /* 0x6AD */ u8 field_0x6ad;
     /* 0x6AE */ u8 mItemsTotal;  // Contains the amount of items which are actually obtained and in
                                  // the item wheel
