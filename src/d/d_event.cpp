@@ -289,6 +289,10 @@ int dEvt_control_c::talkXyCheck(dEvt_order_c* order) {
         mTalkXyType = 2;
         itemIndex = SELECT_ITEM_Y;
         break;
+    case dEvt_type_SHOWITEM_Z_e:
+        mTalkXyType = 3;
+        itemIndex = SELECT_ITEM_Z;
+        break;
     #if PLATFORM_WII || PLATFORM_SHIELD
     case 8:
         mTalkXyType = 3;

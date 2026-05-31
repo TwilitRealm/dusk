@@ -446,7 +446,7 @@ void dMenu_ItemExplain_c::move_proc() {
         if (field_0xe7 == 0) {
             return;
         }
-        if (!mDoCPd_c::getTrigX(PAD_1) && !mDoCPd_c::getTrigY(PAD_1)) {
+        if (!mDoCPd_c::getTrigX(PAD_1) && !mDoCPd_c::getTrigY(PAD_1) && !mDoCPd_c::getTrigZ(PAD_1)) {
             return;
         }
     }
@@ -460,6 +460,8 @@ void dMenu_ItemExplain_c::move_proc() {
         mEndButton = 3;
     } else if (mDoCPd_c::getTrigY(PAD_1)) {
         mEndButton = 4;
+    } else if (mDoCPd_c::getTrigZ(PAD_1)) {
+        mEndButton = 5;
     }
     mStatus = 5;
     Z2GetAudioMgr()->seStart(Z2SE_SY_EXP_WIN_CLOSE, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);

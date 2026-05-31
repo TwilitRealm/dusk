@@ -12,7 +12,7 @@
 
 static const int DEFAULT_SELECT_ITEM_INDEX = 0;
 static const int MAX_SELECT_ITEM = 4;
-static const int SELECT_ITEM_NUM = 2;
+static const int SELECT_ITEM_NUM = 3;
 static const int MAX_EQUIPMENT = 6;
 static const int MAX_EVENTS = 256;
 static const int MAX_ITEM_SLOTS = 24;
@@ -123,6 +123,7 @@ enum {
     /* 0x3 */ SELECT_ITEM_B,
     /* 0x0 */ SELECT_ITEM_X = SELECT_ITEM_LEFT,
     /* 0x1 */ SELECT_ITEM_Y = SELECT_ITEM_RIGHT,
+    /* 0x2 */ SELECT_ITEM_Z = SELECT_ITEM_DOWN,
 };
 
 enum {
