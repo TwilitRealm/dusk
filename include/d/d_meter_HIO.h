@@ -736,10 +736,10 @@ public:
     /* 0x290 */ f32 field_0x290;
     /* 0x294 */ f32 field_0x294;
     /* 0x298 */ f32 field_0x298[2];
-    /* 0x2A0 */ f32 mButtonZItemBaseScale;
-    /* 0x2A4 */ f32 mButtonZItemBasePosX;
-    /* 0x2A8 */ f32 mButtonZItemBasePosY;
-    /* 0x2AC */ f32 mButtonZItemBaseAlpha;
+    /* 0x2A0 */ f32 mButtonZItemBaseScale[2];
+    /* 0x2A4 */ f32 mButtonZItemBasePosX[2];
+    /* 0x2A8 */ f32 mButtonZItemBasePosY[2];
+    /* 0x2AC */ f32 mButtonZItemBaseAlpha[2];
     /* 0x2B0 */ f32 mButtonBaseAlpha;
     /* 0x2B4 */ f32 mButtonATextScale;
     /* 0x2B8 */ f32 mButtonATextPosX;

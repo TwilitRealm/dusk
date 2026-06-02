@@ -1535,8 +1535,6 @@ void dMeter2Info_c::setMiniGameItem(u8 i_minigameFlag) {
     if (mMiniGameItemSetFlag != 3) {
         dComIfGs_setItem(SLOT_4, dItemNo_BOW_e);
         dComIfGp_setItem(SLOT_4, dItemNo_BOW_e);
-        dComIfGs_setMixItemIndex(SELECT_ITEM_Z, 0xFF);
-        dComIfGs_setSelectItemIndex(SELECT_ITEM_Z, 0xFF);
         dComIfGs_setMixItemIndex(SELECT_ITEM_Y, 0xFF);
         dComIfGs_setSelectItemIndex(SELECT_ITEM_Y, 0xFF);
         dComIfGs_setMixItemIndex(SELECT_ITEM_X, SLOT_4);

@@ -88,7 +88,7 @@ dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
     mpScreen->search(MULTI_CHAR('ju_ring5'))->hide();
     field_0x73c = 0.0f;
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         mpKanteraMeter[i] = JKR_NEW dKantera_icon_c();
         JUT_ASSERT(0, mpKanteraMeter[i] != NULL);
     }
@@ -192,7 +192,7 @@ dMeter2Draw_c::~dMeter2Draw_c() {
     JKR_DELETE(mpKanteraScreen);
     mpKanteraScreen = NULL;
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         JKR_DELETE(mpKanteraMeter[i]);
         mpKanteraMeter[i] = NULL;
     }
@@ -316,9 +316,9 @@ dMeter2Draw_c::~dMeter2Draw_c() {
         }
     }
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 2; j++) {
-            for (int k = 0; k < 2; k++) {
+            for (int k = 0; k < 3; k++) {
                 heap->free(mpItemXYTex[i][j][k]);
                 mpItemXYTex[i][j][k] = NULL;
             }
@@ -329,7 +329,7 @@ dMeter2Draw_c::~dMeter2Draw_c() {
     mpItemB = NULL;
     mpItemBPane = NULL;
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         if (mpItemXY[i] != NULL) {
             JKR_DELETE(mpItemXY[i]);
             mpItemXY[i] = NULL;
@@ -420,7 +420,7 @@ dMeter2Draw_c::~dMeter2Draw_c() {
     JKR_DELETE(mpButtonCrossParent);
     mpButtonCrossParent = NULL;
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             if (mpItemNumTex[i][j] != NULL) {
                 JKR_DELETE(mpItemNumTex[i][j]);
@@ -515,16 +515,17 @@ void dMeter2Draw_c::init() {
     mButtonXAlpha = g_drawHIO.mButtonXAlpha;
     mButtonYAlpha = g_drawHIO.mButtonYAlpha;
     field_0x80c = g_drawHIO.field_0x168;
-    field_0x810 = g_drawHIO.mButtonZAlpha;
+    // field_0x810 = g_drawHIO.mButtonZAlpha;
+    mButtonZAlpha = g_drawHIO.mButtonZAlpha;
 
     for (int i = 0; i < 2; i++) {
         mItemBBaseAlpha[i] = g_drawHIO.mItemBBaseAlpha[i];
         mButtonXItemBaseAlpha[i] = g_drawHIO.mButtonXItemBaseAlpha[i];
         mButtonYItemBaseAlpha[i] = g_drawHIO.mButtonYItemBaseAlpha[i];
         field_0x82c[i] = g_drawHIO.field_0x298[i];
+        mButtonZItemBaseAlpha[i] = g_drawHIO.mButtonZItemBaseAlpha[i];
     }
 
-    mButtonZItemBaseAlpha = g_drawHIO.mButtonZItemBaseAlpha;
     mButtonBaseAlpha = g_drawHIO.mButtonBaseAlpha;
     mButtonATextSpacing = g_drawHIO.mButtonATextSpacing;
     mButtonCrossAlpha = g_drawHIO.mButtonCrossAlpha;
@@ -670,7 +671,7 @@ void dMeter2Draw_c::draw() {
 #if TARGET_PC
     if (!touchControlsEnabled) {
 #endif
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         if (mpItemXY[i] != NULL) {
             for (int j = 0; j < 3; j++) {
                 f32 temp_f30 = mItemParams[i].num_scale * 16.0f;
@@ -690,7 +691,7 @@ void dMeter2Draw_c::draw() {
         }
     }
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         mpKanteraMeter[i]->drawSelf();
     }
 
@@ -709,7 +710,7 @@ void dMeter2Draw_c::draw() {
                        g_drawHIO.mButtonBPikariAnimSpeed, field_0x75a);
         }
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             if (field_0x620[i] > 0.0f) {
                 drawPikari(mpBTextXY[i], &field_0x620[i], g_drawHIO.mButtonXYPikariScale,
                            g_drawHIO.mButtonXYPikariFrontOuter, g_drawHIO.mButtonXYPikariFrontInner,
@@ -1079,12 +1080,12 @@ void dMeter2Draw_c::initButton() {
         }
     }
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         field_0x773[i] = dMeter2Info_isDirectUseItem(i);
         field_0x76c[i] = 0;
 
         for (int j = 0; j < 2; j++) {
-            for (int k = 0; k < 2; k++) {
+            for (int k = 0; k < 3; k++) {
                 mpItemXYTex[i][j][k] = (ResTIMG*)heap->alloc(0xC00, 0x20);
                 JUT_ASSERT(0, mpItemXYTex[i][j][k] != NULL);
             }
@@ -1122,6 +1123,11 @@ void dMeter2Draw_c::initButton() {
     JUT_ASSERT(0, mpItemXY[1] != NULL);
     mpItemXY[1]->getPanePtr()->setBasePosition(J2DBasePosition_4);
     dMeter2Info_setMeterItemPanePtr(1, mpItemXY[1]);
+
+    mpItemXY[2] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('r_itm_p'), 0, NULL);
+    JUT_ASSERT(0, mpItemXY[2] != NULL);
+    mpItemXY[2]->getPanePtr()->setBasePosition(J2DBasePosition_4);
+    dMeter2Info_setMeterItemPanePtr(2, mpItemXY[2]);
 
     mpItemR = NULL;
     mpBTextA = NULL;
@@ -1232,6 +1238,7 @@ void dMeter2Draw_c::initButton() {
 
     mpTextXY[0]->hide();
     mpTextXY[1]->hide();
+    mpTextXY[2]->hide();
 
     mpButtonParent = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('cont_n'), 2, NULL);
     JUT_ASSERT(0, mpButtonParent != NULL);
@@ -1264,7 +1271,7 @@ void dMeter2Draw_c::initButton() {
 
     ResTIMG* timg = (ResTIMG*)dComIfGp_getMain2DArchive()->getResource(
         'TIMG', dMeter2Info_getNumberTextureName(0));
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             mpItemNumTex[i][j] = JKR_NEW J2DPicture(timg);
             JUT_ASSERT(0, mpItemNumTex[i][j] != NULL);
@@ -1298,6 +1305,7 @@ void dMeter2Draw_c::initButton() {
 
     drawButtonXY(0, dComIfGp_getSelectItem(0), dComIfGp_getXStatus(), true, false);
     drawButtonXY(1, dComIfGp_getSelectItem(1), dComIfGp_getYStatus(), true, false);
+    drawButtonXY(2, dComIfGp_getSelectItem(2), dComIfGp_getZStatus(), true, false);
     drawButtonA(dComIfGp_getDoStatus(), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, false, false);
     drawButtonB(dComIfGp_getAStatus(), true, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, false);
     drawButtonR(dComIfGs_getCollectSmell(), dComIfGp_getRStatus(), true, false);
@@ -1325,6 +1333,8 @@ void dMeter2Draw_c::initButtonCross() {
     static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju2')))->setString(0x40, "");
     static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju3')))->setString(0x40, "");
     static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju4')))->setString(0x40, "");
+
+    mpButtonCrossParent->getPanePtr()->appendChild(mpButtonMidona->mPane);
 
     dMeter2Info_getString(
         0x61, static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju0')))->getStringPtr(), NULL);
@@ -2527,7 +2537,7 @@ void dMeter2Draw_c::drawButtonB(u8 i_action, bool param_1, f32 i_posX, f32 i_pos
 }
 
 void dMeter2Draw_c::drawButtonR(u8 unused0, u8 i_action, bool unused1, bool unused2) {
-    mpScreen->search(MULTI_CHAR('item_r_n'))->hide();
+    // mpScreen->search(MULTI_CHAR('item_r_n'))->hide();
     mpTextXY[2]->show();
 
     getActionString(i_action, 1, &field_0x768[2]);
@@ -2544,16 +2554,17 @@ void dMeter2Draw_c::drawButtonZ(u8 i_action) {
     }
 
     if (i_action == 0x27) {
-        mpTextXY[2]->hide();
+        // mpTextXY[2]->hide();
         mpButtonMidona->hide();
     } else if (*mp_string != 0 && i_action != 0x2F && i_action != 8) {
-        mpTextXY[2]->show();
+        // mpTextXY[2]->show();
         mpButtonMidona->hide();
     } else {
-        mpTextXY[2]->hide();
+        // mpTextXY[2]->hide();
         mpButtonMidona->show();
     }
 
+    /**
     JUT_ASSERT(0, strlen(mp_string) < (64));
 
     for (int i = 0; i < 5; i++) {
@@ -2572,6 +2583,7 @@ void dMeter2Draw_c::drawButtonZ(u8 i_action) {
 
     mpTextXY[2]->scale(g_drawHIO.mButtonZFontScale, g_drawHIO.mButtonZFontScale);
     mpTextXY[2]->paneTrans(g_drawHIO.mButtonZFontPosX, g_drawHIO.mButtonZFontPosY);
+    **/
 }
 
 void dMeter2Draw_c::drawButton3D(u8 i_action) {
@@ -2614,7 +2626,7 @@ void dMeter2Draw_c::drawButtonBin(u8 i_action) {
 void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_3, bool param_4) {
     JUT_ASSERT(0, i_no < SELECT_MAX_e);
 
-    static u64 const tag[] = {MULTI_CHAR('item_x_n'), MULTI_CHAR('item_y_n')};
+    static u64 const tag[] = {MULTI_CHAR('item_x_n'), MULTI_CHAR('item_y_n'), MULTI_CHAR('item_r_n')};
 
     if (!param_3) {
         mpScreen->search(tag[i_no])->hide();
@@ -2624,6 +2636,8 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
             var_r26 = dComIfGp_isXSetFlag(2) | dComIfGp_isXSetFlag(4);
         } else if (i_no == SELECT_Y_e) {
             var_r26 = dComIfGp_isYSetFlag(2) | dComIfGp_isYSetFlag(4);
+        } else if (i_no == SELECT_Z_e) {
+            var_r26 = dComIfGp_isZSetFlag(2) | dComIfGp_isZSetFlag(4);
         }
 
         char* mp_string = getActionString(i_action, 1, &field_0x768[i_no]);
@@ -2666,7 +2680,11 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
         } else if (i_no == SELECT_Y_e) {
             mpTextXY[i_no]->scale(g_drawHIO.mButtonXYTextScale, g_drawHIO.mButtonXYTextScale);
             mpTextXY[i_no]->paneTrans(g_drawHIO.mButtonXYTextPosX, g_drawHIO.mButtonXYTextPosY);
+        } else if (i_no == SELECT_Z_e) {
+            mpTextXY[i_no]->scale(g_drawHIO.mButtonXYTextScale, g_drawHIO.mButtonXYTextScale);
+            mpTextXY[i_no]->paneTrans(g_drawHIO.mButtonXYTextPosX, g_drawHIO.mButtonXYTextPosY);
         }
+
     } else {
         mpScreen->search(tag[i_no])->show();
         mpTextXY[i_no]->hide();
@@ -2750,6 +2768,34 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
             mpLightXY[1]->paneTrans(g_drawHIO.mButtonYItemBasePosX[var_r29],
                                     g_drawHIO.mButtonYItemBasePosY[var_r29]);
             mpLightXY[1]->setAlphaRate(mButtonYItemBaseAlpha[var_r29] * field_0x7f0);
+
+            mpTextXY[i_no]->scale(g_drawHIO.mButtonXYTextScale, g_drawHIO.mButtonXYTextScale);
+            mpTextXY[i_no]->paneTrans(g_drawHIO.mButtonXYTextPosX, g_drawHIO.mButtonXYTextPosY);
+        } else if (i_no == SELECT_Z_e) {
+            mpButtonXY[2]->scale(g_drawHIO.mButtonZScale, g_drawHIO.mButtonZScale);
+            mpButtonXY[2]->paneTrans(g_drawHIO.mButtonZPosX, g_drawHIO.mButtonZPosY);
+            f32 temp_f31 = mItemParams[SELECT_Z_e].scale;
+
+            if (field_0x773[2] != dMeter2Info_isDirectUseItem(2)) {
+                field_0x773[2] = dMeter2Info_isDirectUseItem(2);
+
+                if (dMeter2Info_isDirectUseItem(2) && field_0x610[2] == 0.0f) {
+                    field_0x610[2] = 18.0f - g_drawHIO.field_0x4e0;
+                }
+            }
+
+            dMeter2Info_isDirectUseItem(2);
+
+            temp_f31 *= g_drawHIO.field_0x54c;
+            mpItemXY[2]->scale(temp_f31, temp_f31);
+            mpItemXY[2]->paneTrans(mItemParams[SELECT_Z_e].pos_x + field_0x6ac[2],
+                                   mItemParams[SELECT_Z_e].pos_y + field_0x6b8[2]);
+
+            mpLightXY[2]->scale(g_drawHIO.mButtonZItemBaseScale[var_r29],
+                                g_drawHIO.mButtonZItemBaseScale[var_r29]);
+            mpLightXY[2]->paneTrans(g_drawHIO.mButtonZItemBasePosX[var_r29],
+                                    g_drawHIO.mButtonZItemBasePosY[var_r29]);
+            mpLightXY[2]->setAlphaRate(mButtonZItemBaseAlpha[var_r29] * field_0x7f0);
 
             mpTextXY[i_no]->scale(g_drawHIO.mButtonXYTextScale, g_drawHIO.mButtonXYTextScale);
             mpTextXY[i_no]->paneTrans(g_drawHIO.mButtonXYTextPosX, g_drawHIO.mButtonXYTextPosY);
@@ -2919,20 +2965,27 @@ void dMeter2Draw_c::setAlphaButtonChange(bool param_0) {
         field_0x80c = g_drawHIO.field_0x168;
     }
 
+    /**
     if (field_0x810 != g_drawHIO.mButtonZAlpha || param_0) {
         field_0x810 = g_drawHIO.mButtonZAlpha;
         set_buttonZ = true;
     }
+    **/
+
+    if (mButtonZAlpha != g_drawHIO.mButtonZAlpha || param_0) {
+        mButtonZAlpha = g_drawHIO.mButtonZAlpha;
+        set_buttonZ = true;
+    }
 
     int sp44[4];
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         if (mpTextXY[i]->isVisible()) {
             sp44[i] = 0;
         } else {
             sp44[i] = 1;
         }
     }
-    sp44[2] = 0;
+    // sp44[2] = 0;
     sp44[3] = 0;
 
     if (mItemBBaseAlpha[sp44[3]] != g_drawHIO.mItemBBaseAlpha[sp44[3]] || param_0) {
@@ -2949,8 +3002,8 @@ void dMeter2Draw_c::setAlphaButtonChange(bool param_0) {
         set_buttonYItem = true;
     }
 
-    if (mButtonZItemBaseAlpha != g_drawHIO.mButtonZItemBaseAlpha || param_0) {
-        mButtonZItemBaseAlpha = g_drawHIO.mButtonZItemBaseAlpha;
+    if (mButtonZItemBaseAlpha[sp44[2]] != g_drawHIO.mButtonZItemBaseAlpha[sp44[2]] || param_0) {
+        mButtonZItemBaseAlpha[sp44[2]] = g_drawHIO.mButtonZItemBaseAlpha[sp44[2]];
         set_buttonZItem = true;
     }
 
@@ -2980,7 +3033,7 @@ void dMeter2Draw_c::setAlphaButtonChange(bool param_0) {
     }
 
     if (set_parent || set_buttonZ || param_0) {
-        mpButtonXY[2]->setAlphaRate(field_0x810 * field_0x7f0);
+        mpButtonXY[2]->setAlphaRate(mButtonZAlpha * field_0x7f0);
     }
 
     if (set_parent || set_buttonXItem || param_0) {
@@ -2991,12 +3044,14 @@ void dMeter2Draw_c::setAlphaButtonChange(bool param_0) {
         mpLightXY[1]->setAlphaRate(mButtonYItemBaseAlpha[sp44[1]] * field_0x7f0);
     }
 
+    /**
     if (set_parent || param_0) {
         mpLightXY[2]->setAlphaRate(field_0x82c[sp44[2]] * field_0x7f0);
     }
+    **/
 
     if (set_parent || set_buttonZItem || param_0) {
-        mpLightXY[2]->setAlphaRate(mButtonZItemBaseAlpha * field_0x7f0);
+        mpLightXY[2]->setAlphaRate(mButtonZItemBaseAlpha[sp44[2]] * field_0x7f0);
     }
 
     if (mpUzu != NULL && (set_parent || set_buttonBase || param_0)) {
@@ -3356,6 +3411,7 @@ void dMeter2Draw_c::setButtonIconAlpha(int i_no, u8 unused0, u32 unused1, bool u
         } else {
             var_f2 =
                 g_drawHIO.mButtonZAlpha * (g_drawHIO.mParentAlpha * g_drawHIO.mMainHUDButtonsAlpha);
+            var_f30 = g_drawHIO.mButtonZItemBaseAlpha[var_r26];
         }
 
         u8 var_r28 = mpItemXY[i_no]->getInitAlpha();
@@ -3385,6 +3441,17 @@ void dMeter2Draw_c::setButtonIconAlpha(int i_no, u8 unused0, u32 unused1, bool u
                 var_r27 = g_drawHIO.mButtonXYItemDimAlpha;
                 var_r26_2 = g_drawHIO.mButtonXYBaseDimAlpha;
             }
+        } else if (i_no == 2) {
+            if (!dMeter2Info_isUseButton(0x800)) {
+                if (getFishingType()) {
+                    var_r28 = 0;
+                } else {
+                    var_r28 = g_drawHIO.mButtonXYItemDimAlpha;
+                }
+
+                var_r27 = g_drawHIO.mButtonXYItemDimAlpha;
+                var_r26_2 = g_drawHIO.mButtonXYBaseDimAlpha;
+            }
         }
 
         mpItemXY[i_no]->setAlpha((f32)var_r28 * temp_f31);
@@ -3398,6 +3465,10 @@ void dMeter2Draw_c::setButtonIconAlpha(int i_no, u8 unused0, u32 unused1, bool u
             }
         } else if (i_no == 1) {
             if (!dMeter2Info_isUseButton(8)) {
+                var_r26_3 = 0;
+            }
+        } else if (i_no == 2) {
+            if (!dMeter2Info_isUseButton(0x800)) {
                 var_r26_3 = 0;
             }
         }
@@ -3537,7 +3608,7 @@ void dMeter2Draw_c::changeTextureItemXY(int i_no, u8 i_itemNo) {
     if (dMeter2Info_readItemTexture(i_itemNo, mpItemXYTex[i_no][field_0x76c[i_no]][0],
                                     (J2DPicture*)mpItemXY[i_no]->getPanePtr(),
                                     mpItemXYTex[i_no][field_0x76c[i_no]][1], mpItemXYPane[i_no],
-                                    NULL, NULL, NULL, NULL, -1) <= 1)
+                                    mpItemXYTex[i_no][field_0x76c[i_no]][2], NULL, NULL, NULL, -1) <= 1)
     {
         mpItemXYPane[i_no]->hide();
     } else {
@@ -3565,9 +3636,12 @@ void dMeter2Draw_c::changeTextureItemXY(int i_no, u8 i_itemNo) {
     if (i_no == SELECT_X_e) {
         mpItemXY[i_no]->paneTrans(mItemParams[SELECT_X_e].pos_x + field_0x6ac[i_no],
                                   mItemParams[SELECT_X_e].pos_y + field_0x6b8[i_no]);
-    } else {
+    } else if (i_no == SELECT_Y_e) {
         mpItemXY[i_no]->paneTrans(mItemParams[SELECT_Y_e].pos_x + field_0x6ac[i_no],
                                   mItemParams[SELECT_Y_e].pos_y + field_0x6b8[i_no]);
+    } else {
+        mpItemXY[i_no]->paneTrans(mItemParams[SELECT_Z_e].pos_x + field_0x6ac[i_no],
+                                  mItemParams[SELECT_Z_e].pos_y + field_0x6b8[i_no]);
     }
 
     mpItemXYPane[i_no]->resize(field_0x6c4[i_no], field_0x6d0[i_no]);
