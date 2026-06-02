@@ -505,7 +505,7 @@ dMenu_Ring_c::~dMenu_Ring_c() {
     dMeter2Info_setItemExplainWindowStatus(0);
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 3; j++) {
-            for (int k = 0; k < 2; k++) {
+            for (int k = 0; k < 3; k++) {
                 mpHeap->free(mpSelectItemTexBuf[i][j][k]);
                 mpSelectItemTexBuf[i][j][k] = NULL;
             }
@@ -664,6 +664,7 @@ void dMenu_Ring_c::_draw() {
             mRingAlpha = ringAlpha;
             mpCircle->setAlphaRate(mRingAlpha);
         }
+        // Something might need to go here to fix a crash, not sure
         mpCenterParent->setAlphaRate(mAlphaRate);
         mpCenterScreen->draw(mCenterPosX, mCenterPosY, grafPort);
         drawItem();
@@ -1040,6 +1041,7 @@ void dMenu_Ring_c::setItem() {
 
     u8 mixItemIndex0 = dComIfGs_getMixItemIndex(0);
     u8 mixItemIndex1 = dComIfGs_getMixItemIndex(1);
+    u8 mixItemIndex2 = dComIfGs_getMixItemIndex(2); // todo: extend this to support combos on Z(?)
 
     for (int i = 0; i < 4; i++) {
         setSelectItemForce(i);
@@ -1118,7 +1120,7 @@ void dMenu_Ring_c::setItem() {
     field_0x6b4[3] = uVar4;
     field_0x6b8[0] = mixItemIndex0;
     field_0x6b8[1] = mixItemIndex1;
-    field_0x6b8[2] = dItemNo_NONE_e;
+    field_0x6b8[2] = mixItemIndex2;
     field_0x6b8[3] = dItemNo_NONE_e;
     field_0x6cd = dItemNo_NONE_e;
     setJumpItem(true);
@@ -1153,6 +1155,7 @@ void dMenu_Ring_c::setJumpItem(bool i_useVibrationM) {
     if (field_0x6b3 == 0) {
         field_0x538[0] = g_ringHIO.mSelectItemScale;
         field_0x538[1] = g_ringHIO.mUnselectItemScale;
+        field_0x538[2] = g_ringHIO.mUnselectItemScale;
         if (field_0x6b4[0] != dComIfGs_getSelectItemIndex(0) ||
             field_0x6b8[0] != dComIfGs_getMixItemIndex(0))
         {
@@ -1164,6 +1167,7 @@ void dMenu_Ring_c::setJumpItem(bool i_useVibrationM) {
     } else if (field_0x6b3 == 1) {
         field_0x538[0] = g_ringHIO.mUnselectItemScale;
         field_0x538[1] = g_ringHIO.mSelectItemScale;
+        field_0x538[2] = g_ringHIO.mUnselectItemScale;
         if (field_0x6b4[1] != dComIfGs_getSelectItemIndex(1) ||
             field_0x6b8[1] != dComIfGs_getMixItemIndex(1))
         {
@@ -1174,7 +1178,8 @@ void dMenu_Ring_c::setJumpItem(bool i_useVibrationM) {
         }
     } else if (field_0x6b3 == 2) {
         field_0x538[0] = g_ringHIO.mUnselectItemScale;
-        field_0x538[1] = g_ringHIO.mSelectItemScale;
+        field_0x538[1] = g_ringHIO.mUnselectItemScale;
+        field_0x538[2] = g_ringHIO.mSelectItemScale;
         if (field_0x6b4[2] != dComIfGs_getSelectItemIndex(2) ||
             field_0x6b8[2] != dComIfGs_getMixItemIndex(2))
         {
@@ -1336,6 +1341,7 @@ void dMenu_Ring_c::setMixItem() {
     bool bVar1 = false;
     u8 selectItemIndex0 = dComIfGs_getSelectItemIndex(0);
     u8 selectItemIndex1 = dComIfGs_getSelectItemIndex(1);
+    u8 selectItemIndex2 = dComIfGs_getSelectItemIndex(2);
     u8 local_28[4] = {dItemNo_NONE_e, dItemNo_NONE_e, dItemNo_NONE_e, dItemNo_NONE_e};
 
     if (dComIfGs_getMixItemIndex(0) == SLOT_4 &&
@@ -1360,6 +1366,15 @@ void dMenu_Ring_c::setMixItem() {
         field_0x6b3 = 1;
         field_0x6cd = 1;
         bVar1 = true;
+    } else if (dComIfGs_getMixItemIndex(2) == 4 &&
+               mItemSlots[mCurrentSlot] == dComIfGs_getSelectItemIndex(2)) {
+        Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_COMBINE_OFF, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        field_0x6cb = selectItemIndex2;
+        selectItemIndex2 = 4;
+        local_28[2] = getCursorPos(4);
+        field_0x6b8[2] = 0xff;
+        field_0x6b3 = 2;
+        field_0x6cd = 2;
     } else {
         switch (item) {
         case dItemNo_NORMAL_BOMB_e:
@@ -1380,6 +1395,9 @@ void dMenu_Ring_c::setMixItem() {
                 if (selectItemIndex1 == mItemSlots[mCurrentSlot]) {
                     selectItemIndex1 = 0xff;
                     mYButtonSlot = 0xff;
+                } else if (selectItemIndex2 == mItemSlots[mCurrentSlot]) {
+                    selectItemIndex2 = 0xff;
+                    mZButtonSlot = 0xff;
                 }
             } else if ((dComIfGs_getSelectItemIndex(1) == 4 &&
                         dComIfGs_getMixItemIndex(1) == dItemNo_NONE_e) ||
@@ -1396,6 +1414,28 @@ void dMenu_Ring_c::setMixItem() {
                 if (selectItemIndex0 == mItemSlots[mCurrentSlot]) {
                     selectItemIndex0 = 0xff;
                     mXButtonSlot = 0xff;
+                } else if (selectItemIndex2 == mItemSlots[mCurrentSlot]) {
+                    selectItemIndex2 = 0xff;
+                    mZButtonSlot = 0xff;
+                }
+            } else if ((dComIfGs_getSelectItemIndex(2) == 4 &&
+                        dComIfGs_getMixItemIndex(2) == dItemNo_NONE_e) ||
+                       dComIfGs_getMixItemIndex(2) == 4)
+            {
+                Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_COMBINE_ON, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                         -1.0f, 0);
+                selectItemIndex2 = mItemSlots[mCurrentSlot];
+                field_0x6b8[2] = 4;
+                field_0x6b3 = 2;
+                mZButtonSlot = mCurrentSlot;
+                field_0x6cd = 0xff;
+                bVar1 = true;
+                if (selectItemIndex0 == mItemSlots[mCurrentSlot]) {
+                    selectItemIndex0 = 0xff;
+                    mXButtonSlot = 0xff;
+                } else if (selectItemIndex1 == mItemSlots[mCurrentSlot]) {
+                    selectItemIndex1 = 0xff;
+                    mYButtonSlot = 0xff;
                 }
             }
             break;
@@ -1404,12 +1444,16 @@ void dMenu_Ring_c::setMixItem() {
     if (bVar1) {
         field_0x6b4[0] = selectItemIndex0;
         field_0x6b4[1] = selectItemIndex1;
+        field_0x6b4[2] = selectItemIndex2;
         setJumpItem(false);
         if (local_28[0] != dItemNo_NONE_e) {
             mXButtonSlot = local_28[0];
         }
         if (local_28[1] != dItemNo_NONE_e) {
             mYButtonSlot = local_28[1];
+        }
+        if (local_28[2] != dItemNo_NONE_e) {
+            mZButtonSlot = local_28[2];
         }
     }
 }
@@ -1887,6 +1931,16 @@ bool dMenu_Ring_c::checkExplainForce() {
             local_18[1] = dItemNo_HAWK_ARROW_e;
             break;
         }
+        switch (item2) {
+        case dItemNo_NORMAL_BOMB_e:
+        case dItemNo_WATER_BOMB_e:
+        case dItemNo_POKE_BOMB_e:
+            local_18[2] = dItemNo_BOMB_ARROW_e;
+            break;
+        case dItemNo_HAWK_EYE_e:
+            local_18[2] = dItemNo_HAWK_ARROW_e;
+            break;
+        }
         break;
     case dItemNo_NORMAL_BOMB_e:
     case dItemNo_WATER_BOMB_e:
@@ -1895,6 +1949,8 @@ bool dMenu_Ring_c::checkExplainForce() {
             local_18[0] = dItemNo_BOMB_ARROW_e;
         } else if (item1 == dItemNo_BOW_e) {
             local_18[1] = dItemNo_BOMB_ARROW_e;
+        } else if (item2 == dItemNo_BOW_e) {
+            local_18[2] = dItemNo_BOMB_ARROW_e;
         }
         break;
     case dItemNo_HAWK_EYE_e:
@@ -1902,6 +1958,8 @@ bool dMenu_Ring_c::checkExplainForce() {
             local_18[0] = dItemNo_HAWK_ARROW_e;
         } else if (item1 == dItemNo_BOW_e) {
             local_18[1] = dItemNo_HAWK_ARROW_e;
+        } else if (item2 == dItemNo_BOW_e) {
+            local_18[2] = dItemNo_HAWK_ARROW_e;
         }
         break;
     case dItemNo_BEE_CHILD_e:
@@ -1909,6 +1967,8 @@ bool dMenu_Ring_c::checkExplainForce() {
             local_18[0] = dItemNo_BEE_ROD_e;
         } else if (item1 == dItemNo_FISHING_ROD_1_e) {
             local_18[1] = dItemNo_BEE_ROD_e;
+        } else if (item2 == dItemNo_FISHING_ROD_1_e) {
+            local_18[2] = dItemNo_BEE_ROD_e;
         }
         break;
     case dItemNo_WORM_e:
@@ -1916,6 +1976,8 @@ bool dMenu_Ring_c::checkExplainForce() {
             local_18[0] = dItemNo_WORM_ROD_e;
         } else if (item1 == dItemNo_FISHING_ROD_1_e) {
             local_18[1] = dItemNo_WORM_ROD_e;
+        } else if (item2 == dItemNo_FISHING_ROD_1_e) {
+            local_18[2] = dItemNo_WORM_ROD_e;
         }
         break;
     case dItemNo_ZORAS_JEWEL_e:
@@ -1923,6 +1985,8 @@ bool dMenu_Ring_c::checkExplainForce() {
             local_18[0] = dItemNo_JEWEL_ROD_e;
         } else if (item1 == dItemNo_FISHING_ROD_1_e) {
             local_18[1] = dItemNo_JEWEL_ROD_e;
+        } else if (item2 == dItemNo_FISHING_ROD_1_e) {
+            local_18[2] = dItemNo_JEWEL_ROD_e;
         }
         break;
     case dItemNo_FISHING_ROD_1_e:
@@ -1938,6 +2002,12 @@ bool dMenu_Ring_c::checkExplainForce() {
             local_18[0] = dItemNo_WORM_ROD_e;
         } else if (item1 == dItemNo_WORM_e) {
             local_18[1] = dItemNo_WORM_ROD_e;
+        } else if (item2 == dItemNo_BEE_CHILD_e) {
+            local_18[2] = dItemNo_BEE_ROD_e;
+        } else if (item2 == dItemNo_ZORAS_JEWEL_e) {
+            local_18[2] = dItemNo_JEWEL_ROD_e;
+        } else if (item2 == dItemNo_WORM_e) {
+            local_18[2] = dItemNo_WORM_ROD_e;
         }
         break;
     }
@@ -1955,6 +2025,12 @@ bool dMenu_Ring_c::checkExplainForce() {
         field_0x6c7[0] = dItemNo_NONE_e;
         field_0x6c7[1] = local_18[1];
         field_0x6c7[2] = dItemNo_NONE_e;
+        field_0x6c7[3] = dItemNo_NONE_e;
+    } else if (local_18[0] == dItemNo_NONE_e && local_18[1] == dItemNo_NONE_e
+                && local_18[2] != dItemNo_NONE_e && local_18[3] == dItemNo_NONE_e && dComIfGs_getMixItemIndex(2) == dItemNo_NONE_e) {
+        field_0x6c7[0] = dItemNo_NONE_e;
+        field_0x6c7[1] = dItemNo_NONE_e;
+        field_0x6c7[2] = local_18[2];
         field_0x6c7[3] = dItemNo_NONE_e;
     } else {
         field_0x6c7[0] = dItemNo_NONE_e;
@@ -2077,6 +2153,11 @@ bool dMenu_Ring_c::isMixItemOn() {
             {
                 return true;
             }
+            if (dComIfGs_getSelectItemIndex(2) == SLOT_4 && dComIfGs_getMixItemIndex(2) == dItemNo_NONE_e ||
+                dComIfGs_getMixItemIndex(2) == SLOT_4)
+            {
+                return true;
+            }
             break;
         }
     }
@@ -2092,6 +2173,11 @@ bool dMenu_Ring_c::isMixItemOff() {
         }
         if ((dComIfGs_getMixItemIndex(1) == SLOT_4) &&
             (mItemSlots[mCurrentSlot] == dComIfGs_getSelectItemIndex(1)))
+        {
+            return 1;
+        }
+        if (dComIfGs_getMixItemIndex(2) == SLOT_4 &&
+            mItemSlots[mCurrentSlot] == dComIfGs_getSelectItemIndex(2))
         {
             return 1;
         }

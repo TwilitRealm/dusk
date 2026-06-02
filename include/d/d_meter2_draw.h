@@ -18,7 +18,7 @@ public:
         SELECT_X_e,
         SELECT_Y_e,
         SELECT_Z_e,
-        SELECT_MAX_e = 2,
+        SELECT_MAX_e = 3,
     };
 
     struct item_params {
@@ -163,7 +163,7 @@ private:
     /* 0x084 */ J2DPicture* mpItemNumTex[3][3];
     /* 0x09C */ CPaneMgr* field_0x9c[3];
     /* 0x0A8 */ int field_0xa8;
-    /* 0x0AC */ dKantera_icon_c* mpKanteraMeter[2];
+    /* 0x0AC */ dKantera_icon_c* mpKanteraMeter[3];
     /* 0x0B4 */ u8 field_0xb4[8];
     /* 0x0BC */ CPaneMgr* mpParent;
     /* 0x0C0 */ CPaneMgr* mpAText[5];
@@ -196,7 +196,7 @@ private:
     /* 0x318 */ CPaneMgr* mpLightB;
     /* 0x31C */ CPaneMgr* mpLightXY[3];
     /* 0x328 */ CPaneMgr* mpItemB;
-    /* 0x32C */ CPaneMgr* mpItemXY[2];
+    /* 0x32C */ CPaneMgr* mpItemXY[3];
     /* 0x334 */ CPaneMgr* mpItemR;
     /* 0x338 */ CPaneMgr* mpBTextA;
     /* 0x33C */ CPaneMgr* mpBTextB;
@@ -217,7 +217,7 @@ private:
     /* 0x4B8 */ CPaneMgrAlpha* mpUzu;
     /* 0x4BC */ u8 field_0x4bc[0x28];
     /* 0x4E4 */ ResTIMG* mpItemBTex[2][2];
-    /* 0x4F4 */ ResTIMG* mpItemXYTex[2][2][2];
+    /* 0x4F4 */ ResTIMG* mpItemXYTex[3][2][3];
     /* 0x514 */ J2DPicture* mpItemBPane;
     /* 0x518 */ J2DPicture* mpItemXYPane[3];
     /* 0x524 */ int field_0x524[2][2];
@@ -302,13 +302,13 @@ private:
     /* 0x767 */ u8 field_0x767;
     /* 0x768 */ u8 field_0x768[3];
     /* 0x76B */ u8 field_0x76b;
-    /* 0x76C */ u8 field_0x76c[2];
+    /* 0x76C */ u8 field_0x76c[3];
     /* 0x76E */ u8 field_0x76e;
     /* 0x76F */ u8 mButtonBItem;
     /* 0x770 */ u8 field_0x770;
     /* 0x771 */ u8 field_0x771;
     /* 0x772 */ u8 field_0x772;
-    /* 0x773 */ u8 field_0x773[2];
+    /* 0x773 */ u8 field_0x773[3];
     /* 0x778 */ f32 mParentScale;
     /* 0x77C */ f32 mParentAlpha;
     /* 0x780 */ f32 mButtonsPosX;
@@ -352,7 +352,7 @@ private:
     /* 0x81C */ f32 mButtonXItemBaseAlpha[2];
     /* 0x824 */ f32 mButtonYItemBaseAlpha[2];
     /* 0x82C */ f32 field_0x82c[2];
-    /* 0x834 */ f32 mButtonZItemBaseAlpha;
+    /* 0x834 */ f32 mButtonZItemBaseAlpha[2];
     /* 0x838 */ f32 mButtonBaseAlpha;
     /* 0x83C */ f32 mButtonATextSpacing;
     /* 0x840 */ f32 mButtonCrossAlpha;

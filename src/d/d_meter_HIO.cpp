@@ -1856,6 +1856,16 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
     mButtonYItemBasePosY[1] = 0.0f;
     mButtonYItemBaseAlpha[1] = 0.5f;
 
+    mButtonZItemBaseScale[0] = 1.5f;
+    mButtonZItemBasePosX[0] = 16.0f;
+    mButtonZItemBasePosY[0] = -12.0f;
+    mButtonZItemBaseAlpha[0] = 0.0f;
+
+    mButtonZItemBaseScale[1] = 1.5f;
+    mButtonZItemBasePosX[1] = 0.0f;
+    mButtonZItemBasePosY[1] = 0.0f;
+    mButtonZItemBaseAlpha[1] = 0.5f;
+
     field_0x280 = 1.5f;
     field_0x288 = 0.0f;
     field_0x290 = 6.0f;
@@ -1865,11 +1875,6 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
     field_0x28c = 0.0f;
     field_0x294 = 4.0f;
     field_0x298[1] = 1.0f;
-
-    mButtonZItemBaseScale = 1.0f;
-    mButtonZItemBasePosX = 0.0f;
-    mButtonZItemBasePosY = 0.0f;
-    mButtonZItemBaseAlpha = 0.5f;
 
     mButtonBaseAlpha = 0.55f;
 
