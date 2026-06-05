@@ -698,24 +698,24 @@ public:
     /* 0x1C0 */ f32 mButtonYItemPosX;
     /* 0x1C4 */ f32 mButtonYItemPosY;
     /* 0x1C8 */ f32 mButtonYItemScale;
-    /* 0x1CC */ f32 field_0x1cc;
-    /* 0x1D0 */ f32 field_0x1d0;
-    /* 0x1D4 */ f32 field_0x1d4;
-    /* 0x1D8 */ f32 mButtonZItemPosX;
-    /* 0x1DC */ f32 mButtonZItemPosY;
-    /* 0x1E0 */ f32 mButtonZItemScale;
+    /* 0x1CC */ f32 mButtonZItemPosX; // These three fields actually control mButtonZItemScale
+    /* 0x1D0 */ f32 mButtonZItemPosY; // Renamed for clarity
+    /* 0x1D4 */ f32 mButtonZItemScale;
+    /* 0x1D8 */ f32 field_0x1d8; // These are just...misnamed?
+    /* 0x1DC */ f32 field_0x1dc; // ^ actually probably a holdover from Wind Waker
+    /* 0x1E0 */ f32 field_0x1e0;
     /* 0x1E4 */ f32 mButtonItemRotation[3];
     /* 0x1F0 */ f32 mXItemNumPosX;
     /* 0x1F4 */ f32 mYItemNumPosX;
-    /* 0x1F8 */ f32 field_0x1f8;
+    /* 0x1F8 */ f32 mZItemNumPosX;
     /* 0x1FC */ f32 mItemBNumPosX;
     /* 0x200 */ f32 mXItemNumPosY;
     /* 0x204 */ f32 mYItemNumPosY;
-    /* 0x208 */ f32 field_0x208;
+    /* 0x208 */ f32 mZItemNumPosY;
     /* 0x20C */ f32 mItemBNumPosY;
     /* 0x210 */ f32 mXItemNumScale;
     /* 0x214 */ f32 mYItemNumScale;
-    /* 0x218 */ f32 field_0x218;
+    /* 0x218 */ f32 mZItemNumScale;
     /* 0x21C */ f32 mItemBNumScale;
     /* 0x220 */ f32 mItemBBaseScale[2];
     /* 0x228 */ f32 mItemBBasePosX[2];

@@ -1799,9 +1799,9 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
     mButtonYItemPosY = 0.0f;
     mButtonYItemScale = 1.5f;
 
-    field_0x1cc = 0.0f;
-    field_0x1d0 = 0.0f;
-    field_0x1d4 = 1.0f;
+    mButtonZItemPosX = 2.0f;
+    mButtonZItemPosY = -7.0f;
+    mButtonZItemScale = 1.5f;
 
     mXItemNumPosX = -13.0f;
     mXItemNumPosY = -12.0f;
@@ -1811,9 +1811,9 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
     mYItemNumPosY = -18.0f;
     mYItemNumScale = 0.95f;
 
-    field_0x1f8 = 0.0f;
-    field_0x208 = 0.0f;
-    field_0x218 = 1.0f;
+    mZItemNumPosX = -6.0f;
+    mZItemNumPosY = -15.0f;
+    mZItemNumScale = 0.95f;
 
     mItemBNumPosX = 0.0f;
     mItemBNumPosY = 0.0f;
@@ -1823,9 +1823,9 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
         mButtonItemRotation[i] = 0.0f;
     }
 
-    mButtonZItemPosX = 0.0f;
-    mButtonZItemPosY = 0.0f;
-    mButtonZItemScale = 1.0f;
+    field_0x1d8 = 0.0f;
+    field_0x1dc = 0.0f;
+    field_0x1e0 = 1.0f;
 
     for (int i = 0; i < 2; i++) {
         mItemBBaseScale[i] = 1.0f;
@@ -2621,9 +2621,9 @@ void dMeter_drawHIO_c::genMessage(JORMContext* mctx) {
     mctx->genLabel("************************************", 0);
     mctx->genLabel("* 　　　　Ｚアイテムの調整　　　　 *", 0);
     mctx->genLabel("************************************", 0);
-    mctx->genSlider("位置調整Ｘ", &mButtonZItemPosX, -300.0f, 300.0f);
-    mctx->genSlider("位置調整Ｙ", &mButtonZItemPosY, -300.0f, 300.0f);
-    mctx->genSlider("拡大縮小", &mButtonZItemScale, 0.0f, 3.0f);
+    mctx->genSlider("位置調整Ｘ", &field_0x1d8, -300.0f, 300.0f);
+    mctx->genSlider("位置調整Ｙ", &field_0x1dc, -300.0f, 300.0f);
+    mctx->genSlider("拡大縮小", &field_0x1e0, 0.0f, 3.0f);
     mctx->genLabel("", 0);
     mctx->genLabel("************************************", 0);
     mctx->genLabel("*　　　Ｚアイテムベースの調整　　　*", 0);
