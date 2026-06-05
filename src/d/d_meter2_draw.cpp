@@ -1238,7 +1238,7 @@ void dMeter2Draw_c::initButtonCross() {
     static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju3')))->setString(0x40, "");
     static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju4')))->setString(0x40, "");
 
-    mpButtonCrossParent->getPanePtr()->appendChild(mpButtonMidona->mPane);
+    mpButtonCrossParent->getPanePtr()->appendChild(mpButtonMidona->mPane); // This ties Midna icon to the dpad, need to fix position
 
     dMeter2Info_getString(
         0x61, static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju0')))->getStringPtr(), NULL);
@@ -3750,13 +3750,13 @@ void dMeter2Draw_c::setItemParamY(u8 i_itemNo) {
 
 void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
     if (g_drawHIO.mButtonDebug[2]) {
-        mItemParams[SELECT_Z_e].pos_x = g_drawHIO.field_0x1cc;
-        mItemParams[SELECT_Z_e].pos_y = g_drawHIO.field_0x1d0;
-        mItemParams[SELECT_Z_e].scale = g_drawHIO.field_0x1d4;
+        mItemParams[SELECT_Z_e].pos_x = g_drawHIO.mButtonZItemPosX;
+        mItemParams[SELECT_Z_e].pos_y = g_drawHIO.mButtonZItemPosY;
+        mItemParams[SELECT_Z_e].scale = g_drawHIO.mButtonZItemScale;
         mItemParams[SELECT_Z_e].rotation = g_drawHIO.mButtonItemRotation[2];
-        mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.field_0x1f8;
-        mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.field_0x208;
-        mItemParams[SELECT_Z_e].num_scale = g_drawHIO.field_0x218;
+        mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.mZItemNumPosX;
+        mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.mZItemNumPosY;
+        mItemParams[SELECT_Z_e].num_scale = g_drawHIO.mZItemNumScale;
     } else {
         switch (i_itemNo) {
         case dItemNo_BOOMERANG_e:
@@ -3798,11 +3798,11 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
         case dItemNo_KANTERA_e:
             mItemParams[SELECT_Z_e].pos_x = -6.6f;
             mItemParams[SELECT_Z_e].pos_y = 6.6f;
-            mItemParams[SELECT_Z_e].scale = g_drawHIO.field_0x1d4;
+            mItemParams[SELECT_Z_e].scale = g_drawHIO.mButtonZItemScale;
             mItemParams[SELECT_Z_e].rotation = g_drawHIO.mButtonItemRotation[2];
-            mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.field_0x1f8;
-            mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.field_0x208;
-            mItemParams[SELECT_Z_e].num_scale = g_drawHIO.field_0x218;
+            mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.mZItemNumPosX;
+            mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.mZItemNumPosY;
+            mItemParams[SELECT_Z_e].num_scale = g_drawHIO.mZItemNumScale;
             break;
         default:
             if (isBottleItem(i_itemNo)) {
@@ -3810,17 +3810,17 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
                 mItemParams[SELECT_Z_e].pos_y = 17.0f;
                 mItemParams[SELECT_Z_e].scale = 1.888889f;
                 mItemParams[SELECT_Z_e].rotation = g_drawHIO.mButtonItemRotation[2];
-                mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.field_0x1f8;
-                mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.field_0x208;
-                mItemParams[SELECT_Z_e].num_scale = g_drawHIO.field_0x218;
+                mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.mZItemNumPosX;
+                mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.mZItemNumPosY;
+                mItemParams[SELECT_Z_e].num_scale = g_drawHIO.mZItemNumScale;
             } else {
-                mItemParams[SELECT_Z_e].pos_x = g_drawHIO.field_0x1cc;
-                mItemParams[SELECT_Z_e].pos_y = g_drawHIO.field_0x1d0;
-                mItemParams[SELECT_Z_e].scale = g_drawHIO.field_0x1d4;
+                mItemParams[SELECT_Z_e].pos_x = g_drawHIO.mButtonZItemPosX;
+                mItemParams[SELECT_Z_e].pos_y = g_drawHIO.mButtonZItemPosY;
+                mItemParams[SELECT_Z_e].scale = g_drawHIO.mButtonZItemScale;
                 mItemParams[SELECT_Z_e].rotation = g_drawHIO.mButtonItemRotation[2];
-                mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.field_0x1f8;
-                mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.field_0x208;
-                mItemParams[SELECT_Z_e].num_scale = g_drawHIO.field_0x218;
+                mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.mZItemNumPosX;
+                mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.mZItemNumPosY;
+                mItemParams[SELECT_Z_e].num_scale = g_drawHIO.mZItemNumScale;
             }
             break;
         }
