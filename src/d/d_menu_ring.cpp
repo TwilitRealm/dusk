@@ -1117,8 +1117,36 @@ void dMenu_Ring_c::setItem() {
             }
         }
     } else if (field_0x6b3 == 2) {
-        mZButtonSlot = mCurrentSlot;
-        uVar3 = mItemSlots[mZButtonSlot];
+        if (mItemSlots[mCurrentSlot] == dComIfGs_getSelectItemIndex(0)) {
+            u8 temp = dComIfGs_getSelectItemIndex(2);
+            uVar1 = temp;
+            mixItemIndex0 = dComIfGs_getMixItemIndex(2);
+            if (temp == dItemNo_NONE_e) {
+                mXButtonSlot = dItemNo_NONE_e;
+            } else {
+                mXButtonSlot = mZButtonSlot;
+            }
+            mZButtonSlot = mCurrentSlot;
+            uVar3 = mItemSlots[mZButtonSlot];
+            mixItemIndex2 = dItemNo_NONE_e;
+        } else {
+            if (dComIfGs_getMixItemIndex(0) == mItemSlots[mCurrentSlot]) {
+                uVar1 = dComIfGs_getSelectItemIndex(1);
+                mixItemIndex0 = dItemNo_NONE_e;
+                if (uVar1 == dItemNo_NONE_e) {
+                    mXButtonSlot = dItemNo_NONE_e;
+                } else {
+                    mXButtonSlot = mYButtonSlot;
+                }
+                mYButtonSlot = mCurrentSlot;
+                uVar3 = mItemSlots[mZButtonSlot];
+                mixItemIndex2 = dItemNo_NONE_e;
+            } else {
+                mYButtonSlot = mCurrentSlot;
+                uVar3 = mItemSlots[mZButtonSlot];
+                mixItemIndex2 = dItemNo_NONE_e;
+            }
+        }
     }
     field_0x6b4[0] = uVar1;
     field_0x6b4[1] = uVar2;
