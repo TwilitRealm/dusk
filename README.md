@@ -25,7 +25,7 @@ Main features:
 
 - Restart from the beginning of an area/dungeon upon death rather than beginning of a room (no toggle option yet)
   
-  >_Older games in the series already did this, which I thought would be an appropriate change given TP's already_
+  >_Older games in the series already did this, which I thought would be an appropriate change given TP's already piss easy difficulty_
 
 - Lose rupees on death
   
@@ -47,6 +47,18 @@ Planned features:
   >_The QOL feature that everybody asks for. This is what is taking the most time and attention right now because Nintendo devs were smoking crack when they made this game._
 
 - Whatever else I think of on a whim
+
+**INSTALLATION:**
+
+Windows: extract into its own folder and launch. If using the dusklight portable version, extract into your dusklight data folder.
+
+Linux: extract and launch the appimage from anywhere not protected.
+
+Android: Download, install, and launch.
+
+iOS: Sideload to iOS using iloader or something similar. For more detailed instructions, see Dusklight's official github.
+
+Mac: Not sure, don't have a Mac to test on. Extract and launch probably?
 
 #
 **ORIGINAL DUSKLIGHT README:**
