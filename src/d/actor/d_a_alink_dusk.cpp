@@ -103,8 +103,10 @@ void daAlink_c::handleQuickTransform() {
 
     // Ensure that the Z Button is not dimmed
     if (meterDrawPtr->getButtonZAlpha() != 1.f) {
-        Z2GetAudioMgr()->seStart(Z2SE_SYS_ERROR, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-        return;
+        if (!checkShieldCrouch() || !checkNoResetFlg2(FLG2_UNK_8000000)) {
+            Z2GetAudioMgr()->seStart(Z2SE_SYS_ERROR, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            return;
+        }
     }
 
     // The game will crash if trying to quick transform while holding the Ball and Chain
