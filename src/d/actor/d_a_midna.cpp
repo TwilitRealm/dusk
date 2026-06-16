@@ -3080,6 +3080,12 @@ static void* daMidna_searchNpc(fopAc_ac_c* i_actor, void* o_far) {
 }
 
 void daMidna_c::setMidnaNoDrawFlg() {
+#if TARGET_PC
+    if (dusk::getSettings().game.invisibleMidna) {
+        onStateFlg0(FLG0_NO_DRAW);
+        return;
+    }
+#endif
     if (
         (!checkStateFlg1((daMidna_FLG1)(FLG1_SHADOW_MODEL_DRAW_DEMO_FORCE | FLG1_UNK_1)) &&
         (!checkAppear() || !checkMidnaRealBody())) || daAlink_c::checkCloudSea()

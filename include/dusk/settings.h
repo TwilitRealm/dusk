@@ -172,6 +172,7 @@ struct UserSettings {
         ConfigVar<bool> enableDiscordPresence;
         ConfigVar<MenuScaling> menuScalingMode;
         ConfigVar<bool> wolfGear;
+        ConfigVar<bool> invisibleMidna;
 
         // Graphics
         ConfigVar<BloomMode> bloomMode;

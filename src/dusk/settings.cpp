@@ -60,6 +60,7 @@ UserSettings g_userSettings = {
         .enableDiscordPresence {"game.enableDiscordPresence", true},
         .menuScalingMode {"game.menuScalingMode", MenuScaling::Wii},
         .wolfGear {"game.wolfGear", false},
+        .invisibleMidna {"game.invisibleMidna", false},
 
         // Graphics
         .bloomMode {"game.bloomMode", BloomMode::Dusk},
@@ -308,6 +309,7 @@ void registerSettings() {
     Register(g_userSettings.game.enableLED[3]);
     Register(g_userSettings.game.swapDirectSelect);
     Register(g_userSettings.game.wolfGear);
+    Register(g_userSettings.game.invisibleMidna);
 
     Register(g_userSettings.backend.isoPath);
     Register(g_userSettings.backend.isoVerification);

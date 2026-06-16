@@ -1148,6 +1148,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Removes completed Owl Statue markers from the map and Minimap.");
         addOption("Always Show Gear As Wolf", getSettings().game.wolfGear,
             "Makes the sword and shield always visible on Wolf Link.");
+        addOption("Invisible Midna", getSettings().game.invisibleMidna,
+            "Hides Midna on Wolf Link's back.");
 
         leftPane.add_section("Difficulty");
         leftPane.register_control(
