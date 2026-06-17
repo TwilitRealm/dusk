@@ -146,7 +146,7 @@ void daAlink_c::handleQuickTransform() {
     procCoMetamorphoseInit();
 }
 
-bool daAlink_c::checkGyroAimContext() {
+bool daAlink_c::checkAimContext() {
     switch (mProcID) {
     case PROC_SUBJECTIVITY:
     case PROC_SWIM_SUBJECTIVITY:
@@ -175,5 +175,15 @@ bool daAlink_c::checkGyroAimContext() {
         return itemButton() && mItemVar0.field_0x3018 == 2;
     default:
         return false;
+    }
+}
+
+bool daAlink_c::checkAimInputContext() {
+    switch (mProcID) {
+    case PROC_HOOKSHOT_ROOF_WAIT:
+    case PROC_HOOKSHOT_WALL_WAIT:
+        return false;
+    default:
+        return checkAimContext();
     }
 }

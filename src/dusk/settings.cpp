@@ -11,6 +11,9 @@ UserSettings g_userSettings = {
         .enableFpsOverlay {"game.enableFpsOverlay", false},
         .fpsOverlayCorner {"game.fpsOverlayCorner", 0},
         .maxFrameRate {"video.maxFrameRate", 240},
+        .rememberWindowSize {"video.rememberWindowSize", false},
+        .lastWindowWidth {"video.lastWindowWidth", 0},
+        .lastWindowHeight {"video.lastWindowHeight", 0},
     },
 
     .audio = {
@@ -44,6 +47,7 @@ UserSettings g_userSettings = {
         .noMissClimbing {"game.noMissClimbing", false},
         .fastTears {"game.fastTears", false},
         .no2ndFishForCat {"game.no2ndFishForCat", false},
+        .buttonFishing {"game.buttonFishing", false},
         .instantSaves {"game.instantSaves", false},
         .instantText {"game.instantText", false},
         .sunsSong {"game.sunsSong", false},
@@ -53,6 +57,7 @@ UserSettings g_userSettings = {
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
         .minimalHUD {"game.minimalHUD", false},
+        .hudScale {"game.hudScale", 1.0f},
         .pauseOnFocusLost {"game.pauseOnFocusLost", false},
         .enableLinkDollRotation {"game.enableLinkDollRotation", false},
         .enableAchievementToasts {"game.enableAchievementToasts", true},
@@ -80,7 +85,6 @@ UserSettings g_userSettings = {
         .midnasLamentNonStop {"game.midnasLamentNonStop", false},
 
         // Input
-        .gyroMode {"game.gyroMode", GyroMode::Sensor},
         .enableGyroAim {"game.enableGyroAim", false},
         .enableGyroRollgoal {"game.enableGyroRollgoal", false},
         .gyroSensitivityX {"game.gyroSensitivityX", 1.0f},
@@ -90,7 +94,15 @@ UserSettings g_userSettings = {
         .gyroDeadband {"game.gyroDeadband", 0.04f},
         .gyroInvertPitch {"game.gyroInvertPitch", false},
         .gyroInvertYaw {"game.gyroInvertYaw", false},
+        .enableMouseCamera {"game.enableMouseCamera", false},
+        .enableMouseAim {"game.enableMouseAim", false},
+        .mouseAimSensitivity {"game.mouseAimSensitivity", 1.0f},
+        .mouseCameraSensitivity {"game.mouseCameraSensitivity", 1.0f},
+        .invertMouseY {"game.invertMouseY", false},
         .freeCamera {"game.freeCamera", false},
+        .enableTouchControls {"game.enableTouchControls", false},
+        .enableMenuPointer {"game.enableMenuPointer", true},
+        .touchControlsLayout {"game.touchControlsLayout", ui::ControlLayout{}},
         .invertCameraXAxis {"game.invertCameraXAxis", false},
         .invertCameraYAxis {"game.invertCameraYAxis", false},
         .invertFirstPersonXAxis {"game.invertFirstPersonXAxis", false},
@@ -99,6 +111,8 @@ UserSettings g_userSettings = {
         .invertAirSwimY {"game.invertAirSwimY", false},
         .freeCameraXSensitivity {"game.freeCameraXSensitivity", 1.0f},
         .freeCameraYSensitivity {"game.freeCameraYSensitivity", 1.0f},
+        .touchCameraXSensitivity {"game.touchCameraXSensitivity", 1.0f},
+        .touchCameraYSensitivity {"game.touchCameraYSensitivity", 1.0f},
         .debugFlyCam {"game.debugFlyCam", false},
         .debugFlyCamLockEvents {"game.debugFlyCamLockEvents", true},
         .allowBackgroundInput {"game.allowBackgroundInput", true},
@@ -126,7 +140,7 @@ UserSettings g_userSettings = {
         .canTransformAnywhere {"game.canTransformAnywhere", false},
         .fastRoll {"game.fastRoll", false},
         .fastSpinner {"game.fastSpinner", false},
-        .freeMagicArmor {"game.freeMagicArmor", false},
+        .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
         .invincibleEnemies {"game.invincibleEnemies", false},
 
         // Technical
@@ -172,6 +186,18 @@ UserSettings g_userSettings = {
             ActionBindConfigVar{"actionBindings.callMidna_port2", PAD_NATIVE_BUTTON_INVALID},
             ActionBindConfigVar{"actionBindings.callMidna_port3", PAD_NATIVE_BUTTON_INVALID},
         },
+        .openMapScreen {
+            ActionBindConfigVar{"actionBindings.openMapScreen_port0", PAD_NATIVE_BUTTON_INVALID},
+            ActionBindConfigVar{"actionBindings.openMapScreen_port1", PAD_NATIVE_BUTTON_INVALID},
+            ActionBindConfigVar{"actionBindings.openMapScreen_port2", PAD_NATIVE_BUTTON_INVALID},
+            ActionBindConfigVar{"actionBindings.openMapScreen_port3", PAD_NATIVE_BUTTON_INVALID},
+        },
+        .toggleMinimap {
+            ActionBindConfigVar{"actionBindings.toggleMinimap_port0", PAD_NATIVE_BUTTON_INVALID},
+            ActionBindConfigVar{"actionBindings.toggleMinimap_port1", PAD_NATIVE_BUTTON_INVALID},
+            ActionBindConfigVar{"actionBindings.toggleMinimap_port2", PAD_NATIVE_BUTTON_INVALID},
+            ActionBindConfigVar{"actionBindings.toggleMinimap_port3", PAD_NATIVE_BUTTON_INVALID},
+        },
         .openDusklightMenu {
             ActionBindConfigVar{"actionBindings.openDusklightMenu_port0", PAD_NATIVE_BUTTON_INVALID},
             ActionBindConfigVar{"actionBindings.openDusklightMenu_port1", PAD_NATIVE_BUTTON_INVALID},
@@ -199,6 +225,9 @@ void registerSettings() {
     Register(g_userSettings.video.enableFpsOverlay);
     Register(g_userSettings.video.fpsOverlayCorner);
     Register(g_userSettings.video.maxFrameRate);
+    Register(g_userSettings.video.rememberWindowSize);
+    Register(g_userSettings.video.lastWindowWidth);
+    Register(g_userSettings.video.lastWindowHeight);
 
     // Audio
     Register(g_userSettings.audio.masterVolume);
@@ -227,6 +256,7 @@ void registerSettings() {
     Register(g_userSettings.game.fastClimbing);
     Register(g_userSettings.game.fastTears);
     Register(g_userSettings.game.no2ndFishForCat);
+    Register(g_userSettings.game.buttonFishing);
     Register(g_userSettings.game.instantSaves);
     Register(g_userSettings.game.instantText);
     Register(g_userSettings.game.sunsSong);
@@ -241,7 +271,10 @@ void registerSettings() {
     Register(g_userSettings.game.invertAirSwimY);
     Register(g_userSettings.game.freeCameraXSensitivity);
     Register(g_userSettings.game.freeCameraYSensitivity);
+    Register(g_userSettings.game.touchCameraXSensitivity);
+    Register(g_userSettings.game.touchCameraYSensitivity);
     Register(g_userSettings.game.minimalHUD);
+    Register(g_userSettings.game.hudScale);
     Register(g_userSettings.game.pauseOnFocusLost);
     Register(g_userSettings.game.enableDiscordPresence);
     Register(g_userSettings.game.bloomMode);
@@ -257,7 +290,7 @@ void registerSettings() {
     Register(g_userSettings.game.enableFastIronBoots);
     Register(g_userSettings.game.canTransformAnywhere);
     Register(g_userSettings.game.fastRoll);
-    Register(g_userSettings.game.freeMagicArmor);
+    Register(g_userSettings.game.armorRupeeDrain);
     Register(g_userSettings.game.restoreWiiGlitches);
     Register(g_userSettings.game.enableLinkDollRotation);
     Register(g_userSettings.game.enableAchievementToasts);
@@ -289,7 +322,6 @@ void registerSettings() {
     Register(g_userSettings.game.alwaysGreatspin);
     Register(g_userSettings.game.invincibleEnemies);
     Register(g_userSettings.game.enableFrameInterpolation);
-    Register(g_userSettings.game.gyroMode);
     Register(g_userSettings.game.enableGyroAim);
     Register(g_userSettings.game.enableGyroRollgoal);
     Register(g_userSettings.game.gyroSensitivityX);
@@ -299,7 +331,15 @@ void registerSettings() {
     Register(g_userSettings.game.gyroSmoothing);
     Register(g_userSettings.game.gyroInvertPitch);
     Register(g_userSettings.game.gyroInvertYaw);
+    Register(g_userSettings.game.enableMouseCamera);
+    Register(g_userSettings.game.enableMouseAim);
+    Register(g_userSettings.game.mouseAimSensitivity);
+    Register(g_userSettings.game.mouseCameraSensitivity);
+    Register(g_userSettings.game.invertMouseY);
     Register(g_userSettings.game.freeCamera);
+    Register(g_userSettings.game.enableTouchControls);
+    Register(g_userSettings.game.enableMenuPointer);
+    Register(g_userSettings.game.touchControlsLayout);
     Register(g_userSettings.game.debugFlyCam);
     Register(g_userSettings.game.debugFlyCamLockEvents);
     Register(g_userSettings.game.allowBackgroundInput);
@@ -329,6 +369,14 @@ void registerSettings() {
     Register(g_userSettings.actionBindings.callMidna[1]);
     Register(g_userSettings.actionBindings.callMidna[2]);
     Register(g_userSettings.actionBindings.callMidna[3]);
+    Register(g_userSettings.actionBindings.openMapScreen[0]);
+    Register(g_userSettings.actionBindings.openMapScreen[1]);
+    Register(g_userSettings.actionBindings.openMapScreen[2]);
+    Register(g_userSettings.actionBindings.openMapScreen[3]);
+    Register(g_userSettings.actionBindings.toggleMinimap[0]);
+    Register(g_userSettings.actionBindings.toggleMinimap[1]);
+    Register(g_userSettings.actionBindings.toggleMinimap[2]);
+    Register(g_userSettings.actionBindings.toggleMinimap[3]);
     Register(g_userSettings.actionBindings.openDusklightMenu[0]);
     Register(g_userSettings.actionBindings.openDusklightMenu[1]);
     Register(g_userSettings.actionBindings.openDusklightMenu[2]);

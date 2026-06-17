@@ -663,8 +663,15 @@ void dMeter2_c::moveLife() {
         draw_life = true;
     }
 
-    if (mLifeGaugeScale != g_drawHIO.mLifeParentScale) {
-        mLifeGaugeScale = g_drawHIO.mLifeParentScale;
+#if TARGET_PC
+    const f32 lifeGaugeScale =
+        g_drawHIO.mLifeParentScale *
+        std::clamp(dusk::getSettings().game.hudScale.getValue(), 0.5f, 2.0f);
+#else
+    const f32 lifeGaugeScale = g_drawHIO.mLifeParentScale;
+#endif
+    if (mLifeGaugeScale != lifeGaugeScale) {
+        mLifeGaugeScale = lifeGaugeScale;
         draw_life = true;
     }
 
@@ -2966,7 +2973,15 @@ void dMeter2_c::alphaAnimeButtonCross() {
             field_0x190++;
         }
     } else {
+#if TARGET_PC
+        if (dusk::getSettings().game.enableTouchControls) {
+            mpMeterDraw->setAlphaButtonCrossAnimeMin();
+        } else {
+            mpMeterDraw->setAlphaButtonCrossAnimeMax();
+        }
+#else
         mpMeterDraw->setAlphaButtonCrossAnimeMax();
+#endif
 
         if (field_0x190 < 5) {
             field_0x190++;
