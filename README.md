@@ -23,6 +23,10 @@ Main features:
   
   >_Restored an unused animation, applies when holding R and not targeting (same as older games)_
 
+- Extended Wolf Link finishers/Ending Blow
+
+  >_You can now perform ending blow on most common enemies as Wolf Link!_
+
 - Restart from the beginning of an area/dungeon upon death rather than beginning of a room (no toggle option yet)
   
   >_Older games in the series already did this, which I thought would be an appropriate change given TP's already piss easy difficulty_
@@ -35,10 +39,11 @@ Main features:
 
   >_Optional toggle under gameplay section, turn off the brief frame pause when Link lands an attack_
 
+Known issues:
+- After performing a finisher/ending blow on an enemy as Wolf Link, you may be unable to jump attack until you perform a regular B attack or other action
+
 Planned features:
 - Toggle options for features that do not currently have them
-
-- Toggle on/off Midna visibility on Wolf Link's back
   
   >_Just makes sense to include this with the sword+shield visibility option._
 
