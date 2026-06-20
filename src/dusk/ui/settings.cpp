@@ -1200,6 +1200,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Makes the sword and shield always visible on Wolf Link.");
         addOption("Invisible Midna", getSettings().game.invisibleMidna,
             "Hides Midna on Wolf Link's back.");
+        addOption("Always Glowing Light Sword", getSettings().game.alwaysLightSword,
+            "Makes the Light Sword glow even outside of the Twilight Realm.");
 
         leftPane.add_section("Difficulty");
         leftPane.register_control(

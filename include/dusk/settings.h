@@ -186,6 +186,7 @@ struct UserSettings {
         ConfigVar<MenuScaling> menuScalingMode;
         ConfigVar<bool> wolfGear;
         ConfigVar<bool> invisibleMidna;
+        ConfigVar<bool> alwaysLightSword;
 
         // Graphics
         ConfigVar<BloomMode> bloomMode;

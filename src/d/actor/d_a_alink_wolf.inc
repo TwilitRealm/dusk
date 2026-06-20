@@ -3139,6 +3139,7 @@ int daAlink_c::procWolfBackJumpLand() {
     } else if (frameCtrl->getFrame() > mpHIO->mWolf.mWlBackJump.m.mBackLandAnm.mCancelFrame) {
         checkNextActionWolf(1);
     }
+    resetUpperAnime(UPPER_2, mpHIO->mBasic.m.mBasicInterpolation); // Reset animation state to fix jump attacks after using wolf finisher on a non-Poe enemy
     return 1;
 }
 

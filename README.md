@@ -41,6 +41,7 @@ Main features:
 
 Known issues:
 - After performing a finisher/ending blow on an enemy as Wolf Link, you may be unable to jump attack until you perform a regular B attack or other action
+  >_UPDATE: This has been fixed and will be included in the next update._
 
 Planned features:
 - Toggle options for features that do not currently have them

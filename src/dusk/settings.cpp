@@ -66,6 +66,7 @@ UserSettings g_userSettings = {
         .menuScalingMode {"game.menuScalingMode", MenuScaling::Wii},
         .wolfGear {"game.wolfGear", false},
         .invisibleMidna {"game.invisibleMidna", false},
+        .alwaysLightSword {"game.alwaysLightSword", false},
 
         // Graphics
         .bloomMode {"game.bloomMode", BloomMode::Dusk},
@@ -350,6 +351,7 @@ void registerSettings() {
     Register(g_userSettings.game.swapDirectSelect);
     Register(g_userSettings.game.wolfGear);
     Register(g_userSettings.game.invisibleMidna);
+    Register(g_userSettings.game.alwaysLightSword);
 
     Register(g_userSettings.backend.isoPath);
     Register(g_userSettings.backend.isoVerification);
