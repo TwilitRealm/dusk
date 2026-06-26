@@ -3081,7 +3081,9 @@ static void* daMidna_searchNpc(fopAc_ac_c* i_actor, void* o_far) {
 
 void daMidna_c::setMidnaNoDrawFlg() {
 #if TARGET_PC
-    if (dusk::getSettings().game.invisibleMidna) {
+    daAlink_c* link = daAlink_getAlinkActorClass();
+    if (dusk::getSettings().game.invisibleMidna && link->checkWolf()
+        && mDemoType == 0 && !checkMidnaTired()) {
         onStateFlg0(FLG0_NO_DRAW);
         return;
     }
