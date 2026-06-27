@@ -673,8 +673,14 @@ void daNpcAsh_c::playMotion() {
     daNpcF_anmPlayData* pDat7[1] = {&dat7};
     daNpcF_anmPlayData dat8 = {ANM_BOWRUN, mpHIO->m.common.morf_frame, 0};
     daNpcF_anmPlayData* pDat8[1] = {&dat8};
-    daNpcF_anmPlayData dat9 = {ANM_STEP, 4.0f, 1};
-    daNpcF_anmPlayData* pDat9[1] = {&dat9};
+#if TARGET_PC
+    // Segmentation fault crash fix:
+    // pDat9 has 2 loops but only one condition/phase, so it ends up reading garbage, I think?
+    // Doesn't crash on vanilla Dusklight but crashes here. Not sure why
+    daNpcF_anmPlayData dat9a = {ANM_STEP, 4.0f, 1};
+    daNpcF_anmPlayData dat9b = {ANM_WAIT_A, mpHIO->m.common.morf_frame, 0};
+    daNpcF_anmPlayData* pDat9[2] = {&dat9a, &dat9b};
+#endif
     daNpcF_anmPlayData** ppDat[10] = {
         pDat0, pDat1, pDat2, pDat3, pDat4, pDat5, pDat6, pDat7, pDat8, pDat9,
     };

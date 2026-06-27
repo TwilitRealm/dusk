@@ -787,9 +787,14 @@ void daNpcBouS_c::playMotion() {
     daNpcF_anmPlayData* pDat11[1] = {&dat11};
     daNpcF_anmPlayData dat12 = {ANM_WALK, mHIO->m.common.morf_frame, 0};
     daNpcF_anmPlayData* pDat12[1] = {&dat12};
-    daNpcF_anmPlayData dat13 = {ANM_STEP, 4.0f, 1};
-    daNpcF_anmPlayData* pDat13[1] = {&dat13};
-
+#if TARGET_PC
+    // Segmentation fault crash fix:
+    // pDat13 has 2 loops but only one condition/phase, so it ends up reading garbage, I think?
+    // Doesn't crash on vanilla Dusklight but crashes here. Not sure why
+    daNpcF_anmPlayData dat13a = {ANM_STEP, 4.0f, 1};
+    daNpcF_anmPlayData dat13b = {ANM_WAIT_A_2, mHIO->m.common.morf_frame, 0};
+    daNpcF_anmPlayData* pDat13[2] = {&dat13a, &dat13b};
+#endif
     daNpcF_anmPlayData** ppDat[20] = {
         pDat0,
         NULL,
