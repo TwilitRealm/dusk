@@ -2772,6 +2772,9 @@ public:
     int procDemoBoomerangCatchInit();
     int procDemoBoomerangCatch();
     int procCoDeadInit(int);
+#if TARGET_PC
+    int loseRupees();
+#endif
     int procCoDead();
     int procCoLookAroundInit();
     int procCoLookAround();

@@ -96,6 +96,12 @@ constexpr std::array kMagicArmorModes = {
     "Cosmetic",
 };
 
+constexpr std::array kLightSwordModes = {
+    "Off",
+    "Visuals Only",
+    "Include Damage Boost",
+};
+
 bool try_parse_backend(std::string_view backend, AuroraBackend& outBackend) {
     if (backend == "auto") {
         outBackend = BACKEND_AUTO;
@@ -218,6 +224,7 @@ void reset_for_speedrun_mode() {
     getSettings().game.loseRupees.setSpeedrunValue(false);
     getSettings().game.autoSave.setSpeedrunValue(false);
     getSettings().game.sunsSong.setSpeedrunValue(false);
+    getSettings().game.alwaysLightSword.setSpeedrunValue(LightSwordMode::OFF);
 
     getSettings().game.infiniteHearts.setSpeedrunValue(false);
     getSettings().game.infiniteArrows.setSpeedrunValue(false);
@@ -1200,8 +1207,38 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Makes the sword and shield always visible on Wolf Link.");
         addOption("Invisible Midna", getSettings().game.invisibleMidna,
             "Hides Midna on Wolf Link's back.");
-        addOption("Always Glowing Light Sword", getSettings().game.alwaysLightSword,
-            "Makes the Light Sword glow even outside of the Twilight Realm.");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Always Glowing Light Sword",
+                .getValue =
+                    [] {
+                        return kLightSwordModes[static_cast<u8>(getSettings().game.alwaysLightSword.getValue())];
+                    },
+                .isDisabled = [] { return getSettings().game.speedrunMode; },
+                .isModified =
+                    [] {
+                        return getSettings().game.alwaysLightSword.getValue() !=
+                               getSettings().game.alwaysLightSword.getDefaultValue();
+                    },
+            }),
+            rightPane, [](Pane& pane) {
+                for (int i = 0; i < kLightSwordModes.size(); i++) {
+                    pane.add_button({
+                            .text = kLightSwordModes[i],
+                            .isSelected =
+                                [i] {
+                                    return getSettings().game.alwaysLightSword.getValue() == static_cast<LightSwordMode>(i);
+                                },
+                        })
+                        .on_pressed([i] {
+                            mDoAud_seStartMenu(kSoundItemChange);
+                            getSettings().game.alwaysLightSword.setValue(static_cast<LightSwordMode>(i));
+                            config::Save();
+                        });
+                }
+                pane.add_rml(
+                    "<br/>Display the Light Sword glow even outside of Twilight and/or include its extra damage effects.");
+            });
 
         leftPane.add_section("Difficulty");
         leftPane.register_control(

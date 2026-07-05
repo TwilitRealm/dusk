@@ -1184,7 +1184,7 @@ void daAlink_c::setLightningSwordEffect() {
     }
 
     int i;
-    if (mEquipItem == 0x103 && checkNoResetFlg3(FLG3_UNK_100000)) {
+    if (mEquipItem == 0x103 && checkNoResetFlg3(FLG3_UNK_100000) || (dusk::getSettings().game.alwaysLightSword == dusk::LightSwordMode::VISUALS_ONLY && checkLightMasterSwordEquip())) {
         seStartOnlyReverbLevel(Z2SE_AL_LIGHTNING_SW_GLOW);
 
         for (i = 0; i < 3; i++) {

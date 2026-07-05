@@ -60,6 +60,12 @@ enum class MagicArmorMode : u8 {
     COSMETIC = 4,
 };
 
+enum class LightSwordMode : u8 {
+    OFF = 0,
+    VISUALS_ONLY = 1,
+    INCLUDE_DAMAGE = 2,
+};
+
 namespace config {
 template <>
 struct ConfigEnumRange<BloomMode> {
@@ -107,6 +113,12 @@ template <>
 struct ConfigEnumRange<MagicArmorMode> {
     static constexpr auto min = MagicArmorMode::NORMAL;
     static constexpr auto max = MagicArmorMode::COSMETIC;
+};
+
+template <>
+struct ConfigEnumRange<LightSwordMode> {
+    static constexpr auto min = LightSwordMode::OFF;
+    static constexpr auto max = LightSwordMode::INCLUDE_DAMAGE;
 };
 
 template <>
@@ -186,7 +198,7 @@ struct UserSettings {
         ConfigVar<MenuScaling> menuScalingMode;
         ConfigVar<bool> wolfGear;
         ConfigVar<bool> invisibleMidna;
-        ConfigVar<bool> alwaysLightSword;
+        ConfigVar<LightSwordMode> alwaysLightSword;
 
         // Graphics
         ConfigVar<BloomMode> bloomMode;

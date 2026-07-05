@@ -14904,7 +14904,7 @@ void daAlink_c::setLight() {
             stopDrawParticle(field_0x31c4);
         }
 
-        if (mEquipItem == 0x103 && checkNoResetFlg3(FLG3_UNK_100000)) {
+        if (mEquipItem == 0x103 && checkNoResetFlg3(FLG3_UNK_100000) || (dusk::getSettings().game.alwaysLightSword == dusk::LightSwordMode::VISUALS_ONLY && checkLightMasterSwordEquip())) {
             onNoResetFlg1(FLG1_UNK_80);
             var_r28 = true;
         }

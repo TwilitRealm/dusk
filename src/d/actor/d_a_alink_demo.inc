@@ -3007,6 +3007,11 @@ int daAlink_c::procCoDeadInit(int param_0) {
     field_0x3198 = -1;
     return 1;
 }
+#if TARGET_PC
+int daAlink_c::loseRupees() {
+    g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().setRupee(g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().getRupee() / 2);
+}
+#endif
 
 int daAlink_c::procCoDead() {
     daPy_frameCtrl_c* frameCtrl_p = mUnderFrameCtrl;
@@ -3097,10 +3102,15 @@ int daAlink_c::procCoDead() {
                 exitId = mProcVar5.field_0x3012;
                 roomNo = field_0x3198;
             } else {
-                // Old respawn logic:
-                // startRestartRoom(mode, 0xC9, 0, 1);
-                //
-                // Reuse game start stuff:
+                // If Hyrule Castle sewers, reuse old respawn logic:
+                if (checkStageName("R_SP107")) {
+                    startRestartRoom(mode, 0xC9, 0, 1);
+                    if (dusk::getSettings().game.loseRupees) {
+                        loseRupees();
+                    }
+                    return 1;
+                }
+                // Otherwise, reuse game start stuff:
                 dComIfGp_offEnableNextStage();
                 dComIfGp_setNextStage(
                     g_dComIfG_gameInfo.info.getPlayer().getPlayerReturnPlace().getName(),
@@ -3108,10 +3118,11 @@ int daAlink_c::procCoDead() {
                     g_dComIfG_gameInfo.info.getPlayer().getPlayerReturnPlace().getRoomNo(),
                     -1, 0.0f, 0, 1, 0, 0, 0, 0
                     );
-                // Set rupee count to half upon death if lose rupees is on
+                g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().setLife(12);
                 if (dusk::getSettings().game.loseRupees) {
-                    g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().setRupee(g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().getRupee() / 2);
+                    loseRupees();
                 }
+                return 1;
             }
 
             onNoResetFlg0(FLG0_UNK_4000);

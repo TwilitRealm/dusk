@@ -13,10 +13,14 @@ void resetForSpeedrunMode() {
     getSettings().game.enableTurboKeybind.setSpeedrunValue(false);
 
     getSettings().game.damageMultiplier.setSpeedrunValue(1);
+    getSettings().game.swordMultiplier.setSpeedrunValue(100);
     getSettings().game.instantDeath.setSpeedrunValue(false);
     getSettings().game.noHeartDrops.setSpeedrunValue(false);
     getSettings().game.autoSave.setSpeedrunValue(false);
     getSettings().game.sunsSong.setSpeedrunValue(false);
+    getSettings().game.wolfGear.setSpeedrunValue(false);
+    getSettings().game.invisibleMidna.setSpeedrunValue(false);
+    getSettings().game.alwaysLightSword.setSpeedrunValue(LightSwordMode::OFF);
 
     getSettings().game.infiniteHearts.setSpeedrunValue(false);
     getSettings().game.infiniteArrows.setSpeedrunValue(false);

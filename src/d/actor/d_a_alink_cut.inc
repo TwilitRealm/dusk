@@ -45,7 +45,7 @@ static fopAc_ac_c* daAlink_searchNightStalker(fopAc_ac_c* i_actor, void* i_data)
 void daAlink_c::checkLightSwordMtrl() {
     if (checkLightMasterSwordEquip()) {
 #if TARGET_PC
-        if (dusk::getSettings().game.alwaysLightSword || dStage_stagInfo_GetSaveTbl(dComIfGp_getStage()->getStagInfo()) == dStage_SaveTbl_LV8 ||
+        if (dusk::getSettings().game.alwaysLightSword == dusk::LightSwordMode::INCLUDE_DAMAGE || dStage_stagInfo_GetSaveTbl(dComIfGp_getStage()->getStagInfo()) == dStage_SaveTbl_LV8 ||
             fopAcIt_Judge((fopAcIt_JudgeFunc)daAlink_searchNightStalker, NULL))
 #endif
         {

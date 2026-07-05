@@ -66,7 +66,7 @@ UserSettings g_userSettings = {
         .menuScalingMode {"game.menuScalingMode", MenuScaling::Wii},
         .wolfGear {"game.wolfGear", false},
         .invisibleMidna {"game.invisibleMidna", false},
-        .alwaysLightSword {"game.alwaysLightSword", false},
+        .alwaysLightSword {"game.alwaysLightSword", LightSwordMode::OFF},
 
         // Graphics
         .bloomMode {"game.bloomMode", BloomMode::Dusk},

@@ -2442,7 +2442,7 @@ static void h_damage_check(b_gnd_class* i_this) {
                     break;
                 }
 
-                if (((dCcD_GObjInf*)i_this->mAtInfo.mpCollider)->GetAtMtrl() == dCcD_MTRL_LIGHT) {
+                if (((dCcD_GObjInf*)i_this->mAtInfo.mpCollider)->GetAtMtrl() == dCcD_MTRL_LIGHT && ((dCcU_AtInfo*)i_this->mAtInfo.mpCollider)->mHitType != HIT_TYPE_LINK_NORMAL_ATTACK) {
                     OS_REPORT(" GND LIGHT HITL\n");
                     if (i_this->field_0x1e0f == 1) {
                         i_this->field_0x1e0f = 0;
@@ -2463,7 +2463,7 @@ static void h_damage_check(b_gnd_class* i_this) {
                     i_this->mAtInfo.mpCollider = i_this->mHorseBodySph[i].GetTgHitObj();
                     i_this->mHorseBodySph[i].ClrTgHit();
 
-                    if (i_this->mDrawHorse && i_this->field_0x1e08 == 0 && ((dCcD_GObjInf*)i_this->mAtInfo.mpCollider)->GetAtMtrl() == dCcD_MTRL_LIGHT) {
+                    if (i_this->mDrawHorse && i_this->field_0x1e08 == 0 && ((dCcD_GObjInf*)i_this->mAtInfo.mpCollider)->GetAtMtrl() == dCcD_MTRL_LIGHT && ((dCcU_AtInfo*)i_this->mAtInfo.mpCollider)->mHitType != HIT_TYPE_LINK_NORMAL_ATTACK) {
                         OS_REPORT(" HGND LIGHT HITL 2\n");
                         i_this->mDamageInvulnerabilityTimer = 10;
                         if (i_this->field_0x1e0f == 1) {
