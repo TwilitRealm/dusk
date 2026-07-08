@@ -72,7 +72,7 @@ void daAlink_c::handleQuickTransform() {
     }
 
     // Check to see if Link has the ability to transform.
-    if (!dComIfGs_isEventBit(dSv_event_flag_c::M_077) && !dusk::getSettings().game.transformWithoutShadowCrystal) {
+    if (!dComIfGs_isEventBit(dSv_event_flag_c::M_077)) {
         return;
     }
 
@@ -102,9 +102,11 @@ void daAlink_c::handleQuickTransform() {
     }
 
     // Ensure that the Z Button is not dimmed
-    if (meterDrawPtr->getButtonZAlpha() != 1.f && !dusk::getSettings().game.transformWithoutShadowCrystal) {
-        Z2GetAudioMgr()->seStart(Z2SE_SYS_ERROR, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-        return;
+    if (meterDrawPtr->getButtonZAlpha() != 1.f) {
+        if (!checkShieldCrouch() || !checkNoResetFlg2(FLG2_UNK_8000000)) {
+            Z2GetAudioMgr()->seStart(Z2SE_SYS_ERROR, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            return;
+        }
     }
 
     // The game will crash if trying to quick transform while holding the Ball and Chain
@@ -122,7 +124,7 @@ void daAlink_c::handleQuickTransform() {
     bool canTransform = false;
 
     if (mLinkAcch.ChkGroundHit() && !checkModeFlg(MODE_PLAYER_FLY) && !checkMagneBootsOn()) {
-        if (checkMidnaRide() || dusk::getSettings().game.transformWithoutShadowCrystal) {
+        if (checkMidnaRide()) {
             if ((checkWolf() &&
                  (checkModeFlg(MODE_UNK_1000) || dComIfGp_checkPlayerStatus0(0, 0x10))) ||
                 (!checkWolf() &&
@@ -144,7 +146,7 @@ void daAlink_c::handleQuickTransform() {
     procCoMetamorphoseInit();
 }
 
-bool daAlink_c::checkGyroAimContext() {
+bool daAlink_c::checkAimContext() {
     switch (mProcID) {
     case PROC_SUBJECTIVITY:
     case PROC_SWIM_SUBJECTIVITY:
@@ -173,5 +175,15 @@ bool daAlink_c::checkGyroAimContext() {
         return itemButton() && mItemVar0.field_0x3018 == 2;
     default:
         return false;
+    }
+}
+
+bool daAlink_c::checkAimInputContext() {
+    switch (mProcID) {
+    case PROC_HOOKSHOT_ROOF_WAIT:
+    case PROC_HOOKSHOT_WALL_WAIT:
+        return false;
+    default:
+        return checkAimContext();
     }
 }

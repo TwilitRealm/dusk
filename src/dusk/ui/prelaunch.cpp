@@ -699,8 +699,6 @@ Prelaunch::Prelaunch() : Document(kDocumentSource), mRoot(mDocument->GetElementB
                 return;
             }
 
-            toggle_cursor_if_gyro(false);
-
             mDoAud_seStartMenu(kSoundPlay);
             show_menu_notification();
 
@@ -717,7 +715,7 @@ Prelaunch::Prelaunch() : Document(kDocumentSource), mRoot(mDocument->GetElementB
             }
 
             IsGameLaunched = true;
-            hide(true);
+            pop(false);
         });
         apply_intro_animation(mMenuButtons.back()->root(), "delay-1");
 

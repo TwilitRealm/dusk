@@ -21,6 +21,7 @@ void applyPresetClassic() {
     s.game.shadowResolutionMultiplier.setValue(1);
     s.game.hideTvSettingsScreen.setValue(false);
     s.game.menuScalingMode.setValue(MenuScaling::GameCube);
+    s.game.enableMenuPointer.setValue(false);
     AuroraSetViewportPolicy(AURORA_VIEWPORT_FIT);
 }
 
@@ -37,6 +38,7 @@ void applyPresetDusk() {
     s.game.invertCameraXAxis.setValue(true);
     s.game.invertFirstPersonYAxis.setValue(true);
     s.game.no2ndFishForCat.setValue(true);
+    s.game.buttonFishing.setValue(true);
     s.game.enableAchievementToasts.setValue(true);
     s.game.enableControllerToasts.setValue(true);
     s.game.enableQuickTransform.setValue(true);
@@ -52,6 +54,7 @@ void applyPresetDusk() {
     s.game.autoSave.setValue(true);
     s.game.menuScalingMode.setValue(MenuScaling::Dusklight);
     s.game.enhancedMapMenus.setValue(true);
+    s.game.enableMenuPointer.setValue(true);
 }
 
 }  // namespace

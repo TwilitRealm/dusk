@@ -23,26 +23,48 @@ Main features:
   
   >_Restored an unused animation, applies when holding R and not targeting (same as older games)_
 
+- Extended Wolf Link finishers/Ending Blow
+
+  >_You can now perform ending blow on most common enemies as Wolf Link!_
+
 - Restart from the beginning of an area/dungeon upon death rather than beginning of a room (no toggle option yet)
   
-  >_Older games in the series already did this, which I thought would be an appropriate change given TP's already_
+  >_Older games in the series already did this, which I thought would be an appropriate change given TP's already piss easy difficulty_
+
+- Lose rupees on death
+  
+  >_Optional toggle under difficulty section, lose half of Link's rupees on death (except some events, for now)_
+
+- sudafed's No Hitstop toggle
+
+  >_Optional toggle under gameplay section, turn off the brief frame pause when Link lands an attack_
+
+Known issues:
+- After performing a finisher/ending blow on an enemy as Wolf Link, you may be unable to jump attack until you perform a regular B attack or other action
+  >_UPDATE: This has been fixed and will be included in the next update._
 
 Planned features:
 - Toggle options for features that do not currently have them
-
-- Lose half or all rupees upon death
-  
-  >_Optional, obviously_
-
-- Toggle on/off hitstop
-  
-  >_Game already has hitstop (effect where the game pauses for a handful of frames when an attack lands), but some like the feel of the     game without it (I don't personally care, but I want to see if I can figure out how)_
-
-- Toggle on/off Midna visibility on Wolf Link's back
   
   >_Just makes sense to include this with the sword+shield visibility option._
 
+- Z Button Items (Almost done)
+
+  >_The QOL feature that everybody asks for. This is what is taking the most time and attention right now because Nintendo devs were smoking crack when they made this game._
+
 - Whatever else I think of on a whim
+
+**INSTALLATION:**
+
+Windows: extract into its own folder and launch. If using the dusklight portable version, extract into your dusklight data folder.
+
+Linux: extract and launch the appimage from anywhere not protected.
+
+Android: Download, install, and launch.
+
+iOS: Sideload to iOS using iloader or something similar. For more detailed instructions, see Dusklight's official github.
+
+Mac: Not sure, don't have a Mac to test on. Extract and launch probably?
 
 #
 **ORIGINAL DUSKLIGHT README:**

@@ -184,11 +184,8 @@ void daAlink_c::setUpperGuardAnime(f32 param_0) {
 }
 
 BOOL daAlink_c::checkShieldCrouch() {
-    return checkShieldGet() &&
-           !checkAttentionLock() &&
-           !checkGrabAnime() &&
-           !checkUpperReadyThrowAnime() &&
-           (mDoCPd_c::getHoldLockR(PAD_1));
+    return checkShieldGet() && !checkAttentionLock() && !checkGrabAnime() && !checkUpperReadyThrowAnime() &&
+        !wallGrabTrigger() && !checkFmChainGrabAnime() && mDoCPd_c::getHoldLockR(PAD_1);
 }
 
 void daAlink_c::setShieldCrouch() {
@@ -196,6 +193,10 @@ void daAlink_c::setShieldCrouch() {
     setSingleAnimeBaseSpeed(ANM_CROUCH_DEF, mpHIO->mGuard.m.mCrouchGuardAnmSpeed,
                             mpHIO->mGuard.m.mCrouchGuardInterpolation);
     onNoResetFlg2(FLG2_UNK_8000000);
+    if (mDoCPd_c::getTrigB(PAD_1)) {
+        procCutNormalInit(CUT_NM_PARAM_STAB);
+        resetCombo(TRUE);
+    }
 }
 
 void daAlink_c::setShieldGuard() {
@@ -205,8 +206,7 @@ void daAlink_c::setShieldGuard() {
         (checkGuardAccept() && !checkGrabAnime() && !checkUpperReadyThrowAnime() &&
          !checkDkCaught2Anime() && !checkKandelaarSwingAnime() && !checkCutDashAnime() &&
          !checkCutDashChargeAnime() && (!checkEquipAnime() || checkUpperGuardAnime()) &&
-         !checkRideOn() && checkGuardActionChange() && mDoCPd_c::getHoldLockR(PAD_1) ||
-         checkShieldCrouch()))
+         !checkRideOn() && checkGuardActionChange() && mDoCPd_c::getHoldLockR(PAD_1)))
     {
         onNoResetFlg2(FLG2_UNK_8000000);
     } else {

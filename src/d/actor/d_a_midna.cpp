@@ -3080,6 +3080,14 @@ static void* daMidna_searchNpc(fopAc_ac_c* i_actor, void* o_far) {
 }
 
 void daMidna_c::setMidnaNoDrawFlg() {
+#if TARGET_PC
+    daAlink_c* link = daAlink_getAlinkActorClass();
+    if (dusk::getSettings().game.invisibleMidna && link->checkWolf()
+        && mDemoType == 0 && !checkMidnaTired()) {
+        onStateFlg0(FLG0_NO_DRAW);
+        return;
+    }
+#endif
     if (
         (!checkStateFlg1((daMidna_FLG1)(FLG1_SHADOW_MODEL_DRAW_DEMO_FORCE | FLG1_UNK_1)) &&
         (!checkAppear() || !checkMidnaRealBody())) || daAlink_c::checkCloudSea()
@@ -3106,18 +3114,14 @@ void daMidna_c::setMidnaNoDrawFlg() {
 
 BOOL daMidna_c::checkMetamorphoseEnableBase() {
     BOOL tmp;
+    if (!daAlink_getAlinkActorClass()->checkMidnaRide() || (g_env_light.mEvilInitialized & 0x80) ||
+        /* dSv_event_flag_c::M_077 - Main Event - Get shadow crystal (can now transform) */
+        !dComIfGs_isEventBit(0xD04) ||
 #if TARGET_PC
-    if (((!daAlink_getAlinkActorClass()->checkMidnaRide()  || (g_env_light.mEvilInitialized & 0x80) ||
-          /* dSv_event_flag_c::M_077 - Main Event - Get shadow crystal (can now transform) */
-          !dComIfGs_isEventBit(0xD04)) &&
-          !dusk::getSettings().game.transformWithoutShadowCrystal) ||
-          (fopAcIt_Judge((fopAcIt_JudgeFunc)daMidna_searchNpc, &tmp) &&
-           !dusk::getSettings().game.canTransformAnywhere)
+        (fopAcIt_Judge((fopAcIt_JudgeFunc)daMidna_searchNpc, &tmp) &&
+         !dusk::getSettings().game.canTransformAnywhere)
 #else
-    if (!daAlink_getAlinkActorClass()->checkMidnaRide()  || (g_env_light.mEvilInitialized & 0x80) ||
-          /* dSv_event_flag_c::M_077 - Main Event - Get shadow crystal (can now transform) */
-          !dComIfGs_isEventBit(0xD04) || 
-          fopAcIt_Judge((fopAcIt_JudgeFunc)daMidna_searchNpc, &tmp)
+        fopAcIt_Judge((fopAcIt_JudgeFunc)daMidna_searchNpc, &tmp)
 #endif
     )
     {

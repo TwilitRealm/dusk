@@ -12746,7 +12746,19 @@ void daAlink_c::setMagicArmorBrk(int i_status) {
 
 BOOL daAlink_c::checkMagicArmorHeavy() const {
 #if TARGET_PC
-    return checkMagicArmorWearAbility() && (dComIfGs_getRupee() == 0 && !dusk::getSettings().game.freeMagicArmor);
+    if(!checkMagicArmorWearAbility()) {
+        return false;
+    }
+
+    switch(dusk::getSettings().game.armorRupeeDrain) {
+        case dusk::MagicArmorMode::NORMAL:
+            return dComIfGs_getRupee() == 0;
+        case dusk::MagicArmorMode::ON_DAMAGE:
+        case dusk::MagicArmorMode::DOUBLE_DEFENSE:
+        case dusk::MagicArmorMode::INVINCIBLE:
+        case dusk::MagicArmorMode::COSMETIC:
+            return false;
+    }
 #else
     return checkMagicArmorWearAbility() && dComIfGs_getRupee() == 0;
 #endif
@@ -14808,6 +14820,8 @@ void daAlink_c::deleteEquipItem(BOOL i_isPlaySound, BOOL i_isDeleteKantera) {
 #if TARGET_PC
     mIBChainInterpPrevValid = false;
     mIBChainInterpCurrValid = false;
+    mHsChainInterpPrevValid = false;
+    mHsChainInterpCurrValid = false;
 #endif
     field_0x0774 = NULL;
     field_0x0778 = NULL;
@@ -14890,7 +14904,7 @@ void daAlink_c::setLight() {
             stopDrawParticle(field_0x31c4);
         }
 
-        if (mEquipItem == 0x103 && checkNoResetFlg3(FLG3_UNK_100000)) {
+        if (mEquipItem == 0x103 && checkNoResetFlg3(FLG3_UNK_100000) || (dusk::getSettings().game.alwaysLightSword == dusk::LightSwordMode::VISUALS_ONLY && checkLightMasterSwordEquip())) {
             onNoResetFlg1(FLG1_UNK_80);
             var_r28 = true;
         }
@@ -18729,7 +18743,7 @@ int daAlink_c::execute() {
 #if TARGET_PC
             // This handles rupee drain and transitions between rupees/no rupees
             // We can skip all of that if the magic armor doesn't use rupees
-            if (!dusk::getSettings().game.freeMagicArmor && checkMagicArmorWearAbility() && mClothesChangeWaitTimer == 0) {
+            if (dusk::getSettings().game.armorRupeeDrain.getValue() == dusk::MagicArmorMode::NORMAL && checkMagicArmorWearAbility() && mClothesChangeWaitTimer == 0) {
 #else
             if (checkMagicArmorWearAbility() && mClothesChangeWaitTimer == 0) {
 #endif
@@ -19804,23 +19818,37 @@ int daAlink_c::draw() {
                 dComIfGd_getOpaListDark()->entryImm(mpHookChain, 0);
 
 #if TARGET_PC
-                if (dusk::frame_interp::is_enabled() &&
-                    mEquipItem == dItemNo_IRONBALL_e &&
-                    mIronBallChainPos != NULL && mIronBallChainAngle != NULL)
-                {
-                    if (mIBChainInterpCurrValid) {
-                        memcpy(mIBChainInterpPrevPos, mIBChainInterpCurrPos, IRON_BALL_CHAIN_COUNT * sizeof(cXyz));
-                        memcpy(mIBChainInterpPrevAngle, mIBChainInterpCurrAngle, IRON_BALL_CHAIN_COUNT * sizeof(csXyz));
-                        mIBChainInterpPrevHandRoot = mIBChainInterpCurrHandRoot;
-                        mIBChainInterpPrevValid = true;
+                if (dusk::frame_interp::is_enabled()) {
+                    if (mEquipItem == dItemNo_IRONBALL_e &&
+                        mIronBallChainPos != NULL && mIronBallChainAngle != NULL)
+                    {
+                        if (mIBChainInterpCurrValid) {
+                            memcpy(mIBChainInterpPrevPos, mIBChainInterpCurrPos, IRON_BALL_CHAIN_COUNT * sizeof(cXyz));
+                            memcpy(mIBChainInterpPrevAngle, mIBChainInterpCurrAngle, IRON_BALL_CHAIN_COUNT * sizeof(csXyz));
+                            mIBChainInterpPrevHandRoot = mIBChainInterpCurrHandRoot;
+                            mIBChainInterpPrevValid = true;
+                        }
+
+                        memcpy(mIBChainInterpCurrPos, mIronBallChainPos, IRON_BALL_CHAIN_COUNT * sizeof(cXyz));
+                        memcpy(mIBChainInterpCurrAngle, mIronBallChainAngle, IRON_BALL_CHAIN_COUNT * sizeof(csXyz));
+                        mIBChainInterpCurrHandRoot = mHookshotTopPos;
+                        mIBChainInterpCurrValid = true;
+
+                        dusk::frame_interp::add_interpolation_callback(&ironBallChainInterpCallback, this);
+                    } else {
+                        if (mHsChainInterpCurrValid) {
+                            mHsChainInterpPrevTop = mHsChainInterpCurrTop;
+                            mHsChainInterpPrevRoot = mHsChainInterpCurrRoot;
+                            mHsChainInterpPrevSubRoot = mHsChainInterpCurrSubRoot;
+                            mHsChainInterpPrevSubTop = mHsChainInterpCurrSubTop;
+                            mHsChainInterpPrevValid = true;
+                        }
+                        mHsChainInterpCurrTop = mHookshotTopPos;
+                        mHsChainInterpCurrRoot = mHeldItemRootPos;
+                        mHsChainInterpCurrSubRoot = field_0x3810;
+                        mHsChainInterpCurrSubTop = mIronBallBgChkPos;
+                        mHsChainInterpCurrValid = true;
                     }
-
-                    memcpy(mIBChainInterpCurrPos, mIronBallChainPos, IRON_BALL_CHAIN_COUNT * sizeof(cXyz));
-                    memcpy(mIBChainInterpCurrAngle, mIronBallChainAngle, IRON_BALL_CHAIN_COUNT * sizeof(csXyz));
-                    mIBChainInterpCurrHandRoot = mHookshotTopPos;
-                    mIBChainInterpCurrValid = true;
-
-                    dusk::frame_interp::add_interpolation_callback(&ironBallChainInterpCallback, this);
                 }
 #endif
             }

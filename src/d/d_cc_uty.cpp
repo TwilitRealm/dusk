@@ -407,7 +407,7 @@ fopAc_ac_c* cc_at_check(fopAc_ac_c* i_enemy, dCcU_AtInfo* i_AtInfo) {
         }
 
         if (static_cast<dCcD_GObjInf*>(i_AtInfo->mpCollider)->GetAtMtrl() == dCcD_MTRL_LIGHT) {
-            if (fopAcM_GetName(i_enemy) == fpcNm_B_GND_e) {
+            if (fopAcM_GetName(i_enemy) == fpcNm_B_GND_e && i_AtInfo->mHitType != HIT_TYPE_LINK_NORMAL_ATTACK) {
                 i_AtInfo->mAttackPower = 0;
             } else if (fopAcM_GetName(i_enemy) != fpcNm_B_ZANT_e) {
                 i_AtInfo->mAttackPower = 100;

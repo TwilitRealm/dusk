@@ -15,15 +15,50 @@
 #include <cstring>
 
 #ifdef TARGET_PC
-#include <span>
-#include <numbers>
-#include <array>
+#include "dusk/settings.h"
+#include "m_Do/m_Do_graphic.h"
+#include <dolphin/gx/GXAurora.h>
+#include <aurora/math.hpp>
 
-constexpr u16 kMapResolutionMultiplier = 4;
-constexpr u16 kMapImageSide = 16 * kMapResolutionMultiplier;
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <functional>
+#include <limits>
+#include <numbers>
+#include <span>
+
+constexpr u16 kMapIconResolutionMultiplier = 4;
+constexpr u16 kMapImageSide = 16 * kMapIconResolutionMultiplier;
 constexpr u32 kMapImageTotalPixels = kMapImageSide * kMapImageSide;
 
 typedef std::function<u8(size_t, size_t)> PaintI8Fn;
+
+u16 scaled_map_axis(u16 value, f32 scale) {
+    const auto scaledValue =
+        static_cast<u32>(std::max(1.0f, std::round(static_cast<f32>(value) * scale)));
+    return static_cast<u16>(std::min<u32>(scaledValue, std::numeric_limits<u16>::max()));
+}
+
+aurora::Vec2<u16> map_render_size_for(u16 width, u16 height) {
+    if (width == 0 || height == 0) {
+        return {width, height};
+    }
+
+    u32 renderWidth = 0;
+    u32 renderHeight = 0;
+    AuroraGetRenderSize(&renderWidth, &renderHeight);
+
+    const f32 logicalWidth = std::max(mDoGph_gInf_c::getWidthF(), 1.0f);
+    const f32 logicalHeight = std::max(mDoGph_gInf_c::getHeightF(), 1.0f);
+    const f32 irScaleX = renderWidth > 0 ? static_cast<f32>(renderWidth) / logicalWidth : 1.0f;
+    const f32 irScaleY = renderHeight > 0 ? static_cast<f32>(renderHeight) / logicalHeight : 1.0f;
+    const f32 hudScale = std::clamp(dusk::getSettings().game.hudScale.getValue(), 0.5f, 2.0f);
+    return {
+        scaled_map_axis(width, irScaleX * hudScale),
+        scaled_map_axis(height, irScaleY * hudScale),
+    };
+}
 
 void paint_i8(std::span<u8> dst, size_t width, PaintI8Fn paint) {
     const auto blocksAcross = width >> 3;
@@ -478,9 +513,9 @@ void dRenderingMap_c::makeResTIMG(ResTIMG* p_image, u16 width, u16 height, u8* p
     p_image->format = GX_TF_C8;
     p_image->alphaEnabled = 2;
 #ifdef TARGET_PC
-    // Increase map render resolution
-    p_image->width = width * kMapResolutionMultiplier;
-    p_image->height = height * kMapResolutionMultiplier;
+    const auto [rw, rh] = map_render_size_for(width, height);
+    p_image->width = rw;
+    p_image->height = rh;
 #else
     p_image->width = width;
     p_image->height = height;
@@ -563,16 +598,14 @@ void dRenderingFDAmap_c::drawBack() const {
 
 void dRenderingFDAmap_c::preRenderingMap() {
 #ifdef TARGET_PC
-    // Increase map render resolution
-    const u16 w = mTexWidth * kMapResolutionMultiplier;
-    const u16 h = mTexHeight * kMapResolutionMultiplier;
-    GXCreateFrameBuffer(w, h);
+    const auto [rw, rh] = map_render_size_for(mTexWidth, mTexHeight);
+    GXCreateFrameBuffer(rw, rh);
     // Set logical viewport dimensions
     GXSetViewport(0.0f, 0.0f, mTexWidth, mTexHeight, 0.0f, 1.0f);
     GXSetScissor(0, 0, mTexWidth, mTexHeight);
     // Set render viewport dimensions
-    GXSetViewportRender(0.0f, 0.0f, w, h, 0.0f, 1.0f);
-    GXSetScissorRender(0, 0, w, h);
+    GXSetViewportRender(0.0f, 0.0f, rw, rh, 0.0f, 1.0f);
+    GXSetScissorRender(0, 0, rw, rh);
 #else
     GXSetViewport(0.0f, 0.0f, mTexWidth, mTexHeight, 0.0f, 1.0f);
     GXSetScissor(0, 0, mTexWidth, mTexHeight);
@@ -610,11 +643,9 @@ void dRenderingFDAmap_c::preRenderingMap() {
 void dRenderingFDAmap_c::postRenderingMap() {
     GXSetCopyFilter(GX_FALSE, NULL, GX_FALSE, NULL);
 #ifdef TARGET_PC
-    // Increase map render resolution
-    const u16 w = mTexWidth * kMapResolutionMultiplier;
-    const u16 h = mTexHeight * kMapResolutionMultiplier;
-    GXSetTexCopySrc(0, 0, w, h);
-    GXSetTexCopyDst(w, h, GX_CTF_R8, GX_FALSE);
+    const auto [rw, rh] = map_render_size_for(mTexWidth, mTexHeight);
+    GXSetTexCopySrc(0, 0, rw, rh);
+    GXSetTexCopyDst(rw, rh, GX_CTF_R8, GX_FALSE);
     GXCopyTex(field_0x4, GX_TRUE);
     GXRestoreFrameBuffer();
 #else
