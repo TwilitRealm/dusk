@@ -2773,7 +2773,7 @@ public:
     int procDemoBoomerangCatch();
     int procCoDeadInit(int);
 #if TARGET_PC
-    int loseRupees();
+    void loseRupees();
 #endif
     int procCoDead();
     int procCoLookAroundInit();

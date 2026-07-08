@@ -3005,10 +3005,13 @@ int daAlink_c::procCoDeadInit(int param_0) {
     field_0x3080 = 0;
     mProcVar5.field_0x3012 = 0x3F;
     field_0x3198 = -1;
+    if (dusk::getSettings().game.loseRupees) {
+        loseRupees();
+    }
     return 1;
 }
 #if TARGET_PC
-int daAlink_c::loseRupees() {
+void daAlink_c::loseRupees() {
     g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().setRupee(g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().getRupee() / 2);
 }
 #endif
@@ -3105,9 +3108,6 @@ int daAlink_c::procCoDead() {
                 // If Hyrule Castle sewers, reuse old respawn logic:
                 if (checkStageName("R_SP107")) {
                     startRestartRoom(mode, 0xC9, 0, 1);
-                    if (dusk::getSettings().game.loseRupees) {
-                        loseRupees();
-                    }
                     return 1;
                 }
                 // Otherwise, reuse game start stuff:
@@ -3119,9 +3119,6 @@ int daAlink_c::procCoDead() {
                     -1, 0.0f, 0, 1, 0, 0, 0, 0
                     );
                 g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().setLife(12);
-                if (dusk::getSettings().game.loseRupees) {
-                    loseRupees();
-                }
                 return 1;
             }
 
