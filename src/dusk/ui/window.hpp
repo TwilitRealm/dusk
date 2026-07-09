@@ -17,8 +17,13 @@ public:
         std::unique_ptr<Button> button;
         TabBuilder builder;
     };
+    struct Props {
+        bool tabBar = true;
+        std::vector<Rml::String> styleSheets;
+    };
 
-    Window();
+    Window() : Window(Props{}) {}
+    explicit Window(Props props);
 
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
@@ -34,6 +39,9 @@ protected:
     void request_close();
     virtual bool consume_close_request();
     void add_tab(const Rml::String& title, TabBuilder builder);
+    // Tab-bar-less counterpart of add_tab: stores the builder and runs it immediately.
+    void set_content(TabBuilder builder);
+    void rebuild_content();
     void refresh_active_tab();
     void update_safe_area() noexcept;
     void clear_content() noexcept;
@@ -52,6 +60,9 @@ protected:
     Rml::Element* mRoot;
     Rml::Element* mContentRoot;
     std::unique_ptr<TabBar> mTabBar;
+    // Only set for tab-bar-less windows.
+    std::unique_ptr<Button> mCloseButton;
+    TabBuilder mContentBuilder;
     std::vector<std::unique_ptr<Component> > mContentComponents;
     Insets mBodyPadding;
     bool mInitialOpen = true;

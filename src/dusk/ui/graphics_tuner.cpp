@@ -300,7 +300,7 @@ void GraphicsTuner::show() {
 }
 
 void GraphicsTuner::hide(bool close) {
-    config::Save();
+    config::save();
     mRoot->RemoveAttribute("open");
     if (close) {
         mPendingClose = true;

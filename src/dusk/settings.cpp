@@ -1,5 +1,6 @@
 #include "dusk/settings.h"
 #include "dusk/config.hpp"
+#include <aurora/aurora.h>
 
 namespace dusk {
 
@@ -102,6 +103,7 @@ UserSettings g_userSettings = {
         .invertMouseY {"game.invertMouseY", false},
         .freeCamera {"game.freeCamera", false},
         .enableTouchControls {"game.enableTouchControls", false},
+        .touchTargeting {"game.touchTargeting", TouchTargeting::Hybrid},
         .enableMenuPointer {"game.enableMenuPointer", true},
         .touchControlsLayout {"game.touchControlsLayout", ui::ControlLayout{}},
         .invertCameraXAxis {"game.invertCameraXAxis", false},
@@ -166,7 +168,6 @@ UserSettings g_userSettings = {
         .isoVerification {"backend.isoVerification", DiscVerificationState::Unknown},
         .graphicsBackend {"backend.graphicsBackend", "auto"},
         .skipPreLaunchUI {"backend.skipPreLaunchUI", false},
-        .showPipelineCompilation {"backend.showPipelineCompilation", false},
         .wasPresetChosen {"backend.wasPresetChosen", false},
         .checkForUpdates {"backend.checkForUpdates", true},
         .cardFileType {"backend.cardFileType", static_cast<int>(CARD_GCIFOLDER)},
@@ -276,7 +277,8 @@ void registerSettings() {
     Register(g_userSettings.game.touchCameraYSensitivity);
     Register(g_userSettings.game.minimalHUD);
     Register(g_userSettings.game.hudScale);
-    Register(g_userSettings.game.pauseOnFocusLost);
+    Register(g_userSettings.game.pauseOnFocusLost,
+        [](const bool& value, const bool&) { aurora_set_pause_on_focus_lost(value); });
     Register(g_userSettings.game.enableDiscordPresence);
     Register(g_userSettings.game.bloomMode);
     Register(g_userSettings.game.bloomMultiplier);
@@ -339,6 +341,7 @@ void registerSettings() {
     Register(g_userSettings.game.invertMouseY);
     Register(g_userSettings.game.freeCamera);
     Register(g_userSettings.game.enableTouchControls);
+    Register(g_userSettings.game.touchTargeting);
     Register(g_userSettings.game.enableMenuPointer);
     Register(g_userSettings.game.touchControlsLayout);
     Register(g_userSettings.game.debugFlyCam);
@@ -357,7 +360,6 @@ void registerSettings() {
     Register(g_userSettings.backend.isoVerification);
     Register(g_userSettings.backend.graphicsBackend);
     Register(g_userSettings.backend.skipPreLaunchUI);
-    Register(g_userSettings.backend.showPipelineCompilation);
     Register(g_userSettings.backend.wasPresetChosen);
     Register(g_userSettings.backend.checkForUpdates);
     Register(g_userSettings.backend.cardFileType);

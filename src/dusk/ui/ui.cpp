@@ -17,8 +17,9 @@
 #include "aurora/lib/window.hpp"
 #include "dusk/config.hpp"
 #include "dusk/io.hpp"
-#include "input.hpp"
 #include "icon_provider.hpp"
+#include "input.hpp"
+#include "mod_texture_provider.hpp"
 #include "prelaunch.hpp"
 #include "window.hpp"
 
@@ -62,11 +63,13 @@ bool initialize() noexcept {
     load_font("NotoMono-Regular.ttf");
 
     register_icon_texture_provider();
+    register_mod_texture_provider();
     sInitialized = true;
     return true;
 }
 
 void shutdown() noexcept {
+    unregister_mod_texture_provider();
     unregister_icon_texture_provider();
     sDocumentStack.clear();
     sPassiveDocuments.clear();

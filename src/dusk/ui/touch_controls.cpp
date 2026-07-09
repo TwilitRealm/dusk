@@ -485,43 +485,71 @@ void TouchControls::set_control_pressed(Control control, bool pressed) {
             mLastLTapTime = {};
             break;
         }
-        if (pressed && (mLLatched || mManualLLatched)) {
+        switch (getSettings().game.touchTargeting.getValue()) {
+        case TouchTargeting::Hold:
+            mLPressed = pressed;
             mLLatched = false;
             mManualLLatched = false;
-            mLPressed = false;
-            mLReleasePending = true;
+            mLReleasePending = false;
             mLPressStartTime = {};
             mLastLTapTime = {};
-            set_control_visual(control, false);
-        } else if (pressed) {
-            const auto now = clock::now();
-            if (!player_attention_locked() && mLastLTapTime != clock::time_point{} &&
-                now - mLastLTapTime <= kLDoubleTapWindow)
-            {
-                mManualLLatched = true;
+            break;
+        case TouchTargeting::Switch:
+            if (pressed) {
+                const bool wasLatched = mLPressed || mLLatched || mManualLLatched;
+                mLPressed = false;
+                mLLatched = false;
+                mManualLLatched = !wasLatched;
+                mLReleasePending = true;
+            } else {
+                mLPressed = false;
+                mLLatched = false;
+                mLReleasePending = false;
+            }
+            mLPressStartTime = {};
+            mLastLTapTime = {};
+            break;
+        case TouchTargeting::Hybrid:
+        default:
+            if (pressed && (mLLatched || mManualLLatched)) {
+                mLLatched = false;
+                mManualLLatched = false;
                 mLPressed = false;
                 mLReleasePending = true;
                 mLPressStartTime = {};
                 mLastLTapTime = {};
+                set_control_visual(control, false);
+            } else if (pressed) {
+                const auto now = clock::now();
+                if (!player_attention_locked() && mLastLTapTime != clock::time_point{} &&
+                    now - mLastLTapTime <= kLDoubleTapWindow)
+                {
+                    mManualLLatched = true;
+                    mLPressed = false;
+                    mLReleasePending = true;
+                    mLPressStartTime = {};
+                    mLastLTapTime = {};
+                } else if (!mLReleasePending) {
+                    mLPressed = true;
+                    mLPressStartTime = now;
+                }
             } else if (!mLReleasePending) {
-                mLPressed = true;
-                mLPressStartTime = now;
+                mLPressed = false;
             }
-        } else if (!mLReleasePending) {
-            mLPressed = false;
-        }
-        if (!pressed) {
-            const auto now = clock::now();
-            if (!mLReleasePending) {
-                const bool wasQuickTap = mLPressStartTime != clock::time_point{} &&
-                                         now - mLPressStartTime <= kLDoubleTapWindow;
-                mLastLTapTime = wasQuickTap ? now : clock::time_point{};
+            if (!pressed) {
+                const auto now = clock::now();
+                if (!mLReleasePending) {
+                    const bool wasQuickTap = mLPressStartTime != clock::time_point{} &&
+                                             now - mLPressStartTime <= kLDoubleTapWindow;
+                    mLastLTapTime = wasQuickTap ? now : clock::time_point{};
+                }
+                mLPressStartTime = {};
+                mLReleasePending = false;
             }
-            mLPressStartTime = {};
-            mLReleasePending = false;
-        }
-        if (!pressed && !player_attention_locked()) {
-            mLLatched = false;
+            if (!pressed && !player_attention_locked()) {
+                mLLatched = false;
+            }
+            break;
         }
         break;
     case Control::R:
@@ -635,6 +663,17 @@ void TouchControls::apply_control_transform(Control control) noexcept {
 }
 
 void TouchControls::sync_l_lock_state() noexcept {
+    const auto targeting = getSettings().game.touchTargeting.getValue();
+    if (targeting == TouchTargeting::Hold) {
+        mLLatched = false;
+        mManualLLatched = false;
+        return;
+    }
+    if (targeting == TouchTargeting::Switch) {
+        mLLatched = false;
+        return;
+    }
+
     if (player_attention_locked()) {
         if (mLPressed) {
             mLLatched = true;

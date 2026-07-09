@@ -585,7 +585,7 @@ bool TouchControlsEditor::handle_nav_command(Rml::Event& event, NavCommand cmd) 
 void TouchControlsEditor::save_layout() {
     mWorkingLayout.version = ControlLayout::Version;
     getSettings().game.touchControlsLayout.setValue(mWorkingLayout);
-    config::Save();
+    config::save();
     mDoAud_seStartMenu(kSoundItemChange);
     pop();
 }
