@@ -193,7 +193,7 @@ void daAlink_c::setShieldCrouch() {
     setSingleAnimeBaseSpeed(ANM_CROUCH_DEF, mpHIO->mGuard.m.mCrouchGuardAnmSpeed,
                             mpHIO->mGuard.m.mCrouchGuardInterpolation);
     onNoResetFlg2(FLG2_UNK_8000000);
-    if (mDoCPd_c::getTrigB(PAD_1)) {
+    if (mDoCPd_c::getTrigB(PAD_1) && mEquipItem == 0x103) {
         procCutNormalInit(CUT_NM_PARAM_STAB);
         resetCombo(TRUE);
     }
