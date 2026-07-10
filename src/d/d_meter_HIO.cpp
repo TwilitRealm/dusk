@@ -1734,10 +1734,10 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
     mButtonBVesselPosX = 0.0f;
     mButtonBVesselPosY = 0.0f;
 
-    mMidnaIconScale = 1.1f;
+    mMidnaIconScale = 1.0f;
     mMidnaIconAlpha = 1.0f;
-    mMidnaIconPosX = -170.0f;
-    mMidnaIconPosY = 25.0f;
+    mMidnaIconPosX = -15.0f;
+    mMidnaIconPosY = 130.0f;
 
     field_0x134 = 1.1f;
     field_0x138 = 1.0f;

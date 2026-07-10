@@ -1334,8 +1334,6 @@ void dMeter2Draw_c::initButtonCross() {
     static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju3')))->setString(0x40, "");
     static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju4')))->setString(0x40, "");
 
-    mpButtonCrossParent->getPanePtr()->appendChild(mpButtonMidona->mPane); // This ties Midna icon to the dpad, need to fix position
-
     dMeter2Info_getString(
         0x61, static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju0')))->getStringPtr(), NULL);
     dMeter2Info_getString(
