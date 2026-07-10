@@ -437,7 +437,12 @@ void dMeter2_c::checkStatus() {
 
     field_0x128 = daPy_py_c::checkNowWolf();
 
+#if TARGET_PC
+    dMsgObject_c* msgObject = dMsgObject_getMsgObjectClass();
+    if (!dComIfGp_2dShowCheck() || (msgObject != NULL && msgObject->isPlaceMessage())) {
+#else
     if (!dComIfGp_2dShowCheck() || dMsgObject_getMsgObjectClass()->isPlaceMessage()) {
+#endif
         mStatus |= 0x4000;
     } else if (dComIfGp_checkPlayerStatus1(0, 1) && dComIfGp_getAStatus() == 0x12) {
         mStatus |= 0x200000;
@@ -2870,8 +2875,14 @@ void dMeter2_c::alphaAnimeButton() {
     u8 var_31;
     var_31 = 0;
 
+#if TARGET_PC
+    dMsgObject_c* msgObject = dMsgObject_getMsgObjectClass();
+    if ((mStatus & 0x4000) ||
+        ((mStatus & 0x100) && (msgObject != NULL && msgObject->isAutoMessageFlag())) ||
+#else
     if ((mStatus & 0x4000) ||
         ((mStatus & 0x100) && dMsgObject_getMsgObjectClass()->isAutoMessageFlag()) ||
+#endif
         ((mStatus & 0x40000000) && !(mStatus & 0x100)) || (mStatus & 0x80000000) || (mStatus & 8) ||
         (mStatus & 0x10) || (mStatus & 0x20) || (mStatus & 0x04000000) || (mStatus & 0x10000000))
     {

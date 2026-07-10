@@ -7602,6 +7602,10 @@ bool dCamera_c::executeDebugFlyCam() {
         sFlyCamLastMousePos = mouseValid ? io.MousePos : ImVec2{-1.0f, -1.0f};
     }
 
+    if (dusk::getSettings().game.enableMirrorMode) {
+        stickX *= -1.0f;
+    }
+
     f32 verticalDisp = 0.0f;
     if (trigR >= FLYCAM_TRIGGER_DEADZONE) {
         verticalDisp += trigR;
@@ -7712,7 +7716,7 @@ bool dCamera_c::freeCamera() {
 
     f32 yaw_rad = 0.0f;
     f32 pitch_rad = 0.0f;
-    dusk::mouse::getCameraDeltas(yaw_rad, pitch_rad);
+    dusk::mouse::get_camera_deltas(yaw_rad, pitch_rad);
     if (dusk::getSettings().game.enableMouseCamera && (yaw_rad != 0.0f || pitch_rad != 0.0f) &&
         !dComIfGp_checkCameraAttentionStatus(dComIfGp_getPlayerCameraID(0), 0x8))
     {
