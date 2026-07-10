@@ -1266,7 +1266,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     [] {
                         return kLightSwordModes[static_cast<u8>(getSettings().game.alwaysLightSword.getValue())];
                     },
-                .isDisabled = [] { return getSettings().game.speedrunMode; },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
                 .isModified =
                     [] {
                         return getSettings().game.alwaysLightSword.getValue() !=
@@ -1285,7 +1285,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                         .on_pressed([i] {
                             mDoAud_seStartMenu(kSoundItemChange);
                             getSettings().game.alwaysLightSword.setValue(static_cast<LightSwordMode>(i));
-                            config::Save();
+                            config::save();
                         });
                 }
                 pane.add_rml(
@@ -1323,9 +1323,9 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .setValue =
                     [](int value) {
                         getSettings().game.swordMultiplier.setValue(value);
-                        config::Save();
+                        config::save();
                     },
-                .isDisabled = [] { return getSettings().game.speedrunMode; },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
                 .isModified =
                     [] {
                         return getSettings().game.swordMultiplier.getValue() !=
