@@ -1067,7 +1067,20 @@ void dMenu_Ring_c::setItem() {
             mXButtonSlot = mCurrentSlot;
             uVar1 = mItemSlots[mXButtonSlot];
             mixItemIndex0 = dItemNo_NONE_e;
-        } else {
+        }
+        else if (mItemSlots[mCurrentSlot] == uVar3) {
+            uVar3 = dComIfGs_getSelectItemIndex(0);
+            mixItemIndex2 = dComIfGs_getMixItemIndex(0);
+            if (uVar3 == dItemNo_NONE_e) {
+                mZButtonSlot = dItemNo_NONE_e;
+            } else {
+                mZButtonSlot = mXButtonSlot;
+            }
+            mXButtonSlot = mCurrentSlot;
+            uVar1 = mItemSlots[mXButtonSlot];
+            mixItemIndex0 = dItemNo_NONE_e;
+        }
+        else {
             if (dComIfGs_getMixItemIndex(1) == mItemSlots[mCurrentSlot]) {
                 uVar2 = dComIfGs_getSelectItemIndex(0);
                 mixItemIndex1 = dItemNo_NONE_e;
@@ -1079,7 +1092,20 @@ void dMenu_Ring_c::setItem() {
                 mXButtonSlot = mCurrentSlot;
                 uVar1 = mItemSlots[mXButtonSlot];
                 mixItemIndex0 = dItemNo_NONE_e;
-            } else {
+            }
+            else if (dComIfGs_getMixItemIndex(2) == mItemSlots[mCurrentSlot]) {
+                uVar3 = dComIfGs_getSelectItemIndex(0);
+                mixItemIndex2 = dItemNo_NONE_e;
+                if (uVar3 == dItemNo_NONE_e) {
+                    mZButtonSlot = dItemNo_NONE_e;
+                } else {
+                    mZButtonSlot = mXButtonSlot;
+                }
+                mXButtonSlot = mCurrentSlot;
+                uVar1 = mItemSlots[mXButtonSlot];
+                mixItemIndex0 = dItemNo_NONE_e;
+            }
+            else {
                 mXButtonSlot = mCurrentSlot;
                 uVar1 = mItemSlots[mXButtonSlot];
                 mixItemIndex0 = dItemNo_NONE_e;
@@ -1098,7 +1124,21 @@ void dMenu_Ring_c::setItem() {
             mYButtonSlot = mCurrentSlot;
             uVar2 = mItemSlots[mYButtonSlot];
             mixItemIndex1 = dItemNo_NONE_e;
-        } else {
+        }
+        else if (mItemSlots[mCurrentSlot] == dComIfGs_getSelectItemIndex(2)) {
+            u8 temp = dComIfGs_getSelectItemIndex(1);
+            uVar3 = temp;
+            mixItemIndex2 = dComIfGs_getMixItemIndex(1);
+            if (temp == dItemNo_NONE_e) {
+                mZButtonSlot = dItemNo_NONE_e;
+            } else {
+                mZButtonSlot = mYButtonSlot;
+            }
+            mYButtonSlot = mCurrentSlot;
+            uVar2 = mItemSlots[mYButtonSlot];
+            mixItemIndex1 = dItemNo_NONE_e;
+        }
+        else {
             if (dComIfGs_getMixItemIndex(0) == mItemSlots[mCurrentSlot]) {
                 uVar1 = dComIfGs_getSelectItemIndex(1);
                 mixItemIndex0 = dItemNo_NONE_e;
@@ -1106,6 +1146,18 @@ void dMenu_Ring_c::setItem() {
                     mXButtonSlot = dItemNo_NONE_e;
                 } else {
                     mXButtonSlot = mYButtonSlot;
+                }
+                mYButtonSlot = mCurrentSlot;
+                uVar2 = mItemSlots[mYButtonSlot];
+                mixItemIndex1 = dItemNo_NONE_e;
+            }
+            else if (dComIfGs_getMixItemIndex(2) == mItemSlots[mCurrentSlot]) {
+                uVar3 = dComIfGs_getSelectItemIndex(1);
+                mixItemIndex2 = dItemNo_NONE_e;
+                if (uVar3 == dItemNo_NONE_e) {
+                    mZButtonSlot = dItemNo_NONE_e;
+                } else {
+                    mZButtonSlot = mYButtonSlot;
                 }
                 mYButtonSlot = mCurrentSlot;
                 uVar2 = mItemSlots[mYButtonSlot];
@@ -1129,20 +1181,46 @@ void dMenu_Ring_c::setItem() {
             mZButtonSlot = mCurrentSlot;
             uVar3 = mItemSlots[mZButtonSlot];
             mixItemIndex2 = dItemNo_NONE_e;
-        } else {
+        }
+        else if (mItemSlots[mCurrentSlot] == dComIfGs_getSelectItemIndex(1)) {
+            u8 temp = dComIfGs_getSelectItemIndex(2);
+            uVar2 = temp;
+            mixItemIndex1 = dComIfGs_getMixItemIndex(2);
+            if (temp == dItemNo_NONE_e) {
+                mYButtonSlot = dItemNo_NONE_e;
+            } else {
+                mYButtonSlot = mZButtonSlot;
+            }
+            mZButtonSlot = mCurrentSlot;
+            uVar3 = mItemSlots[mZButtonSlot];
+            mixItemIndex2 = dItemNo_NONE_e;
+        }
+        else {
             if (dComIfGs_getMixItemIndex(0) == mItemSlots[mCurrentSlot]) {
-                uVar1 = dComIfGs_getSelectItemIndex(1);
+                uVar1 = dComIfGs_getSelectItemIndex(2);
                 mixItemIndex0 = dItemNo_NONE_e;
                 if (uVar1 == dItemNo_NONE_e) {
                     mXButtonSlot = dItemNo_NONE_e;
                 } else {
-                    mXButtonSlot = mYButtonSlot;
+                    mXButtonSlot = mZButtonSlot;
                 }
-                mYButtonSlot = mCurrentSlot;
+                mZButtonSlot = mCurrentSlot;
+                uVar3 = mItemSlots[mZButtonSlot];
+                mixItemIndex2 = dItemNo_NONE_e;
+            }
+            else if (dComIfGs_getMixItemIndex(1) == mItemSlots[mCurrentSlot]) {
+                uVar2 = dComIfGs_getSelectItemIndex(2);
+                mixItemIndex1 = dItemNo_NONE_e;
+                if (uVar2 == dItemNo_NONE_e) {
+                    mYButtonSlot = dItemNo_NONE_e;
+                } else {
+                    mYButtonSlot = mZButtonSlot;
+                }
+                mZButtonSlot = mCurrentSlot;
                 uVar3 = mItemSlots[mZButtonSlot];
                 mixItemIndex2 = dItemNo_NONE_e;
             } else {
-                mYButtonSlot = mCurrentSlot;
+                mZButtonSlot = mCurrentSlot;
                 uVar3 = mItemSlots[mZButtonSlot];
                 mixItemIndex2 = dItemNo_NONE_e;
             }
@@ -1162,7 +1240,7 @@ void dMenu_Ring_c::setItem() {
 
 void dMenu_Ring_c::setJumpItem(bool i_useVibrationM) {
     for (int i = 0; i < 4; i++) {
-        if (i == 4) {
+        if (i == 3) {
             setSelectItem(i, field_0x6b4[i]);
         } else if (i == field_0x6cd) {
             setSelectItem(i, getItem(field_0x6cb, 0));
@@ -1409,6 +1487,7 @@ void dMenu_Ring_c::setMixItem() {
         field_0x6b8[2] = 0xff;
         field_0x6b3 = 2;
         field_0x6cd = 2;
+        bVar1 = true;
     } else {
         switch (item) {
         case dItemNo_NORMAL_BOMB_e:

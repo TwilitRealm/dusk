@@ -3364,9 +3364,10 @@ void dMeter2Draw_c::setButtonIconMidonaAlpha(u32 param_0) {
         255.0f;
     f32 temp_f30_2 = mpButtonParent->getAlphaRate();
     if (param_0 & 0x1000000) {
-        var_f29_2 = 0.0f;
+        var_f29_2 = 1.0f; // Changed from 0.0f to 1.0f to stop Z fading in item ring
     } else if (!dMeter2Info_isUseButton(0x800)) {
-        var_f29_2 = (f32)g_drawHIO.mButtonXYBaseDimAlpha / 255.0f;
+        // var_f29_2 = (f32)g_drawHIO.mButtonXYBaseDimAlpha / 255.0f;
+        var_f29_2 = 1.0f; // Stop Z from fading while item is being used
     }
 
     if (field_0x724 != var_f29_2) {
@@ -3440,7 +3441,9 @@ void dMeter2Draw_c::setButtonIconAlpha(int i_no, u8 unused0, u32 unused1, bool u
                 var_r26_2 = g_drawHIO.mButtonXYBaseDimAlpha;
             }
         } else if (i_no == 2) {
-            if (!dMeter2Info_isUseButton(0x800)) {
+            // Check if X and Y buttons are usable instead of Midna to dim Z
+            const bool isXYUsable = dMeter2Info_isUseButton(4) || dMeter2Info_isUseButton(8);
+            if (!isXYUsable) {
                 if (getFishingType()) {
                     var_r28 = 0;
                 } else {
