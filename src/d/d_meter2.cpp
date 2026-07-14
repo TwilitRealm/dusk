@@ -2377,7 +2377,7 @@ void dMeter2_c::move2DContents() {
             var_r19 = 1;
             var_r30 -= 1;
         }
-
+        /**
         if (mpMeterDraw->isEmphasisZ() && var_r30 != 0 && mpEmpButton->isSetButton(3)) {
             if (mZStatus == 8) {
                 mpEmpButton->setString(mpMeterDraw->getActionString(100, 0, NULL), 3, 2 - var_r30,
@@ -2390,7 +2390,7 @@ void dMeter2_c::move2DContents() {
             var_r28 = 1;
             var_r30 -= 1;
         }
-
+        **/
         if (mpMeterDraw->isEmphasisR() && var_r30 != 0 && mpEmpButton->isSetButton(2)) {
             mpEmpButton->setString(mpMeterDraw->getActionString(mRStatus, 0, NULL), 2, 2 - var_r30,
                                    0);

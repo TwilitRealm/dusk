@@ -1859,7 +1859,7 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
     mButtonZItemBaseScale[0] = 1.5f;
     mButtonZItemBasePosX[0] = 16.0f;
     mButtonZItemBasePosY[0] = -12.0f;
-    mButtonZItemBaseAlpha[0] = 0.0f;
+    mButtonZItemBaseAlpha[0] = 0.5f;
 
     mButtonZItemBaseScale[1] = 1.5f;
     mButtonZItemBasePosX[1] = 0.0f;

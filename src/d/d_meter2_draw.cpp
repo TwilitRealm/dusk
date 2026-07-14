@@ -2638,7 +2638,7 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
             var_r26 = dComIfGp_isZSetFlag(2) | dComIfGp_isZSetFlag(4);
         }
 
-        char* mp_string = getActionString(i_action, 1, &field_0x768[i_no]);
+        char* mp_string = getActionString(i_action, 1, i_no == SELECT_Z_e ? &field_0x764 : &field_0x768[i_no]);
         if (var_r26) {
             field_0x768[i_no] = 7;
         }
@@ -2962,13 +2962,6 @@ void dMeter2Draw_c::setAlphaButtonChange(bool param_0) {
     if (field_0x80c != g_drawHIO.field_0x168 || param_0) {
         field_0x80c = g_drawHIO.field_0x168;
     }
-
-    /**
-    if (field_0x810 != g_drawHIO.mButtonZAlpha || param_0) {
-        field_0x810 = g_drawHIO.mButtonZAlpha;
-        set_buttonZ = true;
-    }
-    **/
 
     if (mButtonZAlpha != g_drawHIO.mButtonZAlpha || param_0) {
         mButtonZAlpha = g_drawHIO.mButtonZAlpha;
