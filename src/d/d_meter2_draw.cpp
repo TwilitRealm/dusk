@@ -710,7 +710,7 @@ void dMeter2Draw_c::draw() {
                        g_drawHIO.mButtonBPikariAnimSpeed, field_0x75a);
         }
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             if (field_0x620[i] > 0.0f) {
                 drawPikari(mpBTextXY[i], &field_0x620[i], g_drawHIO.mButtonXYPikariScale,
                            g_drawHIO.mButtonXYPikariFrontOuter, g_drawHIO.mButtonXYPikariFrontInner,
