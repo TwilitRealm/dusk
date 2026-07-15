@@ -9368,7 +9368,8 @@ BOOL daAlink_c::midnaTalkTrigger() const {
         return dusk::getActionBindTrig(dusk::ActionBinds::CALL_MIDNA, 0);
     }
 #endif
-    return mItemTrigger & BTN_Z;
+    // return mItemTrigger & BTN_Z;
+    return mDoCPd_c::getHoldA(PAD_1) && mDoCPd_c::getHoldZ(PAD_1);
 }
 
 BOOL daAlink_c::swordSwingTrigger() {
