@@ -1799,7 +1799,7 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
     mButtonYItemPosY = 0.0f;
     mButtonYItemScale = 1.5f;
 
-    mButtonZItemPosX = 2.0f;
+    mButtonZItemPosX = -4.0f;
     mButtonZItemPosY = -7.0f;
     mButtonZItemScale = 1.5f;
 
@@ -1811,8 +1811,8 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
     mYItemNumPosY = -18.0f;
     mYItemNumScale = 0.95f;
 
-    mZItemNumPosX = -6.0f;
-    mZItemNumPosY = -15.0f;
+    mZItemNumPosX = 7.0f;
+    mZItemNumPosY = -30.0f;
     mZItemNumScale = 0.95f;
 
     mItemBNumPosX = 0.0f;
