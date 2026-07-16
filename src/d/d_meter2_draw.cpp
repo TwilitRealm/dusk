@@ -4015,8 +4015,8 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
         default:
             if (isBottleItem(i_itemNo)) {
                 mItemParams[SELECT_Z_e].pos_x = -3.5f;
-                mItemParams[SELECT_Z_e].pos_y = 17.0f;
-                mItemParams[SELECT_Z_e].scale = 1.888889f;
+                mItemParams[SELECT_Z_e].pos_y = 1.3f;
+                mItemParams[SELECT_Z_e].scale = 1.8f;
                 mItemParams[SELECT_Z_e].rotation = g_drawHIO.mButtonItemRotation[2];
                 mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.mZItemNumPosX;
                 mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.mZItemNumPosY;
