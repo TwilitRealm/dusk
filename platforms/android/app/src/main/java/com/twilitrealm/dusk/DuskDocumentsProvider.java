@@ -1,4 +1,4 @@
-package dev.twilitrealm.dusk;
+package dev.kamilink.lazytweaks;
 
 import android.content.ContentResolver;
 import android.content.res.AssetFileDescriptor;
@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class DuskDocumentsProvider extends DocumentsProvider {
-    public static final String AUTHORITY = "dev.twilitrealm.dusk.documents";
+    public static final String AUTHORITY = "dev.kamilink.lazytweaks.documents";
 
     private static final String ROOT_ID = "dusk";
     private static final String ROOT_DOCUMENT_ID = "root";
