@@ -16,11 +16,11 @@ def syncDuskAssets = tasks.register('syncDuskAssets', Sync) {
 }
 
 android {
-    namespace 'dev.twilitrealm.dusk'
+    namespace 'dev.kamilink.lazytweaks'
     compileSdk 36
 
     defaultConfig {
-        applicationId 'dev.twilitrealm.dusk'
+        applicationId 'dev.kamilink.lazytweaks'
         minSdk 26
         targetSdk 36
         versionCode versionCodeInt
