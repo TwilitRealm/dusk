@@ -26,8 +26,8 @@
             android:resource="@xml/game_mode_config" />
 
         <provider
-            android:name="dev.kamilink.lazytweaks.DuskDocumentsProvider"
-            android:authorities="dev.kamilink.lazytweaks.documents"
+            android:name="dev.twilitrealm.dusk.DuskDocumentsProvider"
+            android:authorities="dev.twilitrealm.dusk.documents"
             android:exported="true"
             android:grantUriPermissions="true"
             android:permission="android.permission.MANAGE_DOCUMENTS">
@@ -37,7 +37,7 @@
         </provider>
 
         <activity
-            android:name="dev.kamilink.lazytweaks.DuskActivity"
+            android:name="dev.twilitrealm.dusk.DuskActivity"
             android:alwaysRetainTaskState="true"
             android:configChanges="layoutDirection|locale|grammaticalGender|fontScale|fontWeightAdjustment|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:exported="true"

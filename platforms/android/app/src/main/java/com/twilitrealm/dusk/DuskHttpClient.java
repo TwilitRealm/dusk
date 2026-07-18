@@ -1,4 +1,4 @@
-package dev.kamilink.lazytweaks;
+package dev.twilitrealm.dusk;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

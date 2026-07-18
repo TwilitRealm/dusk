@@ -1,4 +1,4 @@
 # Keep SDL activity and related JNI bridge methods.
 -keep class org.libsdl.app.** { *; }
--keep class dev.kamilink.lazytweaks.DuskHttpClient { *; }
--keep class dev.kamilink.lazytweaks.DuskHttpClient$Response { *; }
+-keep class dev.twilitrealm.dusk.DuskHttpClient { *; }
+-keep class dev.twilitrealm.dusk.DuskHttpClient$Response { *; }

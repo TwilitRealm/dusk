@@ -1,4 +1,4 @@
-package dev.kamilink.lazytweaks;
+package dev.twilitrealm.dusk;
 
 import android.app.ActionBar;
 import android.app.Activity;
