@@ -190,12 +190,18 @@ BOOL daAlink_c::checkShieldCrouch() {
 
 void daAlink_c::setShieldCrouch() {
     mNormalSpeed = 0.0f;
+    int cutDir = getCutDirection();
     setSingleAnimeBaseSpeed(ANM_CROUCH_DEF, mpHIO->mGuard.m.mCrouchGuardAnmSpeed,
                             mpHIO->mGuard.m.mCrouchGuardInterpolation);
     onNoResetFlg2(FLG2_UNK_8000000);
-    if (mDoCPd_c::getTrigB(PAD_1) && mEquipItem == 0x103) {
-        procCutNormalInit(CUT_NM_PARAM_STAB);
-        resetCombo(TRUE);
+    if (mEquipItem == 0x103 && mDoCPd_c::getTrigB(PAD_1)) {
+        if (cutDir == DIR_FORWARD) {
+            procCutNormalInit(CUT_NM_PARAM_COMBO_STAB);
+            resetCombo(TRUE);
+        }
+        else {
+            setCutDash(0, 0);
+        }
     }
 }
 

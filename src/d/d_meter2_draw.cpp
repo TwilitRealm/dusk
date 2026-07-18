@@ -3602,7 +3602,7 @@ void dMeter2Draw_c::changeTextureItemXY(int i_no, u8 i_itemNo) {
     if (dMeter2Info_readItemTexture(i_itemNo, mpItemXYTex[i_no][field_0x76c[i_no]][0],
                                     (J2DPicture*)mpItemXY[i_no]->getPanePtr(),
                                     mpItemXYTex[i_no][field_0x76c[i_no]][1], mpItemXYPane[i_no],
-                                    mpItemXYTex[i_no][field_0x76c[i_no]][2], NULL, NULL, NULL, -1) <= 1)
+                                    NULL, NULL, NULL, NULL, -1) <= 1)
     {
         mpItemXYPane[i_no]->hide();
     } else {
