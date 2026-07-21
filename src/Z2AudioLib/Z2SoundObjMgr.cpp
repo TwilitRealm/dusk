@@ -114,6 +114,11 @@ void Z2SoundObjMgr::searchEnemy() {
         Z2GetSeqMgr()->changeSubBgmStatus(0);
         return;
     }
+
+    if (dusk::getSettings().game.noBattleMusic && !Z2GetSeqMgr()->checkBgmIDPlaying(Z2BGM_BATTLE_TWILIGHT)) {
+        Z2GetSeqMgr()->stopBattleBgm(1, 1);
+        return;
+    }
     #endif
 
     if (!Z2GetLink()) {

@@ -85,6 +85,7 @@ UserSettings g_userSettings = {
         // Audio
         .noLowHpSound {"game.noLowHpSound", false},
         .midnasLamentNonStop {"game.midnasLamentNonStop", false},
+        .noBattleMusic {"game.noBattleMusic", false},
 
         // Input
         .enableGyroAim {"game.enableGyroAim", false},
@@ -301,6 +302,7 @@ void registerSettings() {
     Register(g_userSettings.game.noMissClimbing);
     Register(g_userSettings.game.noLowHpSound);
     Register(g_userSettings.game.midnasLamentNonStop);
+    Register(g_userSettings.game.noBattleMusic);
     Register(g_userSettings.game.enableTurboKeybind);
     Register(g_userSettings.game.enableResetKeybind);
     Register(g_userSettings.game.speedrunMode);

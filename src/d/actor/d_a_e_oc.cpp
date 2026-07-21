@@ -96,12 +96,12 @@ daE_OC_HIO_c::daE_OC_HIO_c() {
     field_0x04 = -1;
     radius_representation = 0;
     basic_size = 1.5f;
-    plyr_srch_max_radius_S = 1200.0f;
+    plyr_srch_max_radius_S = 2400.0f;
     plyr_srch_max_radius_M = 5000.0f;
     plyr_srch_min_radius = 400.0f;
-    battle_participation_radius = 1200.0f;
-    teammate_attention_radius = 2000.0f;
-    standby_distance = 1400.0f;
+    battle_participation_radius = 2400.0f;
+    teammate_attention_radius = 4000.0f;
+    standby_distance = 2800.0f;
     demo_waiting_time = 70.0f;
 }
 
@@ -1225,7 +1225,7 @@ void daE_OC_c::executeFind() {
                         if (pl_dist < 300.0f) {
                             cLib_chaseF(&speedF, -3.0f, 1.0f);
                         } else {
-                            cLib_chaseF(&speedF, 20.0f + nREG_F(0), 1.0f);
+                            cLib_chaseF(&speedF, 40.0f + nREG_F(0), 1.0f);
                         }
 
                         if (pl_dist < 400.0f && pl_dist > 200.0f) {
@@ -1243,7 +1243,7 @@ void daE_OC_c::executeFind() {
                         } else if (pl_dist < 300.0f) {
                             cLib_chaseF(&speedF, -3.0f, 1.0f);
                         } else {
-                            cLib_chaseF(&speedF, 20.0f + nREG_F(0), 1.0f);
+                            cLib_chaseF(&speedF, 40.0f + nREG_F(0), 1.0f);
                         }
 
                         if (speedF < 0.0f) {
@@ -1397,11 +1397,11 @@ void daE_OC_c::executeAttack() {
         case 0: {
             if (cLib_chaseF(&speedF, 0.0f, 1.0f)) {
                 if (cM_rndF(1.0f) < 0.5f) {
-                    setBck(5, 0, 5.0f, 1.0f);
+                    setBck(5, 0, 5.0f, 1.5f);
                     mSound.startCreatureVoice(Z2SE_EN_OC_V_ATTACK_B, -1);
                     mOcState = 1;
                 } else {
-                    setBck(6, 0, 5.0f, 1.0f);
+                    setBck(6, 0, 5.0f, 1.5f);
                     mSound.startCreatureVoice(Z2SE_EN_OC_V_ATTACK_C, -1);
                     mOcState = 2;
                 }
@@ -1486,7 +1486,7 @@ void daE_OC_c::executeAttack() {
             current.pos.z += (my_float - field_0x6a0) * cM_scos(shape_angle.y);
             field_0x6a0 = my_float;
             if (mpMorf->isStop()) {
-                setBck(0x1c, 2, 0.0f, 1.0f);
+                setBck(0x1c, 2, 0.0f, 3.0f);
                 mSound.startCreatureVoice(Z2SE_EN_OC_V_WAIT_ST, -1);
                 if (field_0x6e3) {
                     setActionMode(E_OC_ACTION_MOVE_OUT, 0);
@@ -1508,7 +1508,7 @@ void daE_OC_c::executeAttack() {
                 break;
             }
 
-            setBck(0x1c, 2, 5.0f, 1.0f);
+            setBck(0x1c, 2, 5.0f, 3.0f);
             mSound.startCreatureVoice(Z2SE_EN_OC_V_WAIT_ST, -1);
             if (field_0x6e3) {
                 setActionMode(E_OC_ACTION_MOVE_OUT, 0);

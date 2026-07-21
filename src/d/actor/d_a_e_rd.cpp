@@ -229,11 +229,11 @@ daE_RD_HIO_c::daE_RD_HIO_c() {
     no = -1;
     model_size = 1.2f;
     leader_size_ratio = 1.2f;
-    movement_speed = 3.5f;
-    dash_speed = 14.0f;
-    battle_init_range = 250.0f;
-    attack_init_range = 300.0f;
-    swing_speed = 1.1f;
+    movement_speed = 7.0f;
+    dash_speed = 28.0f;
+    battle_init_range = 350.0f;
+    attack_init_range = 400.0f;
+    swing_speed = 2.2f;
     command_to_ready_stance = 60;
     attack_range = 1300.0f;
     mounted_launch_distance = 2000.0f;
@@ -1275,7 +1275,7 @@ static void e_rd_fight_run(e_rd_class* i_this) {
             attack_flag = false;
         }
     } else {
-        i_this->attack_timer = 35;
+        i_this->attack_timer = 15;
     }
 
     f32 dash_speed;
@@ -1311,7 +1311,7 @@ static void e_rd_fight_run(e_rd_class* i_this) {
 
             case -10:
                 anm_init(i_this, BCK_RD_WAIT01, 7.0f, 2, 1.0f);
-                i_this->timer[1] = cM_rndF(10.0f) + 15.0f;
+                i_this->timer[1] = cM_rndF(5.0f) + 3.5f;
                 i_this->mode = -9;
                 break;
 
@@ -1370,7 +1370,7 @@ static void e_rd_fight_run(e_rd_class* i_this) {
 
         if (i_this->mode < 5 && move_gake_check(i_this, 100.0f)) {
             i_this->mode = 5;
-            i_this->timer[3] = cM_rndF(15.0f) + 30.0f;
+            i_this->timer[3] = cM_rndF(7.0f) + 15.0f;
             anm_init(i_this, BCK_RD_WAIT01, 5.0f, 2, 1.0f);
         }
 
@@ -4154,7 +4154,7 @@ static void big_damage(e_rd_class* i_this) {
     }
 
     i_this->damage_flag = 0;
-    i_this->damage_timer = 1000;
+    i_this->damage_timer = 500;
 
 }
 
@@ -4172,14 +4172,14 @@ static void small_damage(e_rd_class* i_this, int param_2) {
     if (param_2 == 0) {
         s16 range = enemy->shape_angle.y - i_this->angleY;
         if (range < -0x4000 || range > 0x4000) {
-                anm_init(i_this, BCK_RD_DAMAGE_W, 2.0f, 0, 1.0f);
+                anm_init(i_this, BCK_RD_DAMAGE_W, 2.0f, 0, 1.5f);
             } else if (range < 0) {
-                anm_init(i_this, BCK_RD_DAMAGE_L, 2.0f, 0, 1.0f);
+                anm_init(i_this, BCK_RD_DAMAGE_L, 2.0f, 0, 1.5f);
             } else {
-                anm_init(i_this, BCK_RD_DAMAGE_R, 2.0f, 0, 1.0f);
+                anm_init(i_this, BCK_RD_DAMAGE_R, 2.0f, 0, 1.5f);
             }
     } else {
-        anm_init(i_this, BCK_RD_DAMAGE_W, 2.0f, 0, 1.0f);
+        anm_init(i_this, BCK_RD_DAMAGE_W, 2.0f, 0, 1.5f);
     }
 
     i_this->field_0x9f0 = 20.0f + TREG_F(10);

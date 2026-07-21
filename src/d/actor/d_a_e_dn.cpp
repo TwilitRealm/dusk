@@ -133,11 +133,11 @@ enum Animation {
 daE_DN_HIO_c::daE_DN_HIO_c() {
     no = -1;
     model_size = 1.1f;
-    movement_speed = 7.5f;
-    dash_speed = 25.0f;
+    movement_speed = 15.0f;
+    dash_speed = 40.0f;
     battle_init_range = 300.0f;
     attack_init_range = 350.0f;
-    defense_pause_time = 3;
+    defense_pause_time = 1;
     soul_disappear_time_weak = 40;
     soul_disappear_time_strong = 80;
     field_0x22 = 1;
@@ -1471,7 +1471,7 @@ static void e_dn_attack_0(e_dn_class* i_this) {
     i_this->field_0x6f4 = 1;
     switch (i_this->mode) {
         case 0:
-            anm_init(i_this, ANM_ATTACK_TAIL_01, TREG_F(14) + 6.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
+            anm_init(i_this, ANM_ATTACK_TAIL_01, TREG_F(14) + 6.0f, J3DFrameCtrl::EMode_NONE, 1.5f);
             i_this->sound.startCreatureVoice(Z2SE_EN_DN_V_KNIFE, -1);
             i_this->mode = 1;
             // fallthrough
@@ -1506,7 +1506,7 @@ static void e_dn_attack(e_dn_class* i_this) {
     s16 sVar1, sVar2;
     switch (i_this->mode) {
         case 0:
-            anm_init(i_this, ANM_ATTACK_TAIL_02, TREG_F(14) + 6.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
+            anm_init(i_this, ANM_ATTACK_TAIL_02, TREG_F(14) + 6.0f, J3DFrameCtrl::EMode_NONE, 1.5f);
             i_this->sound.startCreatureVoice(Z2SE_EN_DN_V_KNIFE2_A, -1);
             i_this->mode = 1;
             // fallthrough
@@ -1586,7 +1586,7 @@ static void e_dn_tail_attack(e_dn_class* i_this) {
     i_this->field_0x6f4 = 1;
     switch (i_this->mode) {
         case 0:
-            anm_init(i_this, ANM_ATTACK_01, TREG_F(14) + 5.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
+            anm_init(i_this, ANM_ATTACK_01, TREG_F(14) + 5.0f, J3DFrameCtrl::EMode_NONE, 2.0f);
             i_this->mode = 1;
             break;
 
@@ -1648,7 +1648,7 @@ static void e_dn_guard(e_dn_class* i_this) {
             break;
 
         case 5:
-            anm_init(i_this, ANM_GUARD, 3.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
+            anm_init(i_this, ANM_GUARD, 3.0f, J3DFrameCtrl::EMode_NONE, 2.0f);
             i_this->sound.startCreatureVoice(Z2SE_EN_DN_V_GUARD, -1);
             i_this->mode = 6;
             // fallthrough
@@ -1692,7 +1692,7 @@ static void e_dn_s_damage(e_dn_class* i_this) {
         case 0:
             i_this->mode = 1;
             i_this->timer[0] = 20;
-            anm_init(i_this, ANM_WAIT_01, 10.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
+            anm_init(i_this, ANM_WAIT_01, 10.0f, J3DFrameCtrl::EMode_LOOP, 2.0f);
             break;
 
         case 1:
@@ -1941,11 +1941,11 @@ static void e_dn_damage(e_dn_class* i_this) {
 
                 actor->current.angle.y = i_this->field_0x724.y;
                 if (daPy_py_c::checkNowWolf() != 0) {
-                    i_this->timer[0] = 80;
-                    i_this->timer[1] = 55;
+                    i_this->timer[0] = 20;
+                    i_this->timer[1] = 15;
                 } else {
-                    i_this->timer[0] = cM_rndF(10.0f) + 60.0f;
-                    i_this->timer[1] = 35;
+                    i_this->timer[0] = cM_rndF(3.0f) + 15.0f;
+                    i_this->timer[1] = 5;
                 }
 
                 i_this->mode = 3;
@@ -2404,7 +2404,8 @@ static void damage_check(e_dn_class* i_this) {
                         if (player->getCutType() == daPy_py_c::CUT_TYPE_JUMP && player->checkCutJumpCancelTurn()) {
                             small_damage(i_this);
                             i_this->invulnerability_timer = 3;
-                        } else {
+                        } else if (player->getCutType() == daPy_py_c::CUT_TYPE_JUMP || player->getCutType() == daPy_py_c::CUT_TYPE_LARGE_JUMP_FINISH || player->getCutType() == daPy_py_c::CUT_TYPE_MORTAL_DRAW_A ||
+                            player->getCutType() == daPy_py_c::CUT_TYPE_MORTAL_DRAW_B || player->getCutType() == daPy_py_c::CUT_TYPE_LARGE_TURN_LEFT || player->getCutType() == daPy_py_c::CUT_TYPE_LARGE_TURN_RIGHT) {
                             big_damage(i_this);
                             i_this->invulnerability_timer = 1000;
                         }

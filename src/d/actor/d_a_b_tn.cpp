@@ -2421,16 +2421,16 @@ void daB_TN_c::executeAttackH() {
 
         if (playerDistance < 250.0f) {
             mActionMode2 = ACTION2_1_e;
-            setBck(BCK_TNA_ATACK_A, 0, 3.0f, 1.0f);
+            setBck(BCK_TNA_ATACK_A, 0, 3.0f, 2.0f);
         } else if (playerDistance < 350.0f) {
             mActionMode2 = ACTION2_2_e;
-            setBck(BCK_TNA_ATACK_B, 0, 3.0f, 1.0f);
+            setBck(BCK_TNA_ATACK_B, 0, 3.0f, 2.0f);
         } else if (cM_rnd() < 0.5f) {
             mActionMode2 = ACTION2_1_e;
-            setBck(BCK_TNA_ATACK_A, 0, 3.0f, 1.0f);
+            setBck(BCK_TNA_ATACK_A, 0, 3.0f, 2.0f);
         } else {
             mActionMode2 = ACTION2_2_e;
-            setBck(BCK_TNA_ATACK_B, 0, 3.0f, 1.0f);
+            setBck(BCK_TNA_ATACK_B, 0, 3.0f, 2.0f);
             setAttackBlurEffect(1);
         }
 
@@ -2641,9 +2641,9 @@ void daB_TN_c::executeDamageH() {
             current.pos.set(sp1c.x, current.pos.y, sp1c.z);
 
             if (mActionMode2 == ACTION2_0_e) {
-                setBck(BCK_TNA_DAMAGE_L, 0, 0.0f, 1.0f);
+                setBck(BCK_TNA_DAMAGE_L, 0, 0.0f, 2.0f);
             } else {
-                setBck(BCK_TNA_DAMAGE_R, 0, 0.0f, 1.0f);
+                setBck(BCK_TNA_DAMAGE_R, 0, 0.0f, 2.0f);
             }
 
             mSound.startCreatureVoice(Z2SE_EN_TN_V_DMG, -1);
@@ -3335,7 +3335,7 @@ bool daB_TN_c::checkNextMove() {
         if (mPlayerDistance < 250.0f) {
             if (mType == 1) {
                 if (mTimer3 > 90) {
-                    mTimer3 = cM_rndF(30.0f) + 60.0f;
+                    mTimer3 = cM_rndF(15.0f) + 30.0f;
                 }
             } else if (mTimer3 > 30) {
                 mTimer3 = 30;
@@ -4082,9 +4082,9 @@ void daB_TN_c::executeDamageL() {
         mSphC.OffAtSetBit();
 
         if (mActionMode2 == ACTION2_0_e) {
-            setBck(BCK_TNB_DAMAGE_L, 0, 3.0f, 1.0f);
+            setBck(BCK_TNB_DAMAGE_L, 0, 3.0f, 1.5f);
         } else {
-            setBck(BCK_TNB_DAMAGE_R, 0, 3.0f, 1.0f);
+            setBck(BCK_TNB_DAMAGE_R, 0, 3.0f, 1.5f);
         }
 
         mSound.startCreatureVoice(Z2SE_EN_TN_V_DMG, -1);

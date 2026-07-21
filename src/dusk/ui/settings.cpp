@@ -1219,6 +1219,11 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .key = "Non-Stop Midna's Lament",
                 .helpText = "Prevents enemy music while Midna's Lament is playing.",
             });
+        config_bool_select(leftPane, rightPane, getSettings().game.noBattleMusic,
+            {
+                .key = "No Battle Music",
+                .helpText = "Disables battle music (except in Twilight).",
+            });
     });
 
     add_tab("Gameplay", [this](Rml::Element* content) {
