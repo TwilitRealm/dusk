@@ -18246,6 +18246,10 @@ int daAlink_c::execute() {
             damageTimerCount();
         }
 
+        if (dodgeTimer !=0) {
+            dodgeTimer--;
+        }
+
         if (checkEquipHeavyBoots()) {
             int itemButton = checkItemSetButton(dItemNo_HVY_BOOTS_e);
             if (itemButton == 3 || checkNotHeavyBootsStage()) {

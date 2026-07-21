@@ -517,22 +517,16 @@ BOOL daAlink_c::checkDamageAction() {
     if (mDamageTimer != 0) {
         return checkWolfBarrierHitReverse();
     }
-/** WIP dodge i-frame code, unsure if going to keep (it also doesn't work right now lol)
-    bool isDodging = false;
-    float dodgeTimer = 10.0f;
 
-    if (mProcID == PROC_FRONT_ROLL || PROC_FRONT_ROLL_SUCCESS || PROC_SIDE_ROLL || PROC_SIDESTEP || PROC_BACK_JUMP) {
-        isDodging = true;
-    }
-    if (isDodging == true) {
-        mAtSph.OffTgSetBit();
-        mAtSph.ResetTgHit();
-        dodgeTimer--;
-        if (dodgeTimer <= 0) {
-            isDodging = false;
+    if (mProcID == PROC_SIDESTEP || mProcID == PROC_FRONT_ROLL || mProcID == PROC_SIDE_ROLL
+        || mProcID == PROC_BACK_JUMP) {
+        dodgeTimer = 10;
+        if (dodgeTimer != 0) {
+            mCcStts.ClrTg();
+            mCcStts.ClrAt();
+            return checkWolfBarrierHitReverse();
         }
     }
-**/
 
     dCcD_GObjInf* var_r29 = NULL;
     for (int i = 0; i < 3; i++) {
