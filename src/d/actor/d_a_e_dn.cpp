@@ -920,7 +920,7 @@ static void e_dn_drawback(e_dn_class* i_this) {
 
     switch (i_this->mode) {
         case 0:
-            anm_init(i_this, ANM_DRAWBACK, 5.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
+            anm_init(i_this, ANM_DRAWBACK, 5.0f, J3DFrameCtrl::EMode_NONE, 1.5f);
             i_this->mode = 1;
             actor->speedF = KREG_F(4) + -5.0f;
             i_this->invulnerability_timer = 10;
@@ -1691,7 +1691,7 @@ static void e_dn_s_damage(e_dn_class* i_this) {
     switch (i_this->mode) {
         case 0:
             i_this->mode = 1;
-            i_this->timer[0] = 20;
+            i_this->timer[0] = 10;
             anm_init(i_this, ANM_WAIT_01, 10.0f, J3DFrameCtrl::EMode_LOOP, 2.0f);
             break;
 
@@ -1699,7 +1699,7 @@ static void e_dn_s_damage(e_dn_class* i_this) {
             if (i_this->timer[0] == 0) {
                 i_this->action = ACTION_FIGHT_RUN;
                 i_this->mode = 0;
-                i_this->timer[0] = 40;
+                i_this->timer[0] = 20;
             }
     }
 
@@ -2404,10 +2404,13 @@ static void damage_check(e_dn_class* i_this) {
                         if (player->getCutType() == daPy_py_c::CUT_TYPE_JUMP && player->checkCutJumpCancelTurn()) {
                             small_damage(i_this);
                             i_this->invulnerability_timer = 3;
-                        } else if (player->getCutType() == daPy_py_c::CUT_TYPE_JUMP || player->getCutType() == daPy_py_c::CUT_TYPE_LARGE_JUMP_FINISH || player->getCutType() == daPy_py_c::CUT_TYPE_MORTAL_DRAW_A ||
-                            player->getCutType() == daPy_py_c::CUT_TYPE_MORTAL_DRAW_B || player->getCutType() == daPy_py_c::CUT_TYPE_LARGE_TURN_LEFT || player->getCutType() == daPy_py_c::CUT_TYPE_LARGE_TURN_RIGHT) {
+                        } else if (player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_LEFT && player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_STAB
+                            && player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_RIGHT && player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_VERTICAL) {
                             big_damage(i_this);
                             i_this->invulnerability_timer = 1000;
+                        }
+                        else {
+                            small_damage(i_this);
                         }
                     } else {
                         small_damage(i_this);
@@ -3428,9 +3431,9 @@ static cPhs_Step daE_DN_Create(fopAc_ac_c* actor) {
         i_this->acchcir.SetWall(80.0f, 100.0f);
 
         if (i_this->arg1 == 1) {
-            actor->field_0x560 = actor->health = 100;
+            actor->field_0x560 = actor->health = 150;
         } else {
-            actor->field_0x560 = actor->health = 100;
+            actor->field_0x560 = actor->health = 150;
         }
         i_this->stts.Init(200, 0, actor);
 

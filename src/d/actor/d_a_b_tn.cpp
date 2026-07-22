@@ -1079,7 +1079,7 @@ bool daB_TN_c::checkNormalAttackAble() {
             return 0;
         }
 
-        m_attack_timer = 30;
+        m_attack_timer = 5;
     }
 
     return 1;
@@ -1386,6 +1386,7 @@ void daB_TN_c::damage_check() {
             if (mAtInfo.mpCollider->ChkAtType(AT_TYPE_SHIELD_ATTACK)) {
                 field_0xaa8 = true;
                 def_se_set(&mSound, dStack_160.GetTgHitObj(), 42, this);
+                mGuardCounterKick = false;
                 setActionMode(ACT_GUARDL, ACTION2_0_e);
                 return;
             }
@@ -1409,6 +1410,8 @@ void daB_TN_c::damage_check() {
                 {
                     field_0xaa8 = false;
                     setShieldEffect(&dStack_160);
+                    mGuardCounterKick = (cut_type == daPy_py_c::CUT_TYPE_DASH_LEFT ||
+                                         cut_type == daPy_py_c::CUT_TYPE_DASH_RIGHT);
                     setActionMode(ACT_GUARDL, ACTION2_0_e);
                     return;
                 }
@@ -1488,6 +1491,7 @@ void daB_TN_c::damage_check() {
                 setShieldEffect(&dStack_160);
             } else if (!bVar1 || mTimer10 != 0) {
                 setShieldEffect(&dStack_160);
+                mGuardCounterKick = false;
                 setActionMode(ACT_GUARDL, ACTION2_0_e);
             } else {
                 health = 100;
@@ -2364,6 +2368,7 @@ void daB_TN_c::checkStartAttackH() {
     f32 mPlayerDistance = fopAcM_searchPlayerDistance(this);
     fopAcM_searchPlayerAngleY(this);
     s16 sVar1 = fopAcM_searchPlayerAngleY(this) - shape_angle.y;
+    daPy_py_c* player = daPy_getPlayerActorClass();
 
     if (mPlayerDistance < 400.0f && abs(sVar1) < 0x3000) {
         if (mNextBreakPart >= 11) {
@@ -2470,6 +2475,7 @@ void daB_TN_c::executeAttackH() {
 
         if (mpModelMorf2->checkFrame(18.0f)) {
             setSwordAtBit(1);
+            setSwordAtBreak(1);
         }
 
         if (mpModelMorf2->checkFrame(29.0f)) {
@@ -2507,6 +2513,7 @@ void daB_TN_c::executeAttackH() {
 
         if (mpModelMorf2->checkFrame(22.0f)) {
             setSwordAtBit(1);
+            setSwordAtBreak(1);
         }
 
         if (mpModelMorf2->checkFrame(30.0f)) {
@@ -3979,6 +3986,12 @@ void daB_TN_c::executeGuardL() {
         break;
 
     case ACTION2_1_e:
+        if (mGuardCounterKick && mpModelMorf2->getFrame() >= 6.0f) {
+            mGuardCounterKick = false;
+            setActionMode(ACT_ATTACKSHIELDL, ACTION2_0_e);
+            break;
+        }
+
         field_0xa91 = false;
 
         if (player->getCutType() != daPy_py_c::CUT_TYPE_HEAD_JUMP && abs(mPlayerAngleY) < 0x3000) {
@@ -4432,6 +4445,7 @@ void daB_TN_c::executeZakoEnding() {
 
 void daB_TN_c::action() {
     daPy_py_c* player = daPy_getPlayerActorClass();
+    f32 mPlayerDistance = fopAcM_searchPlayerDistance(this);
 
     if (m_attack_timer != 0) {
         m_attack_timer--;
@@ -5133,6 +5147,7 @@ int daB_TN_c::create() {
             mAtInfo.mPowerType = 1;
             gravity = -5.0f;
             mStates[0xd] = 1;
+            mGuardCounterKick = false;
 
             setSwordAtBreak(1);
 

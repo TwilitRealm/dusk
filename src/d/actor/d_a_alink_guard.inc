@@ -189,11 +189,17 @@ BOOL daAlink_c::checkShieldCrouch() {
 }
 
 void daAlink_c::setShieldCrouch() {
-    mNormalSpeed = 0.0f;
+    if (mNormalSpeed >= 10.0f) {
+        seStartMapInfoLevel(Z2SE_FN_LINK_SLIP);
+        setFootEffectProcType(1);
+    }
+    cLib_chaseF(&mNormalSpeed, 0.0f, 1.75f);
     int cutDir = getCutDirection();
+
     setSingleAnimeBaseSpeed(ANM_CROUCH_DEF, mpHIO->mGuard.m.mCrouchGuardAnmSpeed,
                             mpHIO->mGuard.m.mCrouchGuardInterpolation);
     onNoResetFlg2(FLG2_UNK_8000000);
+
     if (mEquipItem == 0x103 && mDoCPd_c::getTrigB(PAD_1)) {
         if (cutDir == DIR_FORWARD) {
             procCutNormalInit(CUT_NM_PARAM_COMBO_STAB);
@@ -243,7 +249,12 @@ void daAlink_c::setGuardSe(dCcD_GObjInf* i_objinf) {
 }
 
 void daAlink_c::setSmallGuard(dCcD_GObjInf* i_objinf) {
-    setUpperAnimeBase(dRes_ID_ALANM_BCK_ATDEFS_e);
+    if (checkShieldCrouch()) {
+        setUpperAnimeBase(dRes_ID_ALANM_BCK_CROUCHDEFS_e);
+    }
+    else {
+        setUpperAnimeBase(dRes_ID_ALANM_BCK_ATDEFS_e);
+    }
     cXyz* dmg_vec = getDamageVec(i_objinf);
 
     mBodyAngle.y = (dmg_vec->atan2sX_Z() + 0x8000) - shape_angle.y;
@@ -264,7 +275,7 @@ int daAlink_c::procGuardSlipInit(int i_atSpl, dCcD_GObjInf* i_objinf) {
     }
 
     field_0x2fd5++;
-    if (field_0x2fd5 == 4) {
+    if (field_0x2fd5 == 2) {
         field_0x2fd5 = 0;
         return procGuardBreakInit();
     }
@@ -286,15 +297,19 @@ int daAlink_c::procGuardSlipInit(int i_atSpl, dCcD_GObjInf* i_objinf) {
         mProcVar2.field_0x300c = 0;
         mProcVar3.field_0x300e = 0;
     } else {
-        anmParams = &mpHIO->mGuard.m.mGuardHitAnm;
-        if (field_0x2f98 == 2) {
-            anm = ANM_GUARD_LEFT;
-        } else {
-            anm = ANM_GUARD_RIGHT;
+        if (checkShieldCrouch()) {
+            setUpperAnimeBase(dRes_ID_ALANM_BCK_CROUCHDEFSS_e);
         }
-
-        setSingleAnimeParam(anm, anmParams);
-        setUpperGuardAnime(-1.0f);
+        else {
+            anmParams = &mpHIO->mGuard.m.mGuardHitAnm;
+            if (field_0x2f98 == 2) {
+                anm = ANM_GUARD_LEFT;
+            } else {
+                anm = ANM_GUARD_RIGHT;
+            }
+            setSingleAnimeParam(anm, anmParams);
+            setUpperGuardAnime(-1.0f);
+        }
 
         mProcVar2.field_0x300c = (current.angle.y + 0x8000) - shape_angle.y;
         if (abs(mProcVar2.field_0x300c) > 0x7000) {
