@@ -3118,7 +3118,6 @@ int daAlink_c::procCoDead() {
                     g_dComIfG_gameInfo.info.getPlayer().getPlayerReturnPlace().getRoomNo(),
                     -1, 0.0f, 0, 1, 0, 0, 0, 0
                     );
-                g_dComIfG_gameInfo.info.getPlayer().getPlayerStatusA().setLife(12);
                 return 1;
             }
 
