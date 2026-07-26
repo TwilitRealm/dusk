@@ -299,6 +299,8 @@ int daAlink_c::procGuardSlipInit(int i_atSpl, dCcD_GObjInf* i_objinf) {
     } else {
         if (checkShieldCrouch()) {
             setUpperAnimeBase(dRes_ID_ALANM_BCK_CROUCHDEFSS_e);
+            resetUpperAnime(UPPER_2, 3.0f);
+            setUpperGuardAnime(-1.0f);
         }
         else {
             anmParams = &mpHIO->mGuard.m.mGuardHitAnm;
