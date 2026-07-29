@@ -149,7 +149,7 @@ public:
 #if PLATFORM_WII || PLATFORM_SHIELD
         return mTalkXyType == 1 || mTalkXyType == 2 || mTalkXyType == 3 || mTalkXyType == 4;
 #else
-        return mTalkXyType == 1 || mTalkXyType == 2;
+        return mTalkXyType == 1 || mTalkXyType == 2 || mTalkXyType == 3;
 #endif
     }
     u8 getPreItemNo() { return mPreItemNo; }

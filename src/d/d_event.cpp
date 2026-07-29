@@ -667,6 +667,7 @@ int dEvt_control_c::entry() {
                 break;
             case dEvt_type_SHOWITEM_X_e:
             case dEvt_type_SHOWITEM_Y_e:
+            case dEvt_type_SHOWITEM_Z_e:
                 if (dComIfGs_getLife() != 0 && talkXyCheck(order)) {
                     return 1;
                 }
