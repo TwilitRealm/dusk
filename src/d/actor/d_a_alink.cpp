@@ -11447,7 +11447,7 @@ void daAlink_c::orderPeep() {
 }
 
 int daAlink_c::orderTalk(int i_checkZTalk) {
-    static const u16 itemTalkType[2] = {6, 7};
+    static const u16 itemTalkType[3] = {6, 7, 8};
 
     if (notTalk()) {
         return 0;
