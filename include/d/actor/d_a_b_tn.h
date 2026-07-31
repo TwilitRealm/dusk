@@ -223,6 +223,7 @@ private:
     /* 0x561C */ u32 mParticleKeys[4];
     /* 0x562C */ u8 mHioInit;
     /* 0x562D */ bool mGuardCounterKick;
+    /* 0x562E */ int mBashSuccessCount;
 };
 
 STATIC_ASSERT(sizeof(daB_TN_c) == 0x5630);

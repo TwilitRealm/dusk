@@ -1381,6 +1381,7 @@ void daB_TN_c::damage_check() {
                 cut_type == daPy_py_c::CUT_TYPE_MORTAL_DRAW_A)
             {
                 mTimer12 = 60;
+                mBashSuccessCount++;
             }
         } else {
             if (mAtInfo.mpCollider->ChkAtType(AT_TYPE_SHIELD_ATTACK)) {
@@ -2582,7 +2583,7 @@ void daB_TN_c::executeGuardH() {
         mActionMode2 = ACTION2_1_e;
         speedF = 0.0f;
 
-        if (field_0xaa8) {
+        if (field_0xaa8 && mBashSuccessCount < 1) {
             shape_angle.y = fopAcM_searchPlayerAngleY(this);
             setBck(BCK_TNA_GUARD_DAMAGE, 0, 0.0f, 1.0f);
         } else {
@@ -5148,6 +5149,7 @@ int daB_TN_c::create() {
             gravity = -5.0f;
             mStates[0xd] = 1;
             mGuardCounterKick = false;
+            mBashSuccessCount = 0;
 
             setSwordAtBreak(1);
 
