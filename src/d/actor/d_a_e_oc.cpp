@@ -761,7 +761,7 @@ void daE_OC_c::damage_check() {
         my_val = 5;
     }
 
-    if (health <= 1) {
+    if (health <= 0) {
         attention_info.flags = 0;
         if (my_val < 5) {
             my_val = 5;

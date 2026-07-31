@@ -231,7 +231,7 @@ daE_RD_HIO_c::daE_RD_HIO_c() {
     leader_size_ratio = 1.2f;
     movement_speed = 7.0f;
     dash_speed = 28.0f;
-    battle_init_range = 350.0f;
+    battle_init_range = 450.0f;
     attack_init_range = 400.0f;
     swing_speed = 2.2f;
     command_to_ready_stance = 60;
