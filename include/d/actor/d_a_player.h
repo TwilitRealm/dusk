@@ -343,7 +343,8 @@ public:
     /* 0x05EC */ cXyz mRightFootPos;
     /* 0x05F8 */ cXyz mViewerCurrentPos;
     /* 0x0604 */ daPy_demo_c mDemo;
-    s16 dodgeTimer;
+    s16 mDodgeTimer;
+    s16 mParryTimer;
 
 public:
     enum daPy_FLG0 {

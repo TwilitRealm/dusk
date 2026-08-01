@@ -933,7 +933,7 @@ const daAlinkHIO_guard_c1 daAlinkHIO_guard_c0::m = {
         1.0f,
         0.0f,
         3.0f,
-        28.0f,
+        35.0f,
 	},
     8000,
     5000,

@@ -18246,8 +18246,12 @@ int daAlink_c::execute() {
             damageTimerCount();
         }
 
-        if (dodgeTimer !=0) {
-            dodgeTimer--;
+        if (mDodgeTimer !=0) {
+            mDodgeTimer--;
+        }
+
+        if (mParryTimer !=0) {
+            mParryTimer--;
         }
 
         if (checkEquipHeavyBoots()) {

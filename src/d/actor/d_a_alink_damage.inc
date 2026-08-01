@@ -520,8 +520,8 @@ BOOL daAlink_c::checkDamageAction() {
 
     if (mProcID == PROC_SIDESTEP || mProcID == PROC_FRONT_ROLL || mProcID == PROC_SIDE_ROLL
         || mProcID == PROC_BACK_JUMP) {
-        dodgeTimer = 10;
-        if (dodgeTimer != 0) {
+        mDodgeTimer = 10;
+        if (mDodgeTimer != 0) {
             mCcStts.ClrTg();
             mCcStts.ClrAt();
             return checkWolfBarrierHitReverse();
@@ -658,6 +658,14 @@ BOOL daAlink_c::checkDamageAction() {
     
         if (var_r29->ChkTgShieldHit()) {
             setGuardSe(var_r29);
+
+            if (mParryTimer > 0 && !(mProcID == PROC_SIDESTEP || mProcID == PROC_FRONT_ROLL || mProcID == PROC_SIDE_ROLL
+                || mProcID == PROC_BACK_JUMP)) {
+                setPlayerSe(Z2SE_MIDNA_JUMP);
+                dComIfGp_getVibration().StartShock(VIBMODE_S_POWER4, 1, cXyz(0.0f, 1.0f, 0.0f));
+                mSwordUpTimer = 65;
+                return checkWolfBarrierHitReverse();
+            }
 
             if (checkHugeAttack(at_spl)) {
                 dComIfGp_getVibration().StartShock(VIBMODE_S_POWER5, 1, cXyz(0.0f, 1.0f, 0.0f));
