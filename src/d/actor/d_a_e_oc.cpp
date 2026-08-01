@@ -761,7 +761,7 @@ void daE_OC_c::damage_check() {
         my_val = 5;
     }
 
-    if (health <= 0) {
+    if (health <= 1) {
         attention_info.flags = 0;
         if (my_val < 5) {
             my_val = 5;
@@ -1223,9 +1223,9 @@ void daE_OC_c::executeFind() {
                 if (!dComIfGp_event_runCheck()) {
                     if (field_0x6c2 == 0) {
                         if (pl_dist < 300.0f) {
-                            cLib_chaseF(&speedF, -3.0f, 1.0f);
+                            cLib_chaseF(&speedF, -3.0f, 1.5f);
                         } else {
-                            cLib_chaseF(&speedF, 40.0f + nREG_F(0), 1.0f);
+                            cLib_chaseF(&speedF, 20.0f + nREG_F(0), 1.0f);
                         }
 
                         if (pl_dist < 400.0f && pl_dist > 200.0f) {
@@ -1243,7 +1243,7 @@ void daE_OC_c::executeFind() {
                         } else if (pl_dist < 300.0f) {
                             cLib_chaseF(&speedF, -3.0f, 1.0f);
                         } else {
-                            cLib_chaseF(&speedF, 40.0f + nREG_F(0), 1.0f);
+                            cLib_chaseF(&speedF, 20.0f + nREG_F(0), 1.0f);
                         }
 
                         if (speedF < 0.0f) {
@@ -1395,7 +1395,7 @@ void daE_OC_c::executeAttack() {
     mPrevShapeAngle = shape_angle.y;
     switch (mOcState) {
         case 0: {
-            if (cLib_chaseF(&speedF, 0.0f, 1.0f)) {
+            if (cLib_chaseF(&speedF, 0.0f, 2.0f)) {
                 if (cM_rndF(1.0f) < 0.5f) {
                     setBck(5, 0, 5.0f, 1.5f);
                     mSound.startCreatureVoice(Z2SE_EN_OC_V_ATTACK_B, -1);
@@ -1486,7 +1486,7 @@ void daE_OC_c::executeAttack() {
             current.pos.z += (my_float - field_0x6a0) * cM_scos(shape_angle.y);
             field_0x6a0 = my_float;
             if (mpMorf->isStop()) {
-                setBck(0x1c, 2, 0.0f, 3.0f);
+                setBck(0x1c, 2, 0.0f, 1.0f);
                 mSound.startCreatureVoice(Z2SE_EN_OC_V_WAIT_ST, -1);
                 if (field_0x6e3) {
                     setActionMode(E_OC_ACTION_MOVE_OUT, 0);
@@ -2285,7 +2285,7 @@ void daE_OC_c::executeFindStay() {
 
             current.angle.y = shape_angle.y;
             if (target_dist < 400.0f && target_dist > 200.0f) {
-                if (abs(shape_angle.y - fopAcM_searchPlayerAngleY(this)) < 0x1000 && checkBeforeFloorBg(100.0f)
+                if (abs(shape_angle.y - fopAcM_searchPlayerAngleY(this)) < 0x5000 && checkBeforeFloorBg(100.0f)
                     && !dComIfGp_event_runCheck()) {
                     setActionMode(E_OC_ACTION_ATTACK, 0);
                 }
