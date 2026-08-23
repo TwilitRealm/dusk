@@ -6255,7 +6255,7 @@ void daAlink_c::decSwordBlur() {
     if (m_swordBlur.field_0x14 < 10) {
         m_swordBlur.field_0x14 = 0;
     } else {
-        m_swordBlur.field_0x14 -= 10;
+        m_swordBlur.field_0x14 -= 5;
         m_swordBlur.traceBlur(&current.pos, &old.pos, shape_angle.y - mPrevAngleY);
     }
 }

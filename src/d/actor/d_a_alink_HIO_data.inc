@@ -833,7 +833,7 @@ const daAlinkHIO_cut_c1 daAlinkHIO_cut_c0::m = {
 	},
     0,
     1,
-    15,
+    40,
     8,
     10,
     90,
