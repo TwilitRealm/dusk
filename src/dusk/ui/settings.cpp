@@ -1256,7 +1256,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             [] { return getSettings().game.minimalHUD.getValue(); });
         config_percent_select(leftPane, rightPane, getSettings().game.zItemScale,
             "Z-Item Scale",
-            "Scales the size of item icons on Z.",
+            "Scales the size of item icons on Z. Re-equip item or reload area after changing.",
             50, 200, 5);
         addOption("Restore Wii 1.0 Glitches", getSettings().game.restoreWiiGlitches,
             "Restores patched glitches from Wii USA 1.0, the first released version.");
