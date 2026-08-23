@@ -368,7 +368,21 @@ fopAc_ac_c* at_power_check(dCcU_AtInfo* i_AtInfo) {
 
     return i_AtInfo->mpActor;
 }
-
+#if TARGET_PC
+// refining implementation of swordMultiplier and new bowMultiplier;
+// this should (hopefully) return scaled damage and be usable like a general
+// damage scalar as opposed to doing the math on-site like before
+static u16 scale_damage(u16 i_power, int i_percent) {
+    if (i_power == 0 || i_percent == 100) {
+        return i_power;
+    }
+    int scaled = (i_power * i_percent + 50) / 100;
+    if (scaled == 0 && i_percent != 0) {
+        scaled = 1; // hard code to 1 so low damage doesn't get rounded to 0
+    }
+    return scaled;
+}
+#endif
 fopAc_ac_c* cc_at_check(fopAc_ac_c* i_enemy, dCcU_AtInfo* i_AtInfo) {
     daPy_py_c* player_p = (daPy_py_c*)dComIfGp_getPlayer(0);
     i_AtInfo->mpActor = at_power_check(i_AtInfo);
@@ -406,6 +420,14 @@ fopAc_ac_c* cc_at_check(fopAc_ac_c* i_enemy, dCcU_AtInfo* i_AtInfo) {
             i_AtInfo->mAttackPower = 0;
         }
 
+#if TARGET_PC
+        if (i_AtInfo->mHitType == HIT_TYPE_ARROW) {
+            if (dusk::getSettings().game.bowMultiplier != 100) {
+                i_AtInfo->mAttackPower = scale_damage(i_AtInfo->mAttackPower, dusk::getSettings().game.bowMultiplier);
+            }
+        }
+#endif
+
         if (static_cast<dCcD_GObjInf*>(i_AtInfo->mpCollider)->GetAtMtrl() == dCcD_MTRL_LIGHT) {
             if (fopAcM_GetName(i_enemy) == fpcNm_B_GND_e && i_AtInfo->mHitType != HIT_TYPE_LINK_NORMAL_ATTACK) {
                 i_AtInfo->mAttackPower = 0;
@@ -418,7 +440,7 @@ fopAc_ac_c* cc_at_check(fopAc_ac_c* i_enemy, dCcU_AtInfo* i_AtInfo) {
             if (!daPy_py_c::checkNowWolf()) {
 #if TARGET_PC
                 if (dusk::getSettings().game.swordMultiplier != 100) {
-                    i_AtInfo->mAttackPower *= dusk::getSettings().game.swordMultiplier * 0.01;
+                    i_AtInfo->mAttackPower = scale_damage(i_AtInfo->mAttackPower, dusk::getSettings().game.swordMultiplier);
                 }
 #endif
                 if (player_p->checkMasterSwordEquip()) {

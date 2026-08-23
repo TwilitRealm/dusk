@@ -1345,6 +1345,30 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 pane.clear();
                 pane.add_text("Multiplies the damage Link's sword will do to most enemies. Set to 0 to make most enemies invulnerable to the sword, except for Ending Blow.");
             });
+        leftPane.register_control(
+            leftPane.add_child<NumberButton>(NumberButton::Props{
+                .key = "Bow Damage Multiplier",
+                .getValue = [] { return getSettings().game.bowMultiplier.getValue(); },
+                .setValue =
+                    [](int value) {
+                        getSettings().game.bowMultiplier.setValue(value);
+                        config::save();
+                    },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
+                .isModified =
+                    [] {
+                        return getSettings().game.bowMultiplier.getValue() !=
+                               getSettings().game.bowMultiplier.getDefaultValue();
+                    },
+                .min = 0,
+                .max = 1000,
+                .step = 10,
+                .suffix = "%",
+            }),
+            rightPane, [](Pane& pane) {
+                pane.clear();
+                pane.add_text("Multiplies the damage Link's arrows will do to most enemies. Set to 0 to make most enemies invulnerable to arrows. Does not affect Bomb Arrows.");
+            });
         addSpeedrunDisabledOption(
             "Instant Death", getSettings().game.instantDeath, "Any hit will instantly kill you.");
         addSpeedrunDisabledOption("No Heart Drops", getSettings().game.noHeartDrops,

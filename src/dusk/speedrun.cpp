@@ -14,6 +14,7 @@ void resetForSpeedrunMode() {
 
     getSettings().game.damageMultiplier.setSpeedrunValue(1);
     getSettings().game.swordMultiplier.setSpeedrunValue(100);
+    getSettings().game.bowMultiplier.setSpeedrunValue(100);
     getSettings().game.instantDeath.setSpeedrunValue(false);
     getSettings().game.noHeartDrops.setSpeedrunValue(false);
     getSettings().game.autoSave.setSpeedrunValue(false);
