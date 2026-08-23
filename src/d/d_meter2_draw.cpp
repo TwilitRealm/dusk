@@ -3952,7 +3952,7 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
         case dItemNo_BOOMERANG_e:
             mItemParams[SELECT_Z_e].pos_x = -1.0f;
             mItemParams[SELECT_Z_e].pos_y = -2.0f;
-            mItemParams[SELECT_Z_e].scale = 2.0f;
+            mItemParams[SELECT_Z_e].scale = dusk::getSettings().game.zItemScale.getValue() + 0.5f;
             mItemParams[SELECT_Z_e].rotation = 17.0f;
             mItemParams[SELECT_Z_e].num_pos_x = 14.0f;
             mItemParams[SELECT_Z_e].num_pos_y = -30.0f;
@@ -3961,7 +3961,7 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
         case dItemNo_BOW_e:
             mItemParams[SELECT_Z_e].pos_x = -1.3f;
             mItemParams[SELECT_Z_e].pos_y = 1.3f;
-            mItemParams[SELECT_Z_e].scale = 2.1f;
+            mItemParams[SELECT_Z_e].scale = dusk::getSettings().game.zItemScale.getValue() + 0.8f;
             mItemParams[SELECT_Z_e].rotation = 0.0f;
             mItemParams[SELECT_Z_e].num_pos_x = 15.0f;
             mItemParams[SELECT_Z_e].num_pos_y = -30.0f;
@@ -3970,7 +3970,7 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
         case dItemNo_HVY_BOOTS_e:
             mItemParams[SELECT_Z_e].pos_x = -6.6f;
             mItemParams[SELECT_Z_e].pos_y = 2.2f;
-            mItemParams[SELECT_Z_e].scale = 2.0f;
+            mItemParams[SELECT_Z_e].scale = dusk::getSettings().game.zItemScale.getValue() + 0.8f;
             mItemParams[SELECT_Z_e].rotation = 0.0f;
             mItemParams[SELECT_Z_e].num_pos_x = 14.0f;
             mItemParams[SELECT_Z_e].num_pos_y = -30.0f;
@@ -3979,7 +3979,7 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
         case dItemNo_HOOKSHOT_e:
             mItemParams[SELECT_Z_e].pos_x = -4.0f;
             mItemParams[SELECT_Z_e].pos_y = 1.3f;
-            mItemParams[SELECT_Z_e].scale = 1.7f;
+            mItemParams[SELECT_Z_e].scale = dusk::getSettings().game.zItemScale.getValue() + 0.7f;
             mItemParams[SELECT_Z_e].rotation = 0.0f;
             mItemParams[SELECT_Z_e].num_pos_x = 1.4f;
             mItemParams[SELECT_Z_e].num_pos_y = -30.0f;
@@ -3988,7 +3988,7 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
         case dItemNo_KANTERA_e:
             mItemParams[SELECT_Z_e].pos_x = -6.6f;
             mItemParams[SELECT_Z_e].pos_y = 1.1f;
-            mItemParams[SELECT_Z_e].scale = g_drawHIO.mButtonZItemScale;
+            mItemParams[SELECT_Z_e].scale = dusk::getSettings().game.zItemScale.getValue() + 0.5f;
             mItemParams[SELECT_Z_e].rotation = g_drawHIO.mButtonItemRotation[2];
             mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.mZItemNumPosX;
             mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.mZItemNumPosY;
@@ -3997,7 +3997,7 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
         case dItemNo_IRONBALL_e:
             mItemParams[SELECT_Z_e].pos_x = 8.0f;
             mItemParams[SELECT_Z_e].pos_y = -7.0f;
-            mItemParams[SELECT_Z_e].scale = 1.8f;
+            mItemParams[SELECT_Z_e].scale = dusk::getSettings().game.zItemScale.getValue() + 0.5f;
             mItemParams[SELECT_Z_e].rotation = 0.0f;
             mItemParams[SELECT_Z_e].num_pos_x = 1.4f;
             mItemParams[SELECT_Z_e].num_pos_y = -30.0f;
@@ -4006,7 +4006,7 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
         case dItemNo_W_HOOKSHOT_e:
             mItemParams[SELECT_Z_e].pos_x = 6.0f;
             mItemParams[SELECT_Z_e].pos_y = -8.0f;
-            mItemParams[SELECT_Z_e].scale = 1.8f;
+            mItemParams[SELECT_Z_e].scale = dusk::getSettings().game.zItemScale.getValue() + 0.4f;
             mItemParams[SELECT_Z_e].rotation = 0.0f;
             mItemParams[SELECT_Z_e].num_pos_x = 1.4f;
             mItemParams[SELECT_Z_e].num_pos_y = -30.0f;
@@ -4016,7 +4016,7 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
             if (isBottleItem(i_itemNo)) {
                 mItemParams[SELECT_Z_e].pos_x = -3.5f;
                 mItemParams[SELECT_Z_e].pos_y = 1.3f;
-                mItemParams[SELECT_Z_e].scale = 1.8f;
+                mItemParams[SELECT_Z_e].scale = dusk::getSettings().game.zItemScale.getValue() + 0.8f;
                 mItemParams[SELECT_Z_e].rotation = g_drawHIO.mButtonItemRotation[2];
                 mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.mZItemNumPosX;
                 mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.mZItemNumPosY;
@@ -4024,7 +4024,7 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
             } else {
                 mItemParams[SELECT_Z_e].pos_x = g_drawHIO.mButtonZItemPosX;
                 mItemParams[SELECT_Z_e].pos_y = g_drawHIO.mButtonZItemPosY;
-                mItemParams[SELECT_Z_e].scale = g_drawHIO.mButtonZItemScale;
+                mItemParams[SELECT_Z_e].scale = dusk::getSettings().game.zItemScale.getValue() + 0.5f;
                 mItemParams[SELECT_Z_e].rotation = g_drawHIO.mButtonItemRotation[2];
                 mItemParams[SELECT_Z_e].num_pos_x = g_drawHIO.mZItemNumPosX;
                 mItemParams[SELECT_Z_e].num_pos_y = g_drawHIO.mZItemNumPosY;

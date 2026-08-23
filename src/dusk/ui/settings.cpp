@@ -1254,6 +1254,10 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Scales the size of the gameplay HUD (hearts, buttons, mini-map, etc.). Does not affect dialog boxes or menus.",
             50, 200, 5,
             [] { return getSettings().game.minimalHUD.getValue(); });
+        config_percent_select(leftPane, rightPane, getSettings().game.zItemScale,
+            "Z-Item Scale",
+            "Scales the size of item icons on Z.",
+            50, 200, 5);
         addOption("Restore Wii 1.0 Glitches", getSettings().game.restoreWiiGlitches,
             "Restores patched glitches from Wii USA 1.0, the first released version.");
         addOption("Enable Rotating Link Doll", getSettings().game.enableLinkDollRotation,
@@ -1294,7 +1298,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                         });
                 }
                 pane.add_rml(
-                    "<br/>Display the Light Sword glow even outside of Twilight and/or include its extra damage effects.");
+                    "<br/>Retain the Master Sword's glow effect after infusing it with the two Sols.");
             });
 
         leftPane.add_section("Difficulty");
