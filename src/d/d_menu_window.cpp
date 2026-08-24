@@ -123,7 +123,13 @@ public:
 #endif
     }
 
-    void setCaptureFlag() { mFlag = 1; }
+    void setCaptureFlag() {
+        mFlag = 1;
+    #ifdef TARGET_PC
+        dusk::frame_interp::request_presentation_sync();
+    #endif
+    }
+
     bool checkDraw() { return mFlag; }
     u8 getAlpha() { return mAlpha; }
     u8 getTopFlag() { return mTopFlag; }
@@ -219,7 +225,7 @@ static BOOL dMw_isMenuRing() {
 }
 
 typedef void (dMw_c::*initFunc)(u8);
-initFunc init_proc[] = {
+DUSK_GAME_DATA initFunc init_proc[] = {
     &dMw_c::key_wait_init,
     &dMw_c::ring_open_init,
     &dMw_c::ring_move_init,
@@ -258,7 +264,7 @@ initFunc init_proc[] = {
 };
 
 typedef void (dMw_c::*procFunc)();
-procFunc move_proc[] = {
+DUSK_GAME_DATA procFunc move_proc[] = {
     &dMw_c::key_wait_proc,
     &dMw_c::ring_open_proc,
     &dMw_c::ring_move_proc,
@@ -1092,10 +1098,6 @@ void dMw_c::dMw_ring_create(u8 i_origin) {
     }
 
     mpCapture->setCaptureFlag();
-
-#ifdef TARGET_PC
-    dusk::frame_interp::request_presentation_sync();
-#endif
 }
 
 bool dMw_c::dMw_ring_delete() {

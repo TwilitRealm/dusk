@@ -14,7 +14,9 @@
 #include "d/d_com_inf_game.h"
 #include "dusk/data.hpp"
 #include "dusk/dusk.h"
+#include "dusk/speedrun.h"
 #include "dusk/main.h"
+#include "dusk/os.h"
 #include "m_Do/m_Do_main.h"
 
 #include <aurora/lib/internal.hpp>
@@ -23,10 +25,6 @@
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
 #endif
-
-namespace aurora::gx {
-extern bool enableLodBias;
-}
 
 namespace dusk {
     ImGuiMenuTools::ImGuiMenuTools() {}
@@ -37,7 +35,7 @@ namespace dusk {
                 ImGui::BeginDisabled();
             }
 
-            ImGui::BeginDisabled(getSettings().game.speedrunMode);
+            ImGui::BeginDisabled(dusk::speedrun::isActive());
 
             ImGui::MenuItem("Save Editor", hotkeys::SHOW_SAVE_EDITOR, &m_showSaveEditor);
             ImGui::MenuItem("State Share", hotkeys::SHOW_STATE_SHARE, &m_showStateShare);
@@ -59,7 +57,7 @@ namespace dusk {
         }
 
         if (ImGui::BeginMenu("Debug")) {
-            ImGui::BeginDisabled(getSettings().game.speedrunMode);
+            ImGui::BeginDisabled(dusk::speedrun::isActive());
 
             bool developmentMode = mDoMain::developmentMode == 1;
             if (ImGui::Checkbox("Development Mode", &developmentMode)) {
@@ -75,7 +73,6 @@ namespace dusk {
                     getSettings().game.disableWaterRefraction.setValue(disableWaterRefraction);
                     config::save();
                 }
-                ImGui::Checkbox("Enable LOD Bias", &aurora::gx::enableLodBias);
                 ImGui::EndMenu();
             }
 

@@ -57,6 +57,13 @@ int CheckItemCreateHeap(fopAc_ac_c* i_this) {
                                   dItem_data::getBrkName(item_no), dItem_data::getBtpName(item_no));
 }
 
+#if TARGET_PC
+const char* dItem_fieldModelArc(u8 itemNo) {
+    const char* arcName = dItem_data::getFieldArc(itemNo);
+    return arcName != NULL ? arcName : dItem_data::getArcName(itemNo);
+}
+#endif
+
 int CheckFieldItemCreateHeap(fopAc_ac_c* i_this) {
     daItemBase_c* a_this = static_cast<daItemBase_c*>(i_this);
 
@@ -68,7 +75,7 @@ int CheckFieldItemCreateHeap(fopAc_ac_c* i_this) {
         dItem_data::getItemBrkName(item_no), dItem_data::getItemBtpName(item_no));
 }
 
-const daItemBase_data daItemBase_c::m_data = {
+DUSK_GAME_DATA const daItemBase_data daItemBase_c::m_data = {
     -4.5f,  // mGravity
     0.62f,  // mGroundReflect
     45.0f,  // mLaunchSpeed

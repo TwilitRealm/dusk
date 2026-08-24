@@ -1132,6 +1132,16 @@ static void e_po_dead(e_po_class* i_this) {
             camera_player->mCamera.Start();
             camera_player->mCamera.SetTrimSize(0);
             dComIfGp_event_reset();
+#if TARGET_PC
+            const auto itemCheck = dusk::mods::item_check_commit(
+                dusk::mods::item_give_tag_poe(i_this->BitSW), dItemNo_POU_SPIRIT_e, a_this);
+            daPy_getPlayerActorClass()->cancelOriginalDemo();
+            if (itemCheck.itemNo == dItemNo_NONE_e) {
+                dusk::mods::item_check_complete(itemCheck, a_this);
+            } else {
+                dusk::mods::item_check_enqueue(itemCheck, dusk::mods::ItemGiveMode::ForcedDemo);
+            }
+#else
             dComIfGs_addPohSpiritNum();
 #if !PLATFORM_SHIELD
             if (dComIfGs_getPohSpiritNum() == 0x14) {
@@ -1140,6 +1150,7 @@ static void e_po_dead(e_po_class* i_this) {
             }
 #endif
             daPy_getPlayerActorClass()->cancelOriginalDemo();
+#endif
         } else if (mArg0Check(i_this, 0) != 0) {
             if (!fopAcM_isSwitch(a_this, 0x22)) {
                 if (fopAcM_SearchByID(i_this->field_0x5B8, &local_1b0_actor) != 0 &&
@@ -1265,8 +1276,21 @@ static void e_po_dead(e_po_class* i_this) {
             }
         } else {
             if (i_this->field_0x75C == -1) {
+#if TARGET_PC
+                const auto itemCheck = dusk::mods::item_check_commit(
+                    dusk::mods::item_give_tag_poe(i_this->BitSW), dItemNo_POU_SPIRIT_e, a_this);
+                if (itemCheck.itemNo == dItemNo_NONE_e) {
+                    dusk::mods::item_check_complete(itemCheck, a_this);
+                    i_this->field_0x75B = 1;
+                } else {
+                    i_this->field_0x75C = fopAcM_createItemForPresentDemo(
+                        &a_this->current.pos, itemCheck.itemNo, 0, -1, -1, NULL, NULL,
+                        itemCheck.tag);
+                }
+#else
                 i_this->field_0x75C = fopAcM_createItemForPresentDemo(&a_this->current.pos, 0xE0, 0,
                                                                       -1, -1, NULL, NULL);
+#endif
             }
             if (fopAcM_IsExecuting(i_this->field_0x75C)) {
                 i_this->field_0x762 =

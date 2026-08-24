@@ -68,7 +68,7 @@ public:
     JKRMemArchive* getArchive() const { return mArchive; }
     JKRHeap* getHeap() const { return mHeap; }
 
-private:
+// private:
     /* 0x14 */ u8 mMountDirection;
     /* 0x18 */ s32 mEntryNumber;
     /* 0x1C */ JKRMemArchive* mArchive;
@@ -130,21 +130,21 @@ private:
 };  // Size = 0x28
 
 struct mDoDvdThdStack {
-    u8 stack[4096];
-} ATTRIBUTE_ALIGN(16);
+    ATTRIBUTE_ALIGN(16) u8 stack[4096];
+};
 
 struct mDoDvdThd {
     static s32 main(void*);
     static void create(s32);
     static void suspend();
 
-    static OSThread l_thread;
-    static mDoDvdThdStack l_threadStack;
-    static mDoDvdThd_param_c l_param;
+    static DUSK_GAME_DATA OSThread l_thread;
+    static DUSK_GAME_DATA mDoDvdThdStack l_threadStack;
+    static DUSK_GAME_DATA mDoDvdThd_param_c l_param;
 
     static u8 verbose;
-    static u8 DVDLogoMode;
-    static bool SyncWidthSound;
+    static DUSK_GAME_DATA u8 DVDLogoMode;
+    static DUSK_GAME_DATA bool SyncWidthSound;
     static u8 Report_DVDRead;
 };
 

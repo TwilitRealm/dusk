@@ -17,6 +17,7 @@
 #include "aurora/lib/window.hpp"
 #include "dusk/config.hpp"
 #include "dusk/io.hpp"
+#include <borealis/io.hpp>
 #include "icon_provider.hpp"
 #include "input.hpp"
 #include "mod_texture_provider.hpp"
@@ -27,13 +28,13 @@ namespace dusk::ui {
 namespace {
 
 void load_font(const char* filename, bool fallback = false) {
-    Rml::LoadFontFace(io::fs_path_to_string(resource_path(filename)), fallback);
+    Rml::LoadFontFace(borealis::io::fs_path_to_string(resource_path(filename)), fallback);
 }
 
 bool sInitialized = false;
-std::vector<std::unique_ptr<Document> > sDocumentStack;
+std::vector<std::unique_ptr<Document>> sDocumentStack;
 // Documents that don't participate in the focus stack
-std::vector<std::unique_ptr<Document> > sPassiveDocuments;
+std::vector<std::unique_ptr<Document>> sPassiveDocuments;
 
 struct ScopedStyles {
     DocumentScope scope;
@@ -173,10 +174,12 @@ void handle_event(const SDL_Event& event) noexcept {
                 const char* name = SDL_GetGamepadName(gamepad);
                 Rml::String content = fmt::format("<span>{}</span>", name ? name : "[Unknown]");
                 Rml::String title = "Device Connected";
-                if (const char* icon = connection_state_icon(SDL_GetGamepadConnectionState(gamepad))) {
+                if (const char* icon =
+                        connection_state_icon(SDL_GetGamepadConnectionState(gamepad)))
+                {
                     title = fmt::format(
-                        "<row><span>{}</span> <icon class=\"connection\">&#x{};</icon></row>", title,
-                        icon);
+                        "<row><span>{}</span> <icon class=\"connection\">&#x{};</icon></row>",
+                        title, icon);
                 }
                 int batteryLevel = -1;
                 const auto powerState = SDL_GetGamepadPowerInfo(gamepad, &batteryLevel);
@@ -211,6 +214,8 @@ void handle_event(const SDL_Event& event) noexcept {
             });
         }
         sConnectedGamepads.erase(event.gdevice.which);
+    } else if (event.type == SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED) {
+        apply_scale();
     }
     input::handle_event(event);
 }
@@ -260,6 +265,24 @@ Document& push_document(std::unique_ptr<Document> doc, bool show, bool passive) 
 void uncover_top_document() noexcept {
     if (auto* doc = top_document()) {
         doc->uncover();
+    }
+    input::sync_input_block();
+}
+
+Document* find_document(DocumentScope scope) noexcept {
+    for (auto& doc : std::views::reverse(sDocumentStack)) {
+        if (!doc->closed() && doc->scope() == scope) {
+            return doc.get();
+        }
+    }
+    return nullptr;
+}
+
+void close_documents_except(DocumentScope scope) noexcept {
+    for (auto& doc : sDocumentStack) {
+        if (!doc->closed() && doc->scope() != scope) {
+            doc->force_hide(true);
+        }
     }
     input::sync_input_block();
 }
@@ -327,13 +350,10 @@ void update() noexcept {
         sPassiveDocuments.erase(first, last);
     }
 
-    // If no documents have focus, explicitly focus the top one
-    if (auto* context = aurora::rmlui::get_context();
-        context != nullptr && (context->GetFocusElement() == nullptr ||
-                                  context->GetFocusElement() == context->GetRootElement()))
-    {
+    // Keep focus on the highest active document.
+    if (aurora::rmlui::get_context() != nullptr) {
         for (auto& doc : std::views::reverse(sDocumentStack)) {
-            if (doc->active() && doc->focus()) {
+            if (doc->active() && (doc->has_focus() || doc->focus())) {
                 break;
             }
         }
@@ -380,6 +400,17 @@ Rml::Element* append(Rml::Element* parent, const Rml::String& tag) noexcept {
         return nullptr;
     }
     return parent->AppendChild(doc->CreateElement(tag));
+}
+
+Rml::Element* append_text(Rml::Element* parent, const Rml::String& text) noexcept {
+    if (parent == nullptr) {
+        return nullptr;
+    }
+    auto* doc = parent->GetOwnerDocument();
+    if (doc == nullptr) {
+        return nullptr;
+    }
+    return parent->AppendChild(doc->CreateTextNode(text));
 }
 
 NavCommand map_nav_event(const Rml::Event& event) noexcept {
@@ -448,10 +479,6 @@ void push_toast(Toast toast) noexcept {
     sToasts.push_back(std::move(toast));
 }
 
-std::vector<std::unique_ptr<Document> >& get_document_stack() noexcept {
-    return sDocumentStack;
-}
-
 std::deque<Toast>& get_toasts() noexcept {
     return sToasts;
 }
@@ -464,6 +491,16 @@ bool consume_menu_notification_request() noexcept {
     const bool requested = sMenuNotificationRequested;
     sMenuNotificationRequested = false;
     return requested;
+}
+
+void apply_scale() noexcept {
+    const auto userScale = getSettings().video.uiScale.getValue();
+    auto scale = 0.0f;
+    if (userScale != 0) {
+        const auto displayScale = aurora::window::get_window_size().scale;
+        scale = static_cast<float>(userScale) / 100.0f * (displayScale > 0.0f ? displayScale : 1.0f);
+    }
+    aurora::rmlui::set_ui_scale(scale);
 }
 
 }  // namespace dusk::ui

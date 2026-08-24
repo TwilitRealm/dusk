@@ -1,6 +1,8 @@
 #include "dusk/settings.h"
-#include "dusk/config.hpp"
 #include <aurora/aurora.h>
+#include "dusk/config.hpp"
+#include "dusk/ui/ui.hpp"
+#include "dusk/game_mode.hpp"
 
 namespace dusk {
 
@@ -15,6 +17,7 @@ UserSettings g_userSettings = {
         .rememberWindowSize {"video.rememberWindowSize", false},
         .lastWindowWidth {"video.lastWindowWidth", 0},
         .lastWindowHeight {"video.lastWindowHeight", 0},
+        .uiScale {"video.uiScale", 100},
     },
 
     .audio = {
@@ -55,6 +58,7 @@ UserSettings g_userSettings = {
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
+        .aimingReticle {"game.aimingReticle", false},
 
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
@@ -83,6 +87,7 @@ UserSettings g_userSettings = {
         .resampler {"game.resampler", Resampler::Bilinear},
         .enableMapBackground {"game.enableMapBackground", true},
         .disableCutscenePillarboxing {"game.disableCutscenePillarboxing", false},
+        .enableHighQualityMinimapTextures {"game.enableHighQualityMinimapTextures", true},
 
         // Audio
         .noLowHpSound {"game.noLowHpSound", false},
@@ -163,7 +168,8 @@ UserSettings g_userSettings = {
         .recordingMode {"game.recordingMode", false},
         .removeQuestMapMarkers {"game.removeQuestMapMarkers", false},
         .showInputViewer {"game.showInputViewer", false},
-        .showInputViewerGyro {"game.showInputViewerGyro", false}
+        .showInputViewerGyro {"game.showInputViewerGyro", false},
+        .lastSelectedGameModeId {"game.lastSelectedGameModeId", gamemode::kVanillaGameModeId}
     },
 
     .backend = {
@@ -233,6 +239,8 @@ void registerSettings() {
     Register(g_userSettings.video.rememberWindowSize);
     Register(g_userSettings.video.lastWindowWidth);
     Register(g_userSettings.video.lastWindowHeight);
+    Register(g_userSettings.video.uiScale, 
+        [](const int&, const int&) { dusk::ui::apply_scale(); });
 
     // Audio
     Register(g_userSettings.audio.masterVolume);
@@ -268,6 +276,7 @@ void registerSettings() {
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
     Register(g_userSettings.game.enhancedMapMenus);
+    Register(g_userSettings.game.aimingReticle);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
     Register(g_userSettings.game.invertCameraYAxis);
@@ -295,6 +304,7 @@ void registerSettings() {
     Register(g_userSettings.game.shadowResolutionMultiplier);
     Register(g_userSettings.game.enableMapBackground);
     Register(g_userSettings.game.disableCutscenePillarboxing);
+    Register(g_userSettings.game.enableHighQualityMinimapTextures);
     Register(g_userSettings.game.enableFastIronBoots);
     Register(g_userSettings.game.canTransformAnywhere);
     Register(g_userSettings.game.fastRoll);
@@ -317,6 +327,7 @@ void registerSettings() {
     Register(g_userSettings.game.removeQuestMapMarkers);
     Register(g_userSettings.game.showInputViewer);
     Register(g_userSettings.game.showInputViewerGyro);
+    Register(g_userSettings.game.lastSelectedGameModeId);
     Register(g_userSettings.game.fastSpinner);
     Register(g_userSettings.game.infiniteHearts);
     Register(g_userSettings.game.infiniteArrows);
@@ -410,7 +421,7 @@ static TransientSettings g_transientSettings = {
         .colliderViewOpacity = 50.0f,
         .drawRange = 100.0f,
     },
-    .skipFrameRateLimit = false,
+    .turboMode = false,
 };
 
 TransientSettings& getTransientSettings() {

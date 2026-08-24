@@ -222,13 +222,13 @@ static DUSK_CONSTEXPR daNpcT_MotionSeqMngr_c::sequenceStepData_c l_motionSequenc
     {-1, 0, 0},
 };
 
-char DUSK_CONST* DUSK_CONST daNpc_Kkri_c::mCutNameList[3] = {
+DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST daNpc_Kkri_c::mCutNameList[3] = {
     "",
     "CONVERSATION_ABOUT_SOUP",
     "YM_LOOK",
 };
 
-int (daNpc_Kkri_c::* DUSK_CONST daNpc_Kkri_c::mCutList[])(int) = {
+DUSK_GAME_DATA int (daNpc_Kkri_c::* DUSK_CONST daNpc_Kkri_c::mCutList[])(int) = {
     NULL,
     &daNpc_Kkri_c::cutConversationAboutSoup,
     &daNpc_Kkri_c::cutYmLook,
@@ -236,7 +236,7 @@ int (daNpc_Kkri_c::* DUSK_CONST daNpc_Kkri_c::mCutList[])(int) = {
 
 static NPC_KKRI_HIO_CLASS l_HIO;
 
-const daNpc_Kkri_HIOParam daNpc_Kkri_Param_c::m = {
+DUSK_GAME_DATA const daNpc_Kkri_HIOParam daNpc_Kkri_Param_c::m = {
     180.0f,
     -3.0f,
     1.0f,
@@ -1181,7 +1181,18 @@ int daNpc_Kkri_c::talk(void*) {
                     switch (eventId) {
                     case 1:
                         if (mItemPartnerId == fpcM_ERROR_PROCESS_ID_e) {
-                            mItemPartnerId = fopAcM_createItemForPresentDemo(&current.pos, item_no, 0, -1, -1, NULL, NULL);
+#if TARGET_PC
+                            u32 itemGiveTag = 0;
+                            if (item_no == dItemNo_OIL_BOTTLE3_e) {
+                                const auto itemCheck =
+                                    dusk::mods::item_check_commit("coro_bottle", item_no, this);
+                                item_no = itemCheck.itemNo;
+                                itemGiveTag = itemCheck.tag;
+                            }
+#endif
+                            mItemPartnerId = fopAcM_createItemForPresentDemo(&current.pos, item_no,
+                                0, -1, -1, NULL,
+                                NULL IF_DUSK_ARG(itemGiveTag));
                         }
 
                         if (fopAcM_IsExecuting(mItemPartnerId)) {

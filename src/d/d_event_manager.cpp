@@ -15,7 +15,7 @@
 #include "SSystem/SComponent/c_counter.h"
 #include <cstring>
 
-#include "dusk/string.hpp"
+#include "helpers/string.hpp"
 
 #if DEBUG
 static dEvM_HIO_c l_HIO;
@@ -335,6 +335,14 @@ bool dEvent_manager_c::setObjectArchive(DUSK_CONST char* arcname) {
 
     if (arcname != NULL) {
         rt = dComIfG_getObjectRes(arcname, DataFileName);
+#if TARGET_PC
+        if (rt != nullptr && strcmp(arcname, "Prayer") == 0) {
+            // pointer to Prayer event `011get_item` prm0 in it's event_list.dat
+            u8* itemNo = static_cast<u8*>(rt) + 0x927;
+            *itemNo =
+                dusk::mods::item_check("prayer_reward", dItemNo_KAKERA_HEART_e, NULL);
+        }
+#endif
         int base_status = mEventList[BASE_ACTOR].init((char*)rt, -1);
 
         #if DEBUG

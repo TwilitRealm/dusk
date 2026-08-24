@@ -26,10 +26,11 @@
 #include <cstring>
 #include "dusk/logging.h"
 #include "dusk/frame_interpolation.h"
+#include "dusk/version.hpp"
 
-u8 mDoExt::CurrentHeapAdjustVerbose;
-u8 mDoExt::HeapAdjustVerbose;
-u8 mDoExt::HeapAdjustQuiet;
+DUSK_GAME_DATA u8 mDoExt::CurrentHeapAdjustVerbose;
+DUSK_GAME_DATA u8 mDoExt::HeapAdjustVerbose;
+DUSK_GAME_DATA u8 mDoExt::HeapAdjustQuiet;
 
 static void mDoExt_setJ3DData(Mtx mtx, const J3DTransformInfo* transformInfo, u16 param_2) {
     bool local_28;
@@ -691,7 +692,7 @@ JKRExpHeap* mDoExt_getDbPrintHeap() {
     return DbPrintHeap;
 }
 
-JKRExpHeap* gameHeap;
+DUSK_GAME_DATA JKRExpHeap* gameHeap;
 static intptr_t safeGameHeapSize = -1;
 
 JKRExpHeap* mDoExt_createGameHeap(u32 heapSize, JKRHeap* parentHeap) {
@@ -724,8 +725,8 @@ size_t mDoExt_getSafeGameHeapSize() {
     return safeGameHeapSize;
 }
 
-JKRExpHeap* zeldaHeap;
-intptr_t safeZeldaHeapSize = -1;
+DUSK_GAME_DATA JKRExpHeap* zeldaHeap;
+DUSK_GAME_DATA intptr_t safeZeldaHeapSize = -1;
 
 JKRExpHeap* mDoExt_createZeldaHeap(u32 heapSize, JKRHeap* parentHeap) {
     JUT_ASSERT(1815, zeldaHeap == NULL || heapSize == 0);
@@ -758,8 +759,8 @@ intptr_t mDoExt_getSafeZeldaHeapSize() {
     return safeZeldaHeapSize;
 }
 
-JKRExpHeap* commandHeap;
-intptr_t safeCommandHeapSize = -1;
+DUSK_GAME_DATA JKRExpHeap* commandHeap;
+DUSK_GAME_DATA intptr_t safeCommandHeapSize = -1;
 
 JKRExpHeap* mDoExt_createCommandHeap(u32 heapSize, JKRHeap* parentHeap) {
     JUT_ASSERT(1894, commandHeap == 0 || heapSize == 0);
@@ -785,8 +786,8 @@ intptr_t mDoExt_getSafeCommandHeapSize() {
     return safeCommandHeapSize;
 }
 
-JKRExpHeap* archiveHeap;
-intptr_t safeArchiveHeapSize = -1;
+DUSK_GAME_DATA JKRExpHeap* archiveHeap;
+DUSK_GAME_DATA intptr_t safeArchiveHeapSize = -1;
 
 JKRExpHeap* mDoExt_createArchiveHeap(u32 heapSize, JKRHeap* parentHeap) {
     JUT_ASSERT(1966, archiveHeap == 0 || heapSize == 0);
@@ -824,7 +825,7 @@ JKRExpHeap* mDoExt_getArchiveHeapPtr() {
 }
 
 static JKRExpHeap* j2dHeap;
-intptr_t safeJ2dHeapSize = -1;
+DUSK_GAME_DATA intptr_t safeJ2dHeapSize = -1;
 
 JKRExpHeap* mDoExt_createJ2dHeap(u32 heapSize, JKRHeap* parentHeap) {
     JUT_ASSERT(2059, j2dHeap == 0 || heapSize == 0);
@@ -2238,7 +2239,7 @@ void mDoExt_invJntPacket::draw() {
             } while (shapePkt != NULL);
         }
     } else {
-        static u8 l_invisibleMat[] ATTRIBUTE_ALIGN(32) = {
+        ATTRIBUTE_ALIGN(32) static u8 l_invisibleMat[] = {
             0x10, 0x00, 0x00, 0x10, 0x0E, 0x00, 0x00, 0x04, 0x00, 0x10, 0x00, 0x00, 0x10, 0x10, 0x00,
             0x00, 0x04, 0x00, 0x61, 0x28, 0x38, 0x00, 0x00, 0x61, 0xC0, 0x08, 0xFF, 0xFC, 0x61, 0xC1,
             0x08, 0xFF, 0xF0, 0x61, 0xF3, 0x7F, 0x00, 0x00, 0x61, 0x43, 0x00, 0x00, 0x41, 0x61, 0x40,
@@ -2356,7 +2357,7 @@ int mDoExt_3DlineMat0_c::init(u16 param_0, u16 param_1, int param_2) {
     return 1;
 }
 
-static u8 l_matDL[132] ATTRIBUTE_ALIGN(32) = {
+ATTRIBUTE_ALIGN(32) static u8 l_matDL[132] = {
     0x08, 0x30, 0x3C, 0xF3, 0xCF, 0x00, 0x10, 0x00, 0x00, 0x10, 0x18, 0x3C, 0xF3, 0xCF, 0x00,
     0x10, 0x00, 0x00, 0x10, 0x0E, 0x00, 0x00, 0x7F, 0x32, 0x10, 0x00, 0x00, 0x10, 0x10, 0x00,
     0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x10, 0x0C, 0xFF, 0xFF, 0xFF, 0xFF, 0x61, 0x28, 0x38,
@@ -2681,7 +2682,7 @@ int mDoExt_3DlineMat1_c::init(u16 param_0, u16 param_1, ResTIMG* param_2, int pa
     return 1;
 }
 
-static u8 l_mat1DL[141] ATTRIBUTE_ALIGN(32) = {
+ATTRIBUTE_ALIGN(32) static u8 l_mat1DL[141] = {
     0x10, 0x00, 0x00, 0x10, 0x40, 0xFF, 0xFF, 0x42, 0x80, 0x08, 0x30, 0x3C, 0xF3, 0xCF, 0x00, 0x10,
     0x00, 0x00, 0x10, 0x18, 0x3C, 0xF3, 0xCF, 0x00, 0x10, 0x00, 0x00, 0x10, 0x0E, 0x00, 0x00, 0x7F,
     0x32, 0x10, 0x00, 0x00, 0x10, 0x10, 0x00, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x10, 0x0C, 0xFF,
@@ -3711,7 +3712,15 @@ static ResFONT* mDoExt_resfont0;
 
 static void mDoExt_initFont0() {
     static char const fontdata[] = "rodan_b_24_22.bfn";
-#if REGION_JPN
+#if TARGET_PC
+    if (dusk::version::isRegionJpn()) {
+        mDoExt_initFontCommon(&mDoExt_font0, &mDoExt_resfont0, mDoExt_getZeldaHeap(),
+                              fontdata, dComIfGp_getFontArchive(), 0, 200, 512);
+    } else {
+        mDoExt_initFontCommon(&mDoExt_font0, &mDoExt_resfont0, mDoExt_getZeldaHeap(),
+                              fontdata, dComIfGp_getFontArchive(), 1, 0, 0);
+    }
+#elif REGION_JPN
     mDoExt_initFontCommon(&mDoExt_font0, &mDoExt_resfont0, mDoExt_getZeldaHeap(),
                           fontdata, dComIfGp_getFontArchive(), 0, 200, 512);
 #else
@@ -3738,7 +3747,13 @@ void mDoExt_removeMesgFont() {
             JKR_DELETE(mDoExt_font0);
             mDoExt_font0 = NULL;
             if (mDoExt_resfont0 != NULL) {
-#if REGION_JPN
+#if TARGET_PC
+                if (dusk::version::isRegionJpn()) {
+                    JKRFileLoader::removeResource(mDoExt_resfont0, NULL);
+                } else {
+                    JKRFree(mDoExt_resfont0);
+                }
+#elif REGION_JPN
                 JKRFileLoader::removeResource(mDoExt_resfont0, NULL);
 #else
                 JKRFree(mDoExt_resfont0);
@@ -3850,7 +3865,7 @@ J3DModel* mDoExt_J3DModel__create(J3DModelData* i_modelData, u32 i_modelFlag, u3
     return NULL;
 }
 
-DummyCheckHeap* dch;
+DUSK_GAME_DATA DummyCheckHeap* dch;
 
 DummyCheckHeap::DummyCheckHeap() {
     mAlloc = NULL;
@@ -3958,7 +3973,7 @@ void DummyCheckHeap_check() {
     }
 }
 
-u32 aram_cache_size;
+DUSK_GAME_DATA u32 aram_cache_size;
 
 u32 mDoExt_getAraCacheSize() {
     return aram_cache_size;

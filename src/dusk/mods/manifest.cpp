@@ -12,7 +12,7 @@
 
 #include <zstd.h>
 
-#include "aurora/lib/logging.hpp"
+#include <borealis/log.hpp>
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -28,7 +28,7 @@
 namespace dusk::mods::manifest {
 namespace {
 
-aurora::Module Log("dusk::mods::manifest");
+constexpr borealis::Log Log{"dusk::mods::manifest"};
 
 constexpr char kMagic[8] = {'S', 'Y', 'M', 'G', 'E', 'N', '\0', '\0'};
 constexpr uint32_t kVersion = 2;
@@ -80,7 +80,7 @@ constinit const SymdbDescriptor s_symdbDescriptor{kDescriptorMagic, 0, 0};
 __attribute__((section("__DATA,__symdbh"), used)) constinit const SymdbDescriptor
     s_symdbDescriptor{kDescriptorMagic, 0, 0};
 #else
-__attribute__((section("symdbh"), used)) constinit const volatile SymdbDescriptor s_symdbDescriptor{
+__attribute__((section("symdbh"), used)) constinit const SymdbDescriptor s_symdbDescriptor{
     kDescriptorMagic, 0, 0};
 #endif
 
