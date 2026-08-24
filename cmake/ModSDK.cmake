@@ -2,7 +2,7 @@
 #         [RUNTIME_LIBRARIES <file>...] [RES_DIR <res>] [OVERLAY_DIR <overlay>]
 #         [TEXTURES_DIR <textures>] [OUTPUT_DIR <dir>] [BUNDLE])
 set(DUSK_MODS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/mods" CACHE PATH "Directory to write mod packages into")
-set(DUSKLIGHT_SDK_STUB_URL "https://github.com/kamilink7/dusklight/releases/download/sdk-v1.1"
+set(DUSKLIGHT_SDK_STUB_URL "https://github.com/kamilink7/dusklight/releases/download/sdk-v1.2"
         CACHE STRING "Base URL for game link stubs downloaded by out-of-tree mod builds")
 
 function(_mod_lib_info out_platform_var out_name_var)
