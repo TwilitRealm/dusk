@@ -4394,9 +4394,15 @@ static void damage_check(e_rd_class* i_this) {
                     }
 
                     if (enemy->health <= 0 || i_this->at_info.mHitStatus != 0 || i_this->ride_mode != RIDE_MODE_OFF) {
-                        if (pla->getCutType() == daPy_py_c::CUT_TYPE_JUMP && pla->checkCutJumpCancelTurn()) {
+                        if ((pla->getCutType() == daPy_py_c::CUT_TYPE_JUMP && pla->checkCutJumpCancelTurn())
+                            || pla->getCutType() == daPy_py_c::CUT_TYPE_TURN_LEFT || pla->getCutType() == daPy_py_c::CUT_TYPE_TURN_RIGHT) {
                             small_damage(i_this, i);
-                            i_this->damage_timer = 3 + NREG_S(7);
+                            if (pla->getCutType() == daPy_py_c::CUT_TYPE_TURN_LEFT || pla->getCutType() == daPy_py_c::CUT_TYPE_TURN_RIGHT) {
+                                i_this->damage_timer = 6 + NREG_S(7);
+                            }
+                            else {
+                                i_this->damage_timer = 3 + NREG_S(7);
+                            }
                         } else {
                             if (i_this->actor_set != ACTOR_SET_NONE && boar != NULL) {
                                 i_this->damage_timer = 20;

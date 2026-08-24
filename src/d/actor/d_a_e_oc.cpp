@@ -778,13 +778,16 @@ void daE_OC_c::damage_check() {
 
     if (daPy_getPlayerActorClass()->getCutType() == daPy_py_c::CUT_TYPE_TURN_RIGHT || daPy_getPlayerActorClass()->getCutType() == daPy_py_c::CUT_TYPE_TURN_LEFT) {
         my_val = 3;
+        setActionMode(E_OC_ACTION_DAMAGE, my_val);
     }
 
     if (my_val >= 5) {
         setActionMode(E_OC_ACTION_BIG_DAMAGE, my_val - 5);
         offTgSph();
     } else {
-        setActionMode(E_OC_ACTION_DAMAGE, my_val);
+        if (daPy_getPlayerActorClass()->mComboCutCount >= 2) {
+            setActionMode(E_OC_ACTION_DAMAGE, my_val);
+        }
     }
 }
 
