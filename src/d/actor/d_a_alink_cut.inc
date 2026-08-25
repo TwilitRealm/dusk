@@ -361,11 +361,8 @@ BOOL daAlink_c::checkAtShieldHit(dCcD_GObjInf& i_gobj) {
 
 BOOL daAlink_c::checkCutReverseAt(dCcD_GObjInf* i_gobj) {
     fopAc_ac_c* hit_ac = i_gobj->GetAtHitAc();
-    if (hit_ac != NULL && fopAcM_GetGroup(hit_ac) == fpcNm_E_MF_e) {
-        return FALSE;
-    }
     if (checkAtShieldHit(*i_gobj)) {
-        return TRUE;
+        return FALSE;
     } else {
         return FALSE;
     }

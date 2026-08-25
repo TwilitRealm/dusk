@@ -2174,6 +2174,7 @@ static void damage_check(e_mf_class* i_this) {
 
                     i_this->field_0x724 |= i_this->mAtInfo.mHitBit;
                     if (i_this->mAtInfo.mHitType == 16 || i_this->mAtInfo.mpCollider->ChkAtType(AT_TYPE_HOOKSHOT)) {
+                        // insert guard break here once you figure it out lol
                         a_this->health = sVar1;
                         i_this->mAction = 12;
                         i_this->field_0x5b4 = 0;
@@ -2199,12 +2200,23 @@ static void damage_check(e_mf_class* i_this) {
                             if (player->getCutType() == daPy_py_c::CUT_TYPE_JUMP && player->checkCutJumpCancelTurn()) {
                                 small_damage(i_this);
                                 i_this->field_0x6c8 = 3;
-                            } else if (player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_LEFT && player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_STAB
-                            && player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_RIGHT && player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_VERTICAL) {
+                            }
+                            else if (player->getCutType() == daPy_py_c::CUT_TYPE_TURN_LEFT
+                                || player->getCutType() == daPy_py_c::CUT_TYPE_TURN_RIGHT) {
+                                small_damage(i_this);
+                                i_this->field_0x6c8 = 6;
+                            }
+                            else if (player->getCutCount() != 4) {
                                 big_damage(i_this);
                                 i_this->field_0x6c8 = 1000;
                             }
-                        } else {
+                        } else if (player->getCutCount() != 1) {
+                            small_damage(i_this);
+                            i_this->field_0x6c8 = 3;
+                        } else if (player->getCutCount() == 1 && player->getCutType() <= daPy_py_c::CUT_TYPE_NM_LEFT) {
+                            i_this->field_0x6c8 = 2;
+                        }
+                        else {
                             small_damage(i_this);
                         }
 
