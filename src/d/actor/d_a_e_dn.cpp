@@ -2400,19 +2400,33 @@ static void damage_check(e_dn_class* i_this) {
                         }
                     }
 
-                    if (actor->health <= 0 || i_this->at_info.mHitStatus != 0) {
+                    if (actor->health <= 0 || i_this->at_info.mHitStatus != 0) { // heavy attacks only?
+                        // spin cancel branch
                         if (player->getCutType() == daPy_py_c::CUT_TYPE_JUMP && player->checkCutJumpCancelTurn()) {
                             small_damage(i_this);
                             i_this->invulnerability_timer = 3;
-                        } else if (player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_LEFT && player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_STAB
-                            && player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_RIGHT && player->getCutType() != daPy_py_c::CUT_TYPE_FINISH_VERTICAL) {
+                        }
+                        // spin attack branch
+                        else if (player->getCutType() == daPy_py_c::CUT_TYPE_TURN_LEFT || player->getCutType() == daPy_py_c::CUT_TYPE_TURN_RIGHT
+                            || player->getCutCount() == 4) {
+                            small_damage(i_this);
+                            i_this->invulnerability_timer = 6;
+                        }
+                        // prevent combo finishers from knocking back, jump attack and hidden skills should fall here
+                        else if (player->getCutCount() != 4) {
                             big_damage(i_this);
                             i_this->invulnerability_timer = 1000;
                         }
-                        else {
-                            small_damage(i_this);
-                        }
-                    } else {
+                    // explicitly allow non-first attacks to stagger
+                    } else if (player->getCutCount() != 1) {
+                        small_damage(i_this);
+                        i_this->invulnerability_timer = 3;
+                    // explicitly prevent first attacks from staggering
+                    } else if (player->getCutCount() == 1 && player->getCutType() <= daPy_py_c::CUT_TYPE_NM_LEFT) {
+                        i_this->invulnerability_timer = 2;
+                    }
+                    // fallback just in case
+                    else {
                         small_damage(i_this);
                     }
 
