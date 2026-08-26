@@ -994,6 +994,7 @@ static void e_mf_fight_run(e_mf_class* i_this) {
         case -10:
             anm_init(i_this, ANM_WAIT_01, 5.0f, 2, 1.0f);
             i_this->field_0x6c0[1] = cM_rndF(10.0f) + 15.0f;
+            i_this->field_0x6c0[3] = 90;
             i_this->mSound.startCreatureVoice(Z2SE_EN_MF_V_FIND, -1);
             i_this->field_0x5b4 = -9;
             break;
@@ -1150,19 +1151,35 @@ static void e_mf_fight_run(e_mf_class* i_this) {
                 if (i_this->mPlayerDistance < l_HIO.attack_init_range) {
                     if (i_this->field_0x6c0[2] == 0) {
                         i_this->field_0x6c0[2] = cM_rndF(30.0f) + 15.0f;
+                        i_this->field_0x6c0[3] = 90;
                         if (way_check(i_this) == 0 && cM_rndF(1.0f) < 0.65f) {
                             i_this->mAction = 5;
-                            i_this->field_0x5b4 = 0;
                         } else {
                             i_this->mAction = 6;
-                            i_this->field_0x5b4 = 0;
                         }
+                        i_this->field_0x5b4 = 0;
                     }
                 } else {
-                    i_this->field_0x6c0[2] = cM_rndF(50.0f) + 30.0f;
+                    // prevent timer from resetting if player exits range
+                    if (i_this->field_0x6c0[2] > 20) {
+                        i_this->field_0x6c0[2] = 20;
+                    } else if (i_this->field_0x6c0[2] < 10) {
+                        i_this->field_0x6c0[2] = 10;
+                    }
+                    i_this->field_0x6c0[3] = 90;
                 }
-
             }
+        } else if (i_this->mPlayerDistance < l_HIO.attack_init_range &&
+                   i_this->field_0x6c0[3] == 0) {
+            // anti-stall, force an attack if it's been too long
+            i_this->field_0x6c0[2] = cM_rndF(30.0f) + 15.0f;
+            i_this->field_0x6c0[3] = 90;
+            if (way_check(i_this) == 0 && cM_rndF(1.0f) < 0.65f) {
+                i_this->mAction = 5;
+            } else {
+                i_this->mAction = 6;
+            }
+            i_this->field_0x5b4 = 0;
         }
     }
 

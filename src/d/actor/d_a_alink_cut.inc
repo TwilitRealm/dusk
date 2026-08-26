@@ -361,8 +361,10 @@ BOOL daAlink_c::checkAtShieldHit(dCcD_GObjInf& i_gobj) {
 
 BOOL daAlink_c::checkCutReverseAt(dCcD_GObjInf* i_gobj) {
     fopAc_ac_c* hit_ac = i_gobj->GetAtHitAc();
-    if (checkAtShieldHit(*i_gobj)) {
-        return FALSE;
+    // get enemy reference
+    fopAc_ac_c* enemy = mTargetedActor;
+    if (checkAtShieldHit(*i_gobj) && fopAcM_GetName(mTargetedActor) == fpcNm_B_TN_e) {
+        return TRUE;
     } else {
         return FALSE;
     }
