@@ -262,7 +262,7 @@ dMenu_Ring_c::dMenu_Ring_c(JKRExpHeap* i_heap, STControl* i_stick, CSTControl* i
     for (int i = 0; i < MAX_SELECT_ITEM; i++) {
         for (int j = 0; j < 3; j++) {
             for (int k = 0; k < SELECT_ITEM_NUM; k++) {
-                mpSelectItemTexBuf[i][j][k] = (ResTIMG*)mpHeap->alloc(0xC00, 0x20);
+                mpSelectItemTexBuf(i, j, k) = (ResTIMG*)mpHeap->alloc(0xC00, 0x20);
             }
         }
         field_0x6be[i] = 0;
@@ -272,7 +272,7 @@ dMenu_Ring_c::dMenu_Ring_c(JKRExpHeap* i_heap, STControl* i_stick, CSTControl* i
             setSelectItem(i, 0x43);
         }
         for (int j = 0; j < 3; j++) {
-            mpSelectItemTex[i][j] = JKR_NEW J2DPicture(mpSelectItemTexBuf[i][field_0x6be[i]][0]);
+            mpSelectItemTex[i][j] = JKR_NEW J2DPicture(mpSelectItemTexBuf(i, field_0x6be[i], 0));
             mpSelectItemTex[i][j]->setBasePosition(J2DBasePosition_4);
         }
         field_0x548[i] = 0.0f;
@@ -573,8 +573,8 @@ dMenu_Ring_c::~dMenu_Ring_c() {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 3; j++) {
             for (int k = 0; k < 3; k++) {
-                mpHeap->free(mpSelectItemTexBuf[i][j][k]);
-                mpSelectItemTexBuf[i][j][k] = NULL;
+                mpHeap->free(mpSelectItemTexBuf(i, j, k));
+                mpSelectItemTexBuf(i, j, k) = NULL;
             }
             if (mpSelectItemTex[i][j] != NULL) {
                 JKR_DELETE(mpSelectItemTex[i][j]);
@@ -1975,15 +1975,15 @@ void dMenu_Ring_c::setSelectItem(int i_idx, u8 i_itemNo) {
         // !@bug Out-of-bounds access into mpSelectItemTexBuf
         //       (innermost dimension is 2, we take index 2 which is invalid)
         field_0x686[i_idx] = dMeter2Info_readItemTexture(
-            i_itemNo, mpSelectItemTexBuf[i_idx][field_0x6be[i_idx]][0], mpSelectItemTex[i_idx][0],
-            mpSelectItemTexBuf[i_idx][field_0x6be[i_idx]][1], mpSelectItemTex[i_idx][1],
-            mpSelectItemTexBuf[i_idx][field_0x6be[i_idx]][2], mpSelectItemTex[i_idx][2], NULL, NULL,
+            i_itemNo, mpSelectItemTexBuf(i_idx, field_0x6be[i_idx], 0), mpSelectItemTex[i_idx][0],
+            mpSelectItemTexBuf(i_idx, field_0x6be[i_idx], 1), mpSelectItemTex[i_idx][1],
+            mpSelectItemTexBuf(i_idx, field_0x6be[i_idx], 2), mpSelectItemTex[i_idx][2], NULL, NULL,
             -1);
         texScale = dItem_data::getTexScale(i_itemNo) / 100.0f;
     }
-    field_0x548[i_idx] = mpSelectItemTexBuf[i_idx][field_0x6be[i_idx]][0]->width / 48.0f * texScale;
+    field_0x548[i_idx] = mpSelectItemTexBuf(i_idx, field_0x6be[i_idx], 0)->width / 48.0f * texScale;
     field_0x558[i_idx] =
-        mpSelectItemTexBuf[i_idx][field_0x6be[i_idx]][0]->height / 48.0f * texScale;
+        mpSelectItemTexBuf(i_idx, field_0x6be[i_idx], 0)->height / 48.0f * texScale;
 }
 
 void dMenu_Ring_c::drawSelectItem() {

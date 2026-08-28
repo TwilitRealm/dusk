@@ -110,10 +110,10 @@ public:
                                                   // and cursor is on combinable item
     /* 0x1DC */ J2DTextBox* mpBowArrowComboString[5];  // Displays "Bow & Arrow Combo" if bow is
                                                        // equipped and cursor is on combinable item
-    // Upstream-sized placeholder; real storage is mpSelectItemTexBuf at the end of the class.
-    // Widening in place would move mpItemBuf, mpItemExplain and the button slots, which
-    // prebuilt code mods read at their upstream offsets.
-    /* 0x1F0 */ ResTIMG* mpSelectItemTexBufAbi_[4][3][2];
+    // Layers 0 and 1 keep their upstream addresses and hold the live buffers, because .dusk
+    // code mods read them here; only the third layer moves to the end of the class.
+    // Access through mpSelectItemTexBuf(a, b, c).
+    /* 0x1F0 */ ResTIMG* mpSelectItemTexBuf_[4][3][2];
     /* 0x250 */ ResTIMG* mpItemBuf[MAX_ITEM_SLOTS][3];
     /* 0x370 */ dMenu_ItemExplain_c* mpItemExplain;
     /* 0x374 */ void*
@@ -223,7 +223,12 @@ public:
     bool mCursorInterpInit;
     bool mPointerTouchPressHoveredCurrent;
 
-    ResTIMG* mpSelectItemTexBuf[4][3][3];  // real storage; see the placeholder above
+    ResTIMG* mpSelectItemTexBufZ_[4][3];  // third layer; see mpSelectItemTexBuf_ above
+
+public:
+    ResTIMG*& mpSelectItemTexBuf(int a, int b, int c) {
+        return c < 2 ? mpSelectItemTexBuf_[a][b][c] : mpSelectItemTexBufZ_[a][b];
+    }
 #endif
 };
 
