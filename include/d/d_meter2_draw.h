@@ -152,6 +152,10 @@ public:
     constexpr f32 getButtonZAlpha() const {
         return mButtonZAlpha;
     }
+
+    /* Fully-opaque target that getButtonZAlpha() eases toward; compare against this rather than
+       1.0f, since the Midna icon pane's initial alpha is what counts as "not dimmed". */
+    f32 getButtonZAlphaMax();
 #endif
 
 // private:

@@ -541,8 +541,7 @@ void dMeter2Draw_c::init() {
     mButtonXAlpha = g_drawHIO.mButtonXAlpha;
     mButtonYAlpha = g_drawHIO.mButtonYAlpha;
     field_0x80c = g_drawHIO.field_0x168;
-    // field_0x810 = g_drawHIO.mButtonZAlpha;
-    mButtonZAlpha = g_drawHIO.mButtonZAlpha;
+    field_0x810 = g_drawHIO.mButtonZAlpha;
 
     for (int i = 0; i < 2; i++) {
         mItemBBaseAlpha[i] = g_drawHIO.mItemBBaseAlpha[i];
@@ -3005,8 +3004,9 @@ void dMeter2Draw_c::setAlphaButtonChange(bool param_0) {
         field_0x80c = g_drawHIO.field_0x168;
     }
 
-    if (mButtonZAlpha != g_drawHIO.mButtonZAlpha || param_0) {
-        mButtonZAlpha = g_drawHIO.mButtonZAlpha;
+    /* Must stay separate from mButtonZAlpha to not break stuff */
+    if (field_0x810 != g_drawHIO.mButtonZAlpha || param_0) {
+        field_0x810 = g_drawHIO.mButtonZAlpha;
         set_buttonZ = true;
     }
 
@@ -3066,7 +3066,7 @@ void dMeter2Draw_c::setAlphaButtonChange(bool param_0) {
     }
 
     if (set_parent || set_buttonZ || param_0) {
-        mpButtonXY[2]->setAlphaRate(mButtonZAlpha * field_0x7f0);
+        mpButtonXY[2]->setAlphaRate(field_0x810 * field_0x7f0);
     }
 
     if (set_parent || set_buttonXItem || param_0) {
@@ -3334,6 +3334,12 @@ void dMeter2Draw_c::setButtonIconBAlpha(u8 unused0, u32 unused1, bool param_2) {
         }
     }
 }
+
+#if TARGET_PC
+f32 dMeter2Draw_c::getButtonZAlphaMax() {
+    return mpButtonMidona != NULL ? (f32)mpButtonMidona->getInitAlpha() / 255.0f : 1.0f;
+}
+#endif
 
 void dMeter2Draw_c::setButtonIconMidonaAlpha(u32 param_0) {
     mpButtonMidona->scale(g_drawHIO.mMidnaIconScale, g_drawHIO.mMidnaIconScale);
