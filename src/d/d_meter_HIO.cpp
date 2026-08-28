@@ -1856,15 +1856,15 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
     mButtonYItemBasePosY[1] = 0.0f;
     mButtonYItemBaseAlpha[1] = 0.5f;
 
-    mButtonZItemBaseScale[0] = 1.5f;
-    mButtonZItemBasePosX[0] = 16.0f;
-    mButtonZItemBasePosY[0] = -12.0f;
-    mButtonZItemBaseAlpha[0] = 0.5f;
+    mButtonZItemBaseScale(0) = 1.5f;
+    mButtonZItemBasePosX(0) = 16.0f;
+    mButtonZItemBasePosY(0) = -12.0f;
+    mButtonZItemBaseAlpha(0) = 0.5f;
 
-    mButtonZItemBaseScale[1] = 1.5f;
-    mButtonZItemBasePosX[1] = 0.0f;
-    mButtonZItemBasePosY[1] = 0.0f;
-    mButtonZItemBaseAlpha[1] = 0.5f;
+    mButtonZItemBaseScale(1) = 1.5f;
+    mButtonZItemBasePosX(1) = 0.0f;
+    mButtonZItemBasePosY(1) = 0.0f;
+    mButtonZItemBaseAlpha(1) = 0.5f;
 
     field_0x280 = 1.5f;
     field_0x288 = 0.0f;
@@ -2628,10 +2628,10 @@ void dMeter_drawHIO_c::genMessage(JORMContext* mctx) {
     mctx->genLabel("************************************", 0);
     mctx->genLabel("*　　　Ｚアイテムベースの調整　　　*", 0);
     mctx->genLabel("************************************", 0);
-    mctx->genSlider("拡大縮小", &mButtonZItemBaseScale, 0.0f, 3.0f);
-    mctx->genSlider("位置調整Ｘ", &mButtonZItemBasePosX, -300.0f, 300.0f);
-    mctx->genSlider("位置調整Ｙ", &mButtonZItemBasePosY, -300.0f, 300.0f);
-    mctx->genSlider("アルファ", &mButtonZItemBaseAlpha, 0.0f, 1.0f);
+    mctx->genSlider("拡大縮小", &mButtonZItemBaseScale(0), 0.0f, 3.0f);
+    mctx->genSlider("位置調整Ｘ", &mButtonZItemBasePosX(0), -300.0f, 300.0f);
+    mctx->genSlider("位置調整Ｙ", &mButtonZItemBasePosY(0), -300.0f, 300.0f);
+    mctx->genSlider("アルファ", &mButtonZItemBaseAlpha(0), 0.0f, 1.0f);
     mctx->genLabel("", 0);
     mctx->genLabel("************************************", 0);
     mctx->genLabel("* 　　　　Ｚフォントの調整　　　　 *", 0);

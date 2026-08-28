@@ -110,7 +110,10 @@ public:
                                                   // and cursor is on combinable item
     /* 0x1DC */ J2DTextBox* mpBowArrowComboString[5];  // Displays "Bow & Arrow Combo" if bow is
                                                        // equipped and cursor is on combinable item
-    /* 0x1F0 */ ResTIMG* mpSelectItemTexBuf[4][3][3];
+    // Upstream-sized placeholder; real storage is mpSelectItemTexBuf at the end of the class.
+    // Widening in place would move mpItemBuf, mpItemExplain and the button slots, which
+    // prebuilt code mods read at their upstream offsets.
+    /* 0x1F0 */ ResTIMG* mpSelectItemTexBufAbi_[4][3][2];
     /* 0x250 */ ResTIMG* mpItemBuf[MAX_ITEM_SLOTS][3];
     /* 0x370 */ dMenu_ItemExplain_c* mpItemExplain;
     /* 0x374 */ void*
@@ -219,6 +222,8 @@ public:
     bool mCursorInterpCurrAngular;
     bool mCursorInterpInit;
     bool mPointerTouchPressHoveredCurrent;
+
+    ResTIMG* mpSelectItemTexBuf[4][3][3];  // real storage; see the placeholder above
 #endif
 };
 

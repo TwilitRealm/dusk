@@ -356,9 +356,9 @@ dMeter2Draw_c::~dMeter2Draw_c() {
     mpItemBPane = NULL;
 
     for (int i = 0; i < 3; i++) {
-        if (mpItemXY[i] != NULL) {
-            JKR_DELETE(mpItemXY[i]);
-            mpItemXY[i] = NULL;
+        if (mpItemXY(i) != NULL) {
+            JKR_DELETE(mpItemXY(i));
+            mpItemXY(i) = NULL;
         }
     }
 
@@ -548,7 +548,7 @@ void dMeter2Draw_c::init() {
         mButtonXItemBaseAlpha[i] = g_drawHIO.mButtonXItemBaseAlpha[i];
         mButtonYItemBaseAlpha[i] = g_drawHIO.mButtonYItemBaseAlpha[i];
         field_0x82c[i] = g_drawHIO.field_0x298[i];
-        mButtonZItemBaseAlpha[i] = g_drawHIO.mButtonZItemBaseAlpha[i];
+        mButtonZItemBaseAlpha[i] = g_drawHIO.mButtonZItemBaseAlpha(i);
     }
 
     mButtonBaseAlpha = g_drawHIO.mButtonBaseAlpha;
@@ -697,20 +697,20 @@ void dMeter2Draw_c::draw() {
     if (!touchControlsEnabled) {
 #endif
     for (int i = 0; i < 3; i++) {
-        if (mpItemXY[i] != NULL) {
+        if (mpItemXY(i) != NULL) {
             for (int j = 0; j < 3; j++) {
                 f32 temp_f30 = mItemParams[i].num_scale * 16.0f;
 #if TARGET_PC
                 temp_f30 *= dGetUserHudScale();
 #endif
 
-                Vec vtx0 = mpItemXY[i]->getPanePtr()->getGlbVtx(0);
-                Vec vtx3 = mpItemXY[i]->getPanePtr()->getGlbVtx(3);
+                Vec vtx0 = mpItemXY(i)->getPanePtr()->getGlbVtx(0);
+                Vec vtx3 = mpItemXY(i)->getPanePtr()->getGlbVtx(3);
 
                 mpItemNumTex[i][j]->draw(mItemParams[i].num_pos_x +
                                              (((vtx0.x + vtx3.x) * 0.5f) + (temp_f30 * j)),
                                          mItemParams[i].num_pos_y +
-                                             (((vtx0.y + vtx3.y) * 0.5f) + mpItemXY[i]->getSizeY()),
+                                             (((vtx0.y + vtx3.y) * 0.5f) + mpItemXY(i)->getSizeY()),
                                          temp_f30, temp_f30, false, false, false);
             }
         }
@@ -1139,39 +1139,39 @@ void dMeter2Draw_c::initButton() {
     mpItemBPane->setBasePosition(J2DBasePosition_4);
     mpItemB->getPanePtr()->appendChild(mpItemBPane);
 
-    mpItemXY[0] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('x_itm_p'), 0, NULL);
-    JUT_ASSERT(0, mpItemXY[0] != NULL);
-    mpItemXY[0]->getPanePtr()->setBasePosition(J2DBasePosition_4);
-    dMeter2Info_setMeterItemPanePtr(0, mpItemXY[0]);
+    mpItemXY(0) = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('x_itm_p'), 0, NULL);
+    JUT_ASSERT(0, mpItemXY(0) != NULL);
+    mpItemXY(0)->getPanePtr()->setBasePosition(J2DBasePosition_4);
+    dMeter2Info_setMeterItemPanePtr(0, mpItemXY(0));
 
-    mpItemXY[1] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('y_itm_p'), 0, NULL);
-    JUT_ASSERT(0, mpItemXY[1] != NULL);
-    mpItemXY[1]->getPanePtr()->setBasePosition(J2DBasePosition_4);
-    dMeter2Info_setMeterItemPanePtr(1, mpItemXY[1]);
+    mpItemXY(1) = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('y_itm_p'), 0, NULL);
+    JUT_ASSERT(0, mpItemXY(1) != NULL);
+    mpItemXY(1)->getPanePtr()->setBasePosition(J2DBasePosition_4);
+    dMeter2Info_setMeterItemPanePtr(1, mpItemXY(1));
 
-    mpItemXY[2] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('r_itm_p'), 0, NULL);
-    JUT_ASSERT(0, mpItemXY[2] != NULL);
-    mpItemXY[2]->getPanePtr()->setBasePosition(J2DBasePosition_4);
-    dMeter2Info_setMeterItemPanePtr(2, mpItemXY[2]);
+    mpItemXY(2) = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('r_itm_p'), 0, NULL);
+    JUT_ASSERT(0, mpItemXY(2) != NULL);
+    mpItemXY(2)->getPanePtr()->setBasePosition(J2DBasePosition_4);
+    dMeter2Info_setMeterItemPanePtr(2, mpItemXY(2));
 
     mpItemR = NULL;
     mpBTextA = NULL;
 
     mpItemXYPane[0] = JKR_NEW J2DPicture(
         MULTI_CHAR('x_itm_pp'),
-        JGeometry::TBox2<f32>(0.0f, 0.0f, mpItemXY[0]->getInitSizeX(), mpItemXY[0]->getInitSizeY()),
-        static_cast<J2DPicture*>(mpItemXY[0]->getPanePtr())->getTexture(0)->getTexInfo(), NULL);
+        JGeometry::TBox2<f32>(0.0f, 0.0f, mpItemXY(0)->getInitSizeX(), mpItemXY(0)->getInitSizeY()),
+        static_cast<J2DPicture*>(mpItemXY(0)->getPanePtr())->getTexture(0)->getTexInfo(), NULL);
     JUT_ASSERT(0, mpItemXYPane[0] != NULL);
     mpItemXYPane[0]->setBasePosition(J2DBasePosition_4);
-    mpItemXY[0]->getPanePtr()->appendChild(mpItemXYPane[0]);
+    mpItemXY(0)->getPanePtr()->appendChild(mpItemXYPane[0]);
 
     mpItemXYPane[1] = JKR_NEW J2DPicture(
         MULTI_CHAR('y_itm_pp'),
-        JGeometry::TBox2<f32>(0.0f, 0.0f, mpItemXY[1]->getInitSizeX(), mpItemXY[1]->getInitSizeY()),
-        static_cast<J2DPicture*>(mpItemXY[1]->getPanePtr())->getTexture(0)->getTexInfo(), NULL);
+        JGeometry::TBox2<f32>(0.0f, 0.0f, mpItemXY(1)->getInitSizeX(), mpItemXY(1)->getInitSizeY()),
+        static_cast<J2DPicture*>(mpItemXY(1)->getPanePtr())->getTexture(0)->getTexInfo(), NULL);
     JUT_ASSERT(0, mpItemXYPane[1] != NULL);
     mpItemXYPane[1]->setBasePosition(J2DBasePosition_4);
-    mpItemXY[1]->getPanePtr()->appendChild(mpItemXYPane[1]);
+    mpItemXY(1)->getPanePtr()->appendChild(mpItemXYPane[1]);
 
     mpItemR = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('r_itm_p'), 0, NULL);
     JUT_ASSERT(0, mpItemR != NULL);
@@ -2750,8 +2750,8 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
             break;
         }
 
-        mpItemXY[i_no]->getPanePtr()->rotate(mpItemXY[i_no]->getSizeX() * 0.5f,
-                                             mpItemXY[i_no]->getSizeY() * 0.5f, ROTATE_Z,
+        mpItemXY(i_no)->getPanePtr()->rotate(mpItemXY(i_no)->getSizeX() * 0.5f,
+                                             mpItemXY(i_no)->getSizeY() * 0.5f, ROTATE_Z,
                                              mItemParams[i_no].rotation);
 
         if (i_no == SELECT_X_e) {
@@ -2770,8 +2770,8 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
             dMeter2Info_isDirectUseItem(0);
 
             temp_f31 *= g_drawHIO.field_0x54c;
-            mpItemXY[0]->scale(temp_f31, temp_f31);
-            mpItemXY[0]->paneTrans(mItemParams[SELECT_X_e].pos_x + field_0x6ac[0],
+            mpItemXY(0)->scale(temp_f31, temp_f31);
+            mpItemXY(0)->paneTrans(mItemParams[SELECT_X_e].pos_x + field_0x6ac[0],
                                    mItemParams[SELECT_X_e].pos_y + field_0x6b8[0]);
 
             mpLightXY[0]->scale(g_drawHIO.mButtonXItemBaseScale[var_r29],
@@ -2798,8 +2798,8 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
             dMeter2Info_isDirectUseItem(1);
 
             temp_f31 *= g_drawHIO.field_0x54c;
-            mpItemXY[1]->scale(temp_f31, temp_f31);
-            mpItemXY[1]->paneTrans(mItemParams[SELECT_Y_e].pos_x + field_0x6ac[1],
+            mpItemXY(1)->scale(temp_f31, temp_f31);
+            mpItemXY(1)->paneTrans(mItemParams[SELECT_Y_e].pos_x + field_0x6ac[1],
                                    mItemParams[SELECT_Y_e].pos_y + field_0x6b8[1]);
 
             mpLightXY[1]->scale(g_drawHIO.mButtonYItemBaseScale[var_r29],
@@ -2826,14 +2826,14 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
             dMeter2Info_isDirectUseItem(2);
 
             temp_f31 *= g_drawHIO.field_0x54c;
-            mpItemXY[2]->scale(temp_f31, temp_f31);
-            mpItemXY[2]->paneTrans(mItemParams[SELECT_Z_e].pos_x + field_0x6ac[2],
+            mpItemXY(2)->scale(temp_f31, temp_f31);
+            mpItemXY(2)->paneTrans(mItemParams[SELECT_Z_e].pos_x + field_0x6ac[2],
                                    mItemParams[SELECT_Z_e].pos_y + field_0x6b8[2]);
 
-            mpLightXY[2]->scale(g_drawHIO.mButtonZItemBaseScale[var_r29],
-                                g_drawHIO.mButtonZItemBaseScale[var_r29]);
-            mpLightXY[2]->paneTrans(g_drawHIO.mButtonZItemBasePosX[var_r29],
-                                    g_drawHIO.mButtonZItemBasePosY[var_r29]);
+            mpLightXY[2]->scale(g_drawHIO.mButtonZItemBaseScale(var_r29),
+                                g_drawHIO.mButtonZItemBaseScale(var_r29));
+            mpLightXY[2]->paneTrans(g_drawHIO.mButtonZItemBasePosX(var_r29),
+                                    g_drawHIO.mButtonZItemBasePosY(var_r29));
             mpLightXY[2]->setAlphaRate(mButtonZItemBaseAlpha[var_r29] * field_0x7f0);
 
             mpTextXY[i_no]->scale(g_drawHIO.mButtonXYTextScale, g_drawHIO.mButtonXYTextScale);
@@ -3035,8 +3035,8 @@ void dMeter2Draw_c::setAlphaButtonChange(bool param_0) {
         set_buttonYItem = true;
     }
 
-    if (mButtonZItemBaseAlpha[sp44[2]] != g_drawHIO.mButtonZItemBaseAlpha[sp44[2]] || param_0) {
-        mButtonZItemBaseAlpha[sp44[2]] = g_drawHIO.mButtonZItemBaseAlpha[sp44[2]];
+    if (mButtonZItemBaseAlpha[sp44[2]] != g_drawHIO.mButtonZItemBaseAlpha(sp44[2]) || param_0) {
+        mButtonZItemBaseAlpha[sp44[2]] = g_drawHIO.mButtonZItemBaseAlpha(sp44[2]);
         set_buttonZItem = true;
     }
 
@@ -3429,13 +3429,13 @@ void dMeter2Draw_c::setButtonIconMidonaAlpha(u32 param_0) {
 void dMeter2Draw_c::setButtonIconAlpha(int i_no, u8 unused0, u32 unused1, bool unused2) {
     JUT_ASSERT(0, i_no < SELECT_MAX_e);
 
-    if (mpItemXY[i_no]->isVisible() || mpLightXY[i_no]->isVisible() ||
+    if (mpItemXY(i_no)->isVisible() || mpLightXY[i_no]->isVisible() ||
         mpButtonXY[i_no]->isVisible())
     {
         f32 var_f30 = 1.0f;
 
         int var_r26 = 1;
-        if (mpItemXY[i_no]->isVisible()) {
+        if (mpItemXY(i_no)->isVisible()) {
             var_r26 = 0;
         }
 
@@ -3451,10 +3451,10 @@ void dMeter2Draw_c::setButtonIconAlpha(int i_no, u8 unused0, u32 unused1, bool u
         } else {
             var_f2 =
                 g_drawHIO.mButtonZAlpha * (g_drawHIO.mParentAlpha * g_drawHIO.mMainHUDButtonsAlpha);
-            var_f30 = g_drawHIO.mButtonZItemBaseAlpha[var_r26];
+            var_f30 = g_drawHIO.mButtonZItemBaseAlpha(var_r26);
         }
 
-        u8 var_r28 = mpItemXY[i_no]->getInitAlpha();
+        u8 var_r28 = mpItemXY(i_no)->getInitAlpha();
         u8 var_r27 = var_f30 * (var_f2 * (f32)mpLightXY[i_no]->getInitAlpha());
         u8 var_r26_2 = var_f2 * (f32)mpButtonXY[i_no]->getInitAlpha();
         f32 temp_f31 = mpButtonParent->getAlphaRate();
@@ -3496,7 +3496,7 @@ void dMeter2Draw_c::setButtonIconAlpha(int i_no, u8 unused0, u32 unused1, bool u
             }
         }
 
-        mpItemXY[i_no]->setAlpha((f32)var_r28 * temp_f31);
+        mpItemXY(i_no)->setAlpha((f32)var_r28 * temp_f31);
         mpLightXY[i_no]->setAlpha((f32)var_r27 * temp_f31);
         mpButtonXY[i_no]->setAlpha((f32)var_r26_2 * temp_f31);
 
@@ -3648,7 +3648,7 @@ void dMeter2Draw_c::changeTextureItemXY(int i_no, u8 i_itemNo) {
     }
 
     if (dMeter2Info_readItemTexture(i_itemNo, mpItemXYTex[i_no][field_0x76c[i_no]][0],
-                                    (J2DPicture*)mpItemXY[i_no]->getPanePtr(),
+                                    (J2DPicture*)mpItemXY(i_no)->getPanePtr(),
                                     mpItemXYTex[i_no][field_0x76c[i_no]][1], mpItemXYPane[i_no],
                                     NULL, NULL, NULL, NULL, -1) <= 1)
     {
@@ -3666,23 +3666,23 @@ void dMeter2Draw_c::changeTextureItemXY(int i_no, u8 i_itemNo) {
 
     field_0x6c4[i_no] =
         var_f4 *
-        ((mpItemXYTex[i_no][field_0x76c[i_no]][0]->width * mpItemXY[i_no]->getInitSizeX()) / 48.0f);
+        ((mpItemXYTex[i_no][field_0x76c[i_no]][0]->width * mpItemXY(i_no)->getInitSizeX()) / 48.0f);
     field_0x6d0[i_no] =
         var_f4 *
-        ((mpItemXYTex[i_no][field_0x76c[i_no]][0]->height * mpItemXY[i_no]->getInitSizeY()) /
+        ((mpItemXYTex[i_no][field_0x76c[i_no]][0]->height * mpItemXY(i_no)->getInitSizeY()) /
          48.0f);
-    field_0x6ac[i_no] = (mpItemXY[i_no]->getInitSizeX() - field_0x6c4[i_no]) * 0.5f;
-    field_0x6b8[i_no] = (mpItemXY[i_no]->getInitSizeY() - field_0x6d0[i_no]) * 0.5f;
-    mpItemXY[i_no]->resize(field_0x6c4[i_no], field_0x6d0[i_no]);
+    field_0x6ac[i_no] = (mpItemXY(i_no)->getInitSizeX() - field_0x6c4[i_no]) * 0.5f;
+    field_0x6b8[i_no] = (mpItemXY(i_no)->getInitSizeY() - field_0x6d0[i_no]) * 0.5f;
+    mpItemXY(i_no)->resize(field_0x6c4[i_no], field_0x6d0[i_no]);
 
     if (i_no == SELECT_X_e) {
-        mpItemXY[i_no]->paneTrans(mItemParams[SELECT_X_e].pos_x + field_0x6ac[i_no],
+        mpItemXY(i_no)->paneTrans(mItemParams[SELECT_X_e].pos_x + field_0x6ac[i_no],
                                   mItemParams[SELECT_X_e].pos_y + field_0x6b8[i_no]);
     } else if (i_no == SELECT_Y_e) {
-        mpItemXY[i_no]->paneTrans(mItemParams[SELECT_Y_e].pos_x + field_0x6ac[i_no],
+        mpItemXY(i_no)->paneTrans(mItemParams[SELECT_Y_e].pos_x + field_0x6ac[i_no],
                                   mItemParams[SELECT_Y_e].pos_y + field_0x6b8[i_no]);
     } else {
-        mpItemXY[i_no]->paneTrans(mItemParams[SELECT_Z_e].pos_x + field_0x6ac[i_no],
+        mpItemXY(i_no)->paneTrans(mItemParams[SELECT_Z_e].pos_x + field_0x6ac[i_no],
                                   mItemParams[SELECT_Z_e].pos_y + field_0x6b8[i_no]);
     }
 
@@ -3788,7 +3788,7 @@ void dMeter2Draw_c::drawItemNum(u8 i_button, f32 i_alpha) {
     JUT_ASSERT(0, i_button < SELECT_MAX_e);
 
     if (i_alpha == 1.0f) {
-        i_alpha = mpItemXY[i_button]->getAlphaRate();
+        i_alpha = mpItemXY(i_button)->getAlphaRate();
     }
 
     for (int i = 0; i < 3; i++) {
@@ -3799,12 +3799,12 @@ void dMeter2Draw_c::drawItemNum(u8 i_button, f32 i_alpha) {
 void dMeter2Draw_c::drawKanteraMeter(u8 i_button, f32 i_alphaRate) {
     JUT_ASSERT(0, i_button < SELECT_MAX_e);
 
-    CPaneMgr* pane = mpItemXY[i_button];
+    CPaneMgr* pane = mpItemXY(i_button);
     f32 sp10[2] = {0.0f};
     f32 sp8[2] = {0.0f};
 
     if (i_alphaRate == 1.0f) {
-        i_alphaRate = mpItemXY[i_button]->getAlphaRate();
+        i_alphaRate = mpItemXY(i_button)->getAlphaRate();
     }
 
     Vec vtx0 = pane->getPanePtr()->getGlbVtx(0);

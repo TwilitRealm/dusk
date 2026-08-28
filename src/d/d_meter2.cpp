@@ -1713,18 +1713,18 @@ void dMeter2_c::moveButtonZ() {
         draw_buttonZ = true;
     }
 
-    if (field_0x3e4 != g_drawHIO.mButtonZItemBaseScale[1]) {
-        field_0x3e4 = g_drawHIO.mButtonZItemBaseScale[1];
+    if (field_0x3e4 != g_drawHIO.mButtonZItemBaseScale(1)) {
+        field_0x3e4 = g_drawHIO.mButtonZItemBaseScale(1);
         draw_buttonZ = true;
     }
 
-    if (field_0x3e8 != g_drawHIO.mButtonZItemBasePosX[1]) {
-        field_0x3e8 = g_drawHIO.mButtonZItemBasePosX[1];
+    if (field_0x3e8 != g_drawHIO.mButtonZItemBasePosX(1)) {
+        field_0x3e8 = g_drawHIO.mButtonZItemBasePosX(1);
         draw_buttonZ = true;
     }
 
-    if (field_0x3ec != g_drawHIO.mButtonZItemBasePosY[1]) {
-        field_0x3ec = g_drawHIO.mButtonZItemBasePosY[1];
+    if (field_0x3ec != g_drawHIO.mButtonZItemBasePosY(1)) {
+        field_0x3ec = g_drawHIO.mButtonZItemBasePosY(1);
         draw_buttonZ = true;
     }
 
@@ -1742,7 +1742,7 @@ void dMeter2_c::moveButtonZ() {
         field_0x338 = g_drawHIO.mButtonZFontPosY;
         draw_buttonZ = true;
     }
-    **/
+    Keeping these just commented in case I want to roll things back without fucking it up in git **/
 
     if (dComIfGp_getZStatusForce() != 0) {
         dComIfGp_setZStatus(dComIfGp_getZStatusForce(), dComIfGp_getZSetFlagForce());
@@ -1969,18 +1969,18 @@ void dMeter2_c::moveButtonXY() {
             sp8[1] = 1;
         }
 
-        if (field_0x3cc[i] != g_drawHIO.mButtonZItemBaseScale[i]) {
-            field_0x3cc[i] = g_drawHIO.mButtonZItemBaseScale[i];
+        if (field_0x3cc[i] != g_drawHIO.mButtonZItemBaseScale(i)) {
+            field_0x3cc[i] = g_drawHIO.mButtonZItemBaseScale(i);
             sp8[2] = 1;
         }
 
-        if (field_0x3d4[i] != g_drawHIO.mButtonZItemBasePosX[i]) {
-            field_0x3d4[i] = g_drawHIO.mButtonZItemBasePosX[i];
+        if (field_0x3d4[i] != g_drawHIO.mButtonZItemBasePosX(i)) {
+            field_0x3d4[i] = g_drawHIO.mButtonZItemBasePosX(i);
             sp8[2] = 1;
         }
 
-        if (field_0x3dc[i] != g_drawHIO.mButtonZItemBasePosY[i]) {
-            field_0x3dc[i] = g_drawHIO.mButtonZItemBasePosY[i];
+        if (field_0x3dc[i] != g_drawHIO.mButtonZItemBasePosY(i)) {
+            field_0x3dc[i] = g_drawHIO.mButtonZItemBasePosY(i);
             sp8[2] = 1;
         }
     }
@@ -2057,8 +2057,8 @@ void dMeter2_c::moveButtonXY() {
                     sp8[i] = 1;
                 }
 
-                if ((&mXSetFlag)[i] != dComIfGp_isXSetFlag(2)) {
-                    (&mXSetFlag)[i] = dComIfGp_isXSetFlag(2);
+                if (setFlag(i) != dComIfGp_isXSetFlag(2)) {
+                    setFlag(i) = dComIfGp_isXSetFlag(2);
                     spC[i] = 1;
                     sp8[i] = 1;
                 }
@@ -2079,8 +2079,8 @@ void dMeter2_c::moveButtonXY() {
                     sp8[i] = 1;
                 }
 
-                if ((&mXSetFlag)[i] != dComIfGp_isYSetFlag(2)) {
-                    (&mXSetFlag)[i] = dComIfGp_isYSetFlag(2);
+                if (setFlag(i) != dComIfGp_isYSetFlag(2)) {
+                    setFlag(i) = dComIfGp_isYSetFlag(2);
                     spC[i] = 1;
                     sp8[i] = 1;
                 }
@@ -2101,8 +2101,8 @@ void dMeter2_c::moveButtonXY() {
                     sp8[i] = 1;
                 }
 
-                if ((&mXSetFlag)[i] != dComIfGp_isZSetFlag(2)) {
-                    (&mXSetFlag)[i] = dComIfGp_isZSetFlag(2);
+                if (setFlag(i) != dComIfGp_isZSetFlag(2)) {
+                    setFlag(i) = dComIfGp_isZSetFlag(2);
                     spC[i] = 1;
                     sp8[i] = 1;
                 }

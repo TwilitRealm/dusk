@@ -4068,7 +4068,7 @@ JKRHeap* daAlink_c::setItemHeap() {
         onResetFlg0(RFLG0_UNK_4000);
     }
 
-    return mItemHeap[field_0x2fa0].setAnimeHeap();
+    return itemHeap(field_0x2fa0).setAnimeHeap();
 }
 
 /**
@@ -4554,8 +4554,8 @@ void daAlink_c::playerInit() {
     PLAYER_CREATE_ANM_HEAP(mFaceBckHeap, daPy_anmHeap_c::HEAP_TYPE_3, "daAlink_c::mFaceBckHeap");
 
     for (i = 0; i < SELECT_ITEM_NUM; i++) {
-        mItemHeap[i].setBufferSize(0x13200);
-        PLAYER_CREATE_ANM_HEAP_F(mItemHeap[i], daPy_anmHeap_c::HEAP_TYPE_4, "daAlink_c::mItemHeap[%d]", i);
+        itemHeap(i).setBufferSize(0x13200);
+        PLAYER_CREATE_ANM_HEAP_F(itemHeap(i), daPy_anmHeap_c::HEAP_TYPE_4, "daAlink_c::mItemHeap[%d]", i);
     }
     PLAYER_CREATE_ANM_HEAP(mAnmHeap9, daPy_anmHeap_c::HEAP_TYPE_3, "daAlink_c::mAnmHeap9");
     resetBasAnime();

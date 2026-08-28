@@ -163,17 +163,18 @@ private:
     /* 0x1CF */ u8 mNunZStatus;
     /* 0x1D0 */ u8 mNunCStatus;
     /* 0x1D1 */ u8 mBottleStatus;
-    /* 0x1D2 */ u8 mItemStatus[6];
-    /* 0x1D6 */ u8 field_0x1d6[3];
-    /* 0x1D8 */ u8 field_0x1d8[3];
+    /* 0x1D2 */ u8 mItemStatusAbi_[4];   // see mItemStatus at the end of the class
+    /* 0x1D6 */ u8 field_0x1d6Abi_[2];   // see field_0x1d6 at the end of the class
+    /* 0x1D8 */ u8 field_0x1d8Abi_[2];   // see field_0x1d8 at the end of the class
     /* 0x1DA */ u8 mArrowNum;
     /* 0x1DB */ u8 mPachinkoNum;
     /* 0x1DC */ u8 mDoSetFlag;
     /* 0x1DD */ u8 mASetFlag;
     /* 0x1DE */ u8 mRSetFlag;
-    /* 0x1DF */ u8 mXSetFlag; // I'm pretty sure this writes into mYSetFlag intentionally with i == 1
+    // X and Y are adjacent as upstream; Z is at the end of the class, so reach all three
+    // through setFlag(i) rather than indexing off &mXSetFlag.
+    /* 0x1DF */ u8 mXSetFlag;
     /* 0x1E0 */ u8 mYSetFlag;
-                u8 mZSetFlag; // For when i == 2, todo: shift memory addresses down +1
     /* 0x1E1 */ u8 field_0x1e1;
     /* 0x1E2 */ u8 mEquipSword;
     /* 0x1E3 */ u8 field_0x1e3;
@@ -310,6 +311,21 @@ private:
     /* 0x460 */ u8 field_0x460[0x4bc - 0x460];
     /* 0x4BC */ u8 field_0x4bc;
     /* 0x4BC */ u8 field_0x4bd;
+
+    /* Z-slot storage appended past the end of the upstream layout.
+     *
+     * dMeter2_c is reachable from prebuilt code mods, so its field offsets are ABI. Each
+     * widened array keeps an upstream-sized placeholder (the *Abi_ members) at its original
+     * offset and its real storage lives here; names are unchanged, so call sites are too.
+     * See d_meter2_draw.h for the full rationale.
+     */
+    u8 mItemStatus[6];
+    u8 field_0x1d6[3];
+    u8 field_0x1d8[3];
+    u8 mZSetFlag;
+
+public:
+    u8& setFlag(int i) { return i == 0 ? mXSetFlag : i == 1 ? mYSetFlag : mZSetFlag; }
 };
 
 #endif /* D_METER_D_METER2_H */
