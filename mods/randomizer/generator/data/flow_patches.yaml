@@ -1,0 +1,769 @@
+# Patches for NPC text flows
+
+0: # zel_00.bmg
+  # Change the following indices of Midna's flows to jump to our custom choices
+  # instead. These are all the flow jumps that normally determine which "Talk to Midna"
+  # text is displayed.
+  - index:
+      - 0x1
+      - 0x9
+      - 0xC
+      - 0x8F
+      - 0x192
+      - 0x1A4
+      - 0x18F
+      - 0x197
+      - 0x1BC
+      - 0x1C9
+    type: event
+    event: no-op
+    parameters: 0x00000000
+    next: Custom Midna Call Begin
+
+1: # zel_01.bmg - Ordon Village
+  # Patch the flow in Bo's house that normally prevents us from leaving without
+  # having the iron boots. Patch it so we take the flow which allows us to leave
+  # no matter what
+  - index: 0x8F
+    type: branch
+    query: item owned
+    parameters: 0x0045
+    results:
+      - 0x90
+      - 0x90
+
+2: # zel_02.bmg
+  # Patch Barnes to use the randomizer purchase flag instead of counting bomb bags.
+  - index: 0x47C
+    type: branch
+    query: randomizer event flag
+    parameters: 0x004D
+    results:
+      - 0x47D
+      - 0x485
+
+  # Change the flow of buying the red potion item in Kak Malo Mart to not check for an empty bottle first
+  # if the item is randomized. Change both branch paths to lead to the same next node
+  - only if: Shop_Items == On
+    index: 0x43F
+    type: branch
+    query: empty bottles
+    parameters: 0x00000001
+    results:
+      - 0x440
+      - 0x440
+
+  # Change the flow of buying the red potion item in Kak Malo Mart to set the sold out flag if shop
+  # items are randomized
+  - only if: Shop_Items == On
+    index: 0x445
+    type: event
+    event: remove rupees
+    parameters: 0x0000001E
+    next: Kakariko Malo Mart Red Potion Sold Out
+
+  # Change the flow of buying the wooden shield in Kak Malo Mart to set the sold out flag if shop
+  # items are randomized
+  - only if: Shop_Items == On
+    index: 0x417
+    type: event
+    event: remove rupees
+    parameters: 0x00000032
+    next: Kakariko Malo Mart Wooden Shield Sold Out
+
+  # Patch Shad's flow to set the custom flag for receiving his item
+  - index: 0x946
+    type: event
+    event: set event flag
+    parameters: 0x0333
+    next: 0xFFFF
+
+#3: # zel_03.bmg
+4: # zel_04.bmg - Castle Town
+  # Patch Charlo to check for 100 rupees instead of 30
+  - index: 0x34A
+    type: branch
+    query: rupees
+    parameters: 0x0064
+    results:
+      - 0x34E
+      - 0x342
+
+  # Patch Charlo to take 100 rupees from Link instead of 30
+  - index: 0x34E
+    type: event
+    event: add donation
+    parameters: 0x00000064
+    next: 0x357
+
+  # Patch Charlo to add 100 rupees to his counter instead of 30
+  - index: 0x357
+    type: event
+    event: remove rupees
+    parameters: 0x00000064
+    next: 0x350
+
+  # Patch Malo Mart door person to not check for time of day.
+  # Change from branch node that checks time of day to event node
+  # that does nothing.
+  - index: 0x1A5
+    type: event
+    event: no-op
+    parameters: 0x00000000
+    next: 0x1A4
+
+  # Patch Jovani flow so that we can turn in poe souls before completing MDH
+  - index: 0x832
+    type: branch
+    query: event flag
+    parameters: 0x01C8
+    results:
+      - 0x834 # Skip over 0x833 and go directly to 0x834
+      - 0x84E
+
+  # Patch Jovani to skip checking whether we've received the first
+  # or second reward and skip straight to the second reward if we're
+  # talking to him for the first time with 60 souls
+  - index: 0x844
+    type: message
+    message: 0x322
+    next: 0x851
+
+  # Patch Jovani to check if we've received the 20 reward yet at
+  # the end of the 60 reward sequence.
+  - index: 0x81F
+    type: event
+    event: set switch
+    parameters: 0x00000063
+    next: Jovani Check 20 Reward Obtained
+
+  # Patch the flow of showing the Doctor the Invoice to call our custom
+  # event which calls offWarashibeItem instead of setWarashibeItem
+  - index: 0x2D7
+    type: event
+    event: randomizer remove trade item
+    parameters: 0x00000081
+    next: 0x2D8
+
+  # Check custom flag for Goron selling Hylian Shield
+  - only if: Shop_Items == On
+    index: 0xA16
+    type: branch
+    query: event flag
+    parameters: 0x032F
+    results:
+      - 0xA10
+      - 0xA02
+
+  # Set custom flag when buying item from Goron selling Hylian Shield
+  - only if: Shop_Items == On
+    index: 0xA1C
+    type: event
+    event: set event flag
+    parameters: 0x032F
+    next: 0xA1A
+
+  # Check custom flag for Goron selling Red Potion
+  - only if: Shop_Items == On
+    index: 0x9BF
+    type: branch
+    query: event flag
+    parameters: 0x0330
+    results:
+      - 0x9B7
+      - 0x9AA
+
+  # Set custom flag when buying item from Goron selling Red Potion
+  - only if: Shop_Items == On
+    index: 0x9BD
+    type: event
+    event: set event flag
+    parameters: 0x0330
+    next: 0x9BE
+
+  # Make the empty bottle check always proceed to the rupee check
+  - only if: Shop_Items == On
+    index: 0x9A8
+    type: branch
+    query: empty bottles
+    parameters: 0x0001
+    results:
+      - 0x9B6
+      - 0x9B6
+
+  # Check custom flag for Goron selling lantern oil
+  - only if: Shop_Items == On
+    index: 0x9A6
+    type: branch
+    query: event flag
+    parameters: 0x0331
+    results:
+      - 0x9A2
+      - 0x97C
+
+  # Set custom flag when buying item from Goron selling red potion
+  - only if: Shop_Items == On
+    index: 0x97D
+    type: event
+    event: set event flag
+    parameters: 0x0331
+    next: 0x997
+
+  # Make the empty bottle check always proceed to the rupee check
+  - only if: Shop_Items == On
+    index: 0x97F
+    type: branch
+    query: empty bottles
+    parameters: 0x0001
+    results:
+      - 0x980
+      - 0x980
+
+  # Always branch the same direction regardless of whether we've gone through MDH
+  - only if: Shop_Items == On
+    index: 0x988
+    type: branch
+    query: event flag
+    parameters: 0x00FA
+    results:
+      - 0x998
+      - 0x998
+
+  # Check custom flag for Goron who sells 30 Arrows
+  - only if: Shop_Items == On
+    index: 0x9C1
+    type: branch
+    query: event flag
+    parameters: 0x0332
+    results:
+      - 0x9CD
+      - 0x9DD
+
+  # Set custom flag when buying item from Goron selling 30 Arrows
+  - only if: Shop_Items == On
+    index: 0x9FC
+    type: event
+    event: set event flag
+    parameters: 0x0332
+    next: 0x9FD
+
+  # Skip directly to the rupee check when buying from the Goron who sells arrows
+  - only if: Shop_Items == On
+    index: 0x9C4
+    type: branch
+    query: select 2
+    parameters: 0x0000
+    results:
+      - 0x9C5
+      - 0x9FB
+
+  # Always branch the same direction regardless of whether we've gone through MDH
+  - only if: Shop_Items == On
+    index: 0x9DD
+    type: branch
+    query: event flag
+    parameters: 0x00FA
+    results:
+      - 0x9E8
+      - 0x9E8
+
+5: # zel_05.bmg
+  # Patch Yeta flow to always give the map check even if the player has obtained the Ordon Cheese
+  - index: 0x8
+    type: event
+    event: no-op
+    parameters: 0x00000000
+    next: 0x6
+
+  # Patch Yeta flow to always give the map check even if the player has obtained the Ordon Cheese
+  - index: 0x5
+    type: event
+    event: no-op
+    parameters: 0x00000000
+    next: 0xC
+
+  # Patch Gor Liggs to not set the flag for the third key shard.
+  - index: 0x258
+    type: event
+    event: no-op
+    parameters: 0x00000000
+    next: 0x248
+
+  # Patch Cave of Ordeals Great Fairy to skip over the check
+  # for an empty bottle the first time
+  - index: 0x850
+    type: message
+    message: 0x25B
+    next: 0x202
+
+6: # zel_06.bmg - Faron Woods interiors and other shared areas
+  # Modify Coro's flow so that all 3 items can be collected at any time
+  # Change all start indices to first check for first item flag
+  - index:
+      - 0x4F
+      - 0xEE
+      - 0xFF
+      - 0x1C2
+    type: branch
+    query: event flag
+    parameters: 0x0080
+    results:
+      - 0x1B3 # Got first item
+      - 0x1AA # Haven't gotten first item
+
+  # Set flag for getting first item
+  - index: 0x1A9
+    type: event
+    event: set event flag
+    parameters: 0x0080
+    next: 0x1A5
+
+  - index: 0x1AA
+    type: message
+    message: 0x125
+    next: 0x1A6
+
+  # Check if we've gotten 2nd item
+  - index: 0x1B3
+    type: branch
+    query: save switch
+    parameters: 0x0032
+    results:
+      - 0x79  # Got 2nd item
+      - 0x1A4 # Haven't gotten 2nd item
+
+  - index: 0x1A4
+    type: message
+    message: 0xC2
+    next: 0xA1
+
+  - index: 0xA5
+    type: message
+    message: 0xC5
+    next: 0xB4
+
+  # Patch Coro waking up to jump to one of our flow entry points
+  - index: 0x78
+    type: message
+    message: 0xCD
+    next: 0x1C2
+
+#7: # zel_07.bmg
+8: # zel_08.bmg - HF, Outside CT, LH, UZR, Zora's River, KB2, Title Screen
+  # Skip over the node which deletes auru's memo from the inventory after showing it to Fyer
+  - index: 0x53
+    type: message
+    message: 0xA7
+    next: 0x54 # Go directly to 0x54 instead of 0x5D
+
+# Custom Flow Nodes
+custom:
+  # Start of custom midna call tree. Begin by checking if we can change time
+  # of day to see if we show that choice
+  - name: Custom Midna Call Begin
+    group: 0
+    type: branch
+    query: randomizer change time
+    parameters: 0x0000
+    results:
+      - Custom Midna Call 3 Choice Select Setup # Can change time of day
+      - Custom Midna Call 2 Choice Select Setup # Can not change time of day
+
+  #################################################
+  #        CUSTOM MIDNA CALL 2 CHOICE FLOW        #
+  #################################################
+
+  - name: Custom Midna Call 2 Choice Select Setup
+    group: 0
+    type: event
+    event: select vertical
+    parameters: 0x00000003
+    next: Custom Midna Call 2 Choice Intro
+
+  - name: Custom Midna Call 2 Choice Intro
+    group: 0
+    type: message
+    message: Custom Midna Call Need Something Text
+    next: Custom Midna Call 2 Choice
+
+  - name: Custom Midna Call 2 Choice
+    group: 0
+    type: message
+    message: Custom Midna Call 2 Choice Text
+    next: Custom Midna Call 2 Choice Branch
+
+  - name: Custom Midna Call 2 Choice Branch
+    group: 0
+    type: branch
+    query: select 2 cancel
+    parameters: 0x0000
+    results:
+      - Custom Midna Call Hints                  # Hints
+      - Custom Midna Call Return to Spawn Branch # Return to Spawn
+      - 0xFFFF                                   # (B button pressed)
+
+  #################################################
+  #        CUSTOM MIDNA CALL 3 CHOICE FLOW        #
+  #################################################
+
+  - name: Custom Midna Call 3 Choice Select Setup
+    group: 0
+    type: event
+    event: select vertical
+    parameters: 0x00000004
+    next: Custom Midna Call 3 Choice Intro
+
+  - name: Custom Midna Call 3 Choice Intro
+    group: 0
+    type: message
+    message: Custom Midna Call Need Something Text
+    next: Custom Midna Call 3 Choice
+
+  - name: Custom Midna Call 3 Choice
+    group: 0
+    type: message
+    message: Custom Midna Call 3 Choice Text
+    next: Custom Midna Call 3 Choice Branch
+
+  - name: Custom Midna Call 3 Choice Branch
+    group: 0
+    type: branch
+    query: select 3 cancel
+    parameters: 0x0000
+    results:
+      - Custom Midna Call Hints                  # Hints
+      - Custom Midna Call Change Time            # Change time of day
+      - Custom Midna Call Return to Spawn Branch # Return to Spawn
+      - 0xFFFF                                   # (B button pressed)
+
+  #################################################
+  #        CUSTOM MIDNA CALL CHOICE OPTIONS       #
+  #################################################
+
+  - name: Custom Midna Call Hints
+    group: 0
+    type: message
+    message: Custom Midna Call Hints Text
+    next: 0xFFFF
+
+  - name: Custom Midna Call Change Time
+    group: 0
+    type: event
+    event: randomizer change time
+    parameters: 0x00000000
+    next: 0xFFFF
+
+  - name: Custom Midna Call Return to Spawn Branch
+    group: 0
+    type: branch
+    query: randomizer return to spawn
+    parameters: 0x0000
+    results:
+      - Return to Spawn Dungeon Choice Select Setup
+      - Return to Spawn Dungeon No Choice Select Setup
+      - Return to Base Spawn
+
+  #################################################
+  #      RETURN TO SPAWN DUNGEON CHOICE FLOW      #
+  #################################################
+
+  - name: Return to Spawn Dungeon Choice Select Setup
+    group: 0
+    type: event
+    event: select vertical
+    parameters: 0x00000004
+    next: Return to Spawn Dungeon Choice Intro
+
+  - name: Return to Spawn Dungeon Choice Intro
+    group: 0
+    type: message
+    message: Return to Spawn Dungeon Intro Text
+    next: Return to Spawn Dungeon Choice
+
+  - name: Return to Spawn Dungeon Choice
+    group: 0
+    type: message
+    message: Return to Spawn Dungeon Choice Text
+    next: Return to Spawn Dungeon Choice Branch
+
+  - name: Return to Spawn Dungeon Choice Branch
+    group: 0
+    type: branch
+    query: select 3 cancel
+    parameters: 0x0000
+    results:
+      - Return to Dungeon Spawn # Dungeon entrance
+      - 0xFFFF                  # Nevermind
+      - Return to Base Spawn    # Spawn
+      - 0xFFFF                  # (B button pressed)
+
+  #################################################
+  #     RETURN TO SPAWN DUNGEON NO CHOICE FLOW    #
+  #################################################
+
+  - name: Return to Spawn Dungeon No Choice Select Setup
+    group: 0
+    type: event
+    event: select vertical
+    parameters: 0x00000003
+    next: Return to Spawn Dungeon No Choice Intro
+
+  - name: Return to Spawn Dungeon No Choice Intro
+    group: 0
+    type: message
+    message: Return to Spawn Dungeon Intro Text
+    next: Return to Spawn Dungeon No Choice
+
+  - name: Return to Spawn Dungeon No Choice
+    group: 0
+    type: message
+    message: Return to Spawn Dungeon No Choice Text
+    next: Return to Spawn Dungeon No Choice Branch
+
+  - name: Return to Spawn Dungeon No Choice Branch
+    group: 0
+    type: branch
+    query: select 2 cancel
+    parameters: 0x0000
+    results:
+      - 0xFFFF               # Nevermind
+      - Return to Base Spawn # Spawn
+      - 0xFFFF               # (B button pressed)
+
+  #################################################
+  #            RETURN TO SPAWN EVENTS             #
+  #################################################
+
+  # A non-zero parameter uses the current stage's place override when one exists.
+  - name: Return to Dungeon Spawn
+    group: 0
+    type: event
+    event: randomizer return to spawn
+    parameters: 0x00000001
+    next: 0xFFFF
+
+  # A zero parameter always returns to the starting spawn.
+  - name: Return to Base Spawn
+    group: 0
+    type: event
+    event: randomizer return to spawn
+    parameters: 0x00000000
+    next: 0xFFFF
+
+  #################################################
+  #              KAKARIKO MALO MART               #
+  #################################################
+
+  # Set the shop sold-out flag.
+  - name: Kakariko Malo Mart Red Potion Sold Out
+    only if: Shop_Items == On
+    group: 2
+    type: event
+    event: shop sold out
+    parameters: 0x00000000
+    next: 0x449
+
+  # Set the shop sold-out flag.
+  - name: Kakariko Malo Mart Wooden Shield Sold Out
+    only if: Shop_Items == On
+    group: 2
+    type: event
+    event: shop sold out
+    parameters: 0x00000000
+    next: 0x41C
+
+  #################################################
+  #                    JOVANI                     #
+  #################################################
+
+  # Check to see if we've obtained the 20 Poe Soul Reward.
+  # If we haven't then branch to giving the reward
+  - name: Jovani Check 20 Reward Obtained
+    group: 4
+    type: branch
+    query: event flag
+    parameters: 0x0272
+    results:
+      - 0xFFFF # Yes, we've obtained the reward, do nothing
+      - Jovani Give 20 Reward
+
+  - name: Jovani Give 20 Reward
+    group: 4
+    type: event
+    event: start event
+    parameters: 0x00010075
+    next: 0x851
+
+  #################################################
+  #                  HINT SIGNS                   #
+  #################################################
+
+  - name: Ordon Hint Sign
+    type: message
+    message: Ordon Hint Sign Text
+    next: 0xFFFF
+
+  - name: South Faron Woods Hint Sign
+    type: message
+    message: South Faron Woods Hint Sign Text
+    next: 0xFFFF
+
+  - name: Sacred Grove Hint Sign
+    type: message
+    message: Sacred Grove Hint Sign Text
+    next: 0xFFFF
+
+  - name: Faron Field Hint Sign
+    type: message
+    message: Faron Field Hint Sign Text
+    next: 0xFFFF
+
+  - name: Kakariko Gorge Hint Sign
+    type: message
+    message: Kakariko Gorge Hint Sign Text
+    next: 0xFFFF
+
+  - name: Kakariko Village Hint Sign
+    type: message
+    message: Kakariko Village Hint Sign Text
+    next: 0xFFFF
+
+  - name: Kakariko Graveyard Hint Sign
+    type: message
+    message: Kakariko Graveyard Hint Sign Text
+    next: 0xFFFF
+
+  - name: Eldin Field Hint Sign
+    type: message
+    message: Eldin Field Hint Sign Text
+    next: 0xFFFF
+
+  - name: North Eldin Field Hint Sign
+    type: message
+    message: North Eldin Field Hint Sign Text
+    next: 0xFFFF
+
+  - name: Hidden Village Hint Sign
+    type: message
+    message: Hidden Village Hint Sign Text
+    next: 0xFFFF
+
+  - name: Lanayru Field Hint Sign
+    type: message
+    message: Lanayru Field Hint Sign Text
+    next: 0xFFFF
+
+  - name: Beside Castle Town Hint Sign
+    type: message
+    message: Beside Castle Town Hint Sign Text
+    next: 0xFFFF
+
+  - name: Castle Town Center Hint Sign
+    type: message
+    message: Castle Town Center Hint Sign Text
+    next: 0xFFFF
+
+  - name: Outside South Castle Town Hint Sign
+    type: message
+    message: Outside South Castle Town Hint Sign Text
+    next: 0xFFFF
+
+  - name: Lake Hylia Bridge Hint Sign
+    type: message
+    message: Lake Hylia Bridge Hint Sign Text
+    next: 0xFFFF
+
+  - name: Lake Hylia Hint Sign
+    type: message
+    message: Lake Hylia Hint Sign Text
+    next: 0xFFFF
+
+  - name: Lanayru Spring Hint Sign
+    type: message
+    message: Lanayru Spring Hint Sign Text
+    next: 0xFFFF
+
+  - name: Lake Lantern Cave Hint Sign
+    type: message
+    message: Lake Lantern Cave Hint Sign Text
+    next: 0xFFFF
+
+  - name: Fishing Hole Hint Sign
+    type: message
+    message: Fishing Hole Hint Sign Text
+    next: 0xFFFF
+
+  - name: Zoras Domain Hint Sign
+    type: message
+    message: Zoras Domain Hint Sign Text
+    next: 0xFFFF
+
+  - name: Snowpeak Hint Sign
+    type: message
+    message: Snowpeak Hint Sign Text
+    next: 0xFFFF
+
+  - name: Gerudo Desert Hint Sign
+    type: message
+    message: Gerudo Desert Hint Sign Text
+    next: 0xFFFF
+
+  - name: Bulblin Camp Hint Sign
+    type: message
+    message: Bulblin Camp Hint Sign Text
+    next: 0xFFFF
+
+  - name: Forest Temple Hint Sign
+    type: message
+    message: Forest Temple Hint Sign Text
+    next: 0xFFFF
+
+  - name: Goron Mines Hint Sign
+    type: message
+    message: Goron Mines Hint Sign Text
+    next: 0xFFFF
+
+  - name: Lakebed Temple Hint Sign
+    type: message
+    message: Lakebed Temple Hint Sign Text
+    next: 0xFFFF
+
+  - name: Arbiters Grounds Hint Sign
+    type: message
+    message: Arbiters Grounds Hint Sign Text
+    next: 0xFFFF
+
+  - name: Snowpeak Ruins Hint Sign
+    type: message
+    message: Snowpeak Ruins Hint Sign Text
+    next: 0xFFFF
+
+  - name: Temple of Time First Hint Sign
+    type: message
+    message: Temple of Time First Hint Sign Text
+    next: 0xFFFF
+
+  - name: Temple of Time Second Hint Sign
+    type: message
+    message: Temple of Time Second Hint Sign Text
+    next: 0xFFFF
+
+  - name: City in the Sky Hint Sign
+    type: message
+    message: City in the Sky Hint Sign Text
+    next: 0xFFFF
+
+  - name: Palace of Twilight Hint Sign
+    type: message
+    message: Palace of Twilight Hint Sign Text
+    next: 0xFFFF
+
+  - name: Hyrule Castle Hint Sign
+    type: message
+    message: Hyrule Castle Hint Sign Text
+    next: 0xFFFF
+
+  - name: Cave of Ordeals Hint Sign
+    type: message
+    message: Cave of Ordeals Hint Sign Text
+    next: 0xFFFF

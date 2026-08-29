@@ -1,0 +1,48 @@
+.excluded-locations-pane-right {
+    padding: 0dp;
+    gap: 0dp;
+}
+
+.excluded-locations-header {
+    font-family: "Fira Sans Condensed";
+    font-weight: bold;
+    text-transform: uppercase;
+
+    margin-top: 22dp;
+    margin-bottom: 0dp;
+    text-align: center;
+    font-size: 25dp;
+    opacity: 1;
+}
+
+.excluded-locations-subheader {
+    font-family: "Fira Sans Condensed";
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: 0.25;
+    padding-top: 12dp;
+
+    margin-top: 0dp;
+    margin-bottom: 21dp;
+    text-align: center;
+    font-size: 15dp;
+}
+
+.excluded-locations-list {
+    font-size: 20dp;
+    border-top: 1dp #92875B;
+}
+
+.excluded-locations-list:not(:first-child) ui-list-content {
+    padding-top: 8dp;
+}
+
+.excluded-locations-inner-pane-right {
+    gap: 8dp;
+    font-size: 20dp;
+    border-top: 1dp #92875B;
+}
+
+.excluded-locations-inner-pane-right > span {
+    padding-left: 10dp;
+}
