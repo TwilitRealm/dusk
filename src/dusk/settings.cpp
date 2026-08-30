@@ -169,6 +169,8 @@ UserSettings g_userSettings = {
         .removeQuestMapMarkers {"game.removeQuestMapMarkers", false},
         .showInputViewer {"game.showInputViewer", false},
         .showInputViewerGyro {"game.showInputViewerGyro", false},
+        .enableMoveLinkCombo {"game.enableMoveLinkCombo", false},
+        .enableTeleportCombo {"game.enableTeleportCombo", false},
         .lastSelectedGameModeId {"game.lastSelectedGameModeId", gamemode::kVanillaGameModeId}
     },
 
@@ -327,6 +329,8 @@ void registerSettings() {
     Register(g_userSettings.game.removeQuestMapMarkers);
     Register(g_userSettings.game.showInputViewer);
     Register(g_userSettings.game.showInputViewerGyro);
+    Register(g_userSettings.game.enableMoveLinkCombo);
+    Register(g_userSettings.game.enableTeleportCombo);
     Register(g_userSettings.game.lastSelectedGameModeId);
     Register(g_userSettings.game.fastSpinner);
     Register(g_userSettings.game.infiniteHearts);
@@ -420,6 +424,21 @@ static TransientSettings g_transientSettings = {
         .terrainViewOpacity = 50.0f,
         .colliderViewOpacity = 50.0f,
         .drawRange = 100.0f,
+    },
+    .triggerView = {
+        .loadZones = false,
+        .eventAreas = false,
+        .switchAreas = false,
+        .eventTags = false,
+        .midnaStops = false,
+        .twilightGates = false,
+        .checkpoints = false,
+        .paths = false,
+        .transformDists = false,
+        .attentionDists = false,
+        .purpleMistAvoid = false,
+        .leevers = false,
+        .opacity = 75.0f,
     },
     .turboMode = false,
 };
