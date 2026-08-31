@@ -358,7 +358,7 @@ void menu_fmap_create_post(ModContext*, void* args, void*, void*) {
 }
 
 // A and B buttons on the dungeon map screen
-DEFINE_HOOK_SYMBOL("dMenu_DmapBg_c::buttonIconScreenInit", void(dMenu_DmapBg_c*), MenuDMapButtonIconScreenInit);
+DEFINE_HOOK(&dMenu_DmapBg_c::buttonIconScreenInit, MenuDMapButtonIconScreenInit);
 void menu_dmap_button_icon_screen_init_post(ModContext*, void* args, void*, void*) {
     auto menuDMap = mods::arg<dMenu_DmapBg_c*>(args, 0);
     auto screen = menuDMap->mButtonScreen;
