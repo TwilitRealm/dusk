@@ -84,6 +84,13 @@ __attribute__((section("symdbh"), used)) constinit const SymdbDescriptor s_symdb
     kDescriptorMagic, 0, 0};
 #endif
 
+// GCC 16 folds the comparison into a constant if the descriptor is const, so launder the address.
+// Symbol manifest for mods fails otherwise, or some hooks fail
+const SymdbDescriptor& symdb_descriptor() {
+    const SymdbDescriptor* volatile p = &s_symdbDescriptor;
+    return *p;
+}
+
 struct State {
     std::vector<uint8_t> data;
     const Entry* entries = nullptr;
@@ -245,11 +252,12 @@ void initialize() {
     }
     s_state.initialized = true;
 
-    if (s_symdbDescriptor.magic != kDescriptorMagic) {
+    const SymdbDescriptor& descriptor = symdb_descriptor();
+    if (descriptor.magic != kDescriptorMagic) {
         Log.error("symbol manifest descriptor is corrupt");
         return;
     }
-    if (s_symdbDescriptor.rva == 0) {
+    if (descriptor.rva == 0) {
         Log.info("no symbol manifest embedded; by-name resolution unavailable");
         return;
     }
@@ -261,8 +269,8 @@ void initialize() {
         return;
     }
 
-    const auto* blob = reinterpret_cast<const uint8_t*>(imageBase + s_symdbDescriptor.rva);
-    const auto blobLen = static_cast<size_t>(s_symdbDescriptor.size);
+    const auto* blob = reinterpret_cast<const uint8_t*>(imageBase + descriptor.rva);
+    const auto blobLen = static_cast<size_t>(descriptor.size);
     if (blobLen < sizeof(Header)) {
         Log.error("embedded symbol manifest is truncated ({} bytes)", blobLen);
         return;
