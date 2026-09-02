@@ -750,7 +750,7 @@ static void duskExecute() {
     dusk::input::handleGamepadColor();
     updateAutoSave();
 
-    if (dusk::getSettings().game.recordingMode) {
+    if (dusk::getSettings().game.recordingMode || dusk::getSettings().game.muteBGM) {
         Z2GetSoundMgr()->getSeqMgr()->getParams()->moveVolume(0.0f, 0);
         Z2GetSoundMgr()->getStreamMgr()->getParams()->moveVolume(0.0f, 0);
         isRecording = true;

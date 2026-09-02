@@ -1359,6 +1359,9 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .key = "No Battle Music",
                 .helpText = "Disables battle music (except in Twilight).",
             });
+        add_speedrun_disabled_option(leftPane, rightPane, getSettings().game.muteBGM,
+            "Mute All Music",
+            "Disables all background music.");
         addOption("Always Show Gear As Wolf", getSettings().game.wolfGear,
             "Makes the sword and shield always visible on Wolf Link.");
         addOption("Invisible Midna", getSettings().game.invisibleMidna,

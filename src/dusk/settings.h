@@ -236,6 +236,7 @@ struct UserSettings {
         ConfigVar<bool> noLowHpSound;
         ConfigVar<bool> midnasLamentNonStop;
         ConfigVar<bool> noBattleMusic;
+        ConfigVar<bool> muteBGM;
 
         // Input
         ConfigVar<bool> enableGyroAim;
