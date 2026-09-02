@@ -1785,14 +1785,14 @@ DUSK_GAME_DATA const daAlinkHIO_board_c1 daAlinkHIO_board_c0::m = {
 DUSK_GAME_DATA const daAlinkHIO_bottle_c1 daAlinkHIO_bottle_c0::m = {
 	{
 		56,
-        2.30f,
+        2.00f,
         0.0f,
-        6.0f,
+        5.0f,
         57.0f,
 	},
     {
         39,
-        1.2f,
+        1.6f,
         0.0f,
         3.0f,
         40.0f,

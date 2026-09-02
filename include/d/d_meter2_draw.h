@@ -58,6 +58,9 @@ public:
     void setAlphaLifeAnimeMax();
     void drawKanteraScreen(u8);
     void drawMagic(s16, s16, f32, f32);
+    void drawSkill(s16, s16, f32, f32); // skill cooldown meter, reuse slot 0 for magic meter
+    void setAlphaSkillAnimeMin();
+    void setAlphaSkillAnimeMax();
     void setAlphaMagicChange(bool);
     void drawKantera(s32, s32, f32, f32);
     void setAlphaKanteraChange(bool);

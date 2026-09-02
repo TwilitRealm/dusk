@@ -769,7 +769,7 @@ BOOL daAlink_c::checkDoCutAction() {
         return procCutLargeJumpChargeInit();
     } else if (checkDownAttackState()) {
         return procCutDownInit();
-    } else if (checkCutHeadState()) {
+    } else if (checkCutHeadState() && mSkillCooldown <= 150) {
         return procCutHeadInit();
     } else {
         return procCutJumpInit(FALSE);
@@ -1413,6 +1413,7 @@ int daAlink_c::procCutFinishJumpUpInit() {
     dComIfGp_setPlayerStatus0(0, 0x8000);
     setCutWaterDropEffect();
     field_0x2fd0 = 1;
+    mSkillCooldown += 150;
     return 1;
 }
 
@@ -1956,7 +1957,7 @@ int daAlink_c::procCutTurnMove() {
     if (mProcVar2.field_0x300c != 0) {
         if (checkDownAttackState() && !var_r4) {
             setDoStatusEmphasys(BUTTON_STATUS_FINISH);
-        } else if (checkCutHeadState() && !var_r4) {
+        } else if (checkCutHeadState() && !var_r4 && mSkillCooldown <= 150) {
             setDoStatusEmphasys(BUTTON_STATUS_HELM_SPLITTER);
         } else {
             setDoStatus(BUTTON_STATUS_UNK_134);
@@ -2286,6 +2287,8 @@ int daAlink_c::procCutHeadInit() {
                     mpHIO->mCut.mCutHead.m.mSwordRadius);
     setCutType(CUT_TYPE_HEAD_JUMP);
 
+    mSkillCooldown += 150;
+
     return 1;
 }
 
@@ -2371,7 +2374,7 @@ int daAlink_c::procCutLargeJumpCharge() {
 
     if (checkDownAttackState()) {
         setDoStatusEmphasys(BUTTON_STATUS_FINISH);
-    } else if (checkCutHeadState()) {
+    } else if (checkCutHeadState() && mSkillCooldown <= 150) {
         setDoStatusEmphasys(BUTTON_STATUS_HELM_SPLITTER);
     } else {
         setDoStatus(BUTTON_STATUS_UNK_134);

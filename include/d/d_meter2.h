@@ -54,6 +54,10 @@ public:
     void moveLife();
     void moveKantera();
     void moveOxygen();
+#if TARGET_PC
+    void moveSkill();
+    void alphaAnimeSkill();
+#endif
     void moveLightDrop();
     void moveRupee();
     void moveKey();

@@ -454,6 +454,8 @@ int daAlink_c::procGuardAttackInit() {
     mProcVar3.field_0x300e = 0;
     mProcVar5.field_0x3012 = 0;
     mProcVar0.field_0x3008 = 0;
+
+    mSkillCooldown += 150;
     return 1;
 }
 
@@ -491,7 +493,7 @@ int daAlink_c::procGuardAttack() {
     }
 
     if (var_r29) {
-        if (checkCutHeadState()) {
+        if (checkCutHeadState() && mSkillCooldown <= 150) {
             setDoStatusEmphasys(BUTTON_STATUS_HELM_SPLITTER);
         } else {
             setDoStatus(BUTTON_STATUS_UNK_134);

@@ -10349,7 +10349,7 @@ void daAlink_c::decideCommonDoStatus() {
         } else if (checkWolf()) {
             if (checkDownAttackState()) {
                 setDoStatusEmphasys(BUTTON_STATUS_FINISH);
-            } else if (checkCutHeadState()) {
+            } else if (checkCutHeadState() && mSkillCooldown <= 150) {
                 setDoStatusEmphasys(BUTTON_STATUS_HELM_SPLITTER);
             } else if (checkWolfSideStep()) {
                 setDoStatusEmphasys(BUTTON_STATUS_JUMP);
@@ -10400,7 +10400,7 @@ void daAlink_c::decideCommonDoStatus() {
                 if (checkInputOnR() && direction != DIR_FORWARD) {
                     if (mEquipItem == 0x103 && checkDownAttackState()) {
                         setDoStatusEmphasys(BUTTON_STATUS_FINISH);
-                    } else if (mEquipItem == 0x103 && checkCutHeadState()) {
+                    } else if (mEquipItem == 0x103 && checkCutHeadState() && mSkillCooldown <= 150) {
                         setDoStatusEmphasys(BUTTON_STATUS_HELM_SPLITTER);
                     } else {
                         setDoStatusEmphasys(BUTTON_STATUS_JUMP);
@@ -10410,7 +10410,7 @@ void daAlink_c::decideCommonDoStatus() {
                         setDoStatus(BUTTON_STATUS_THROW);
                     } else if (mEquipItem == 0x103 && checkDownAttackState()) {
                         setDoStatusEmphasys(BUTTON_STATUS_FINISH);
-                    } else if (mEquipItem == 0x103 && checkCutHeadState()) {
+                    } else if (mEquipItem == 0x103 && checkCutHeadState() && mSkillCooldown <= 150) {
                         setDoStatusEmphasys(BUTTON_STATUS_HELM_SPLITTER);
                     } else {
                         setDoStatus(BUTTON_STATUS_UNK_134);
@@ -11704,7 +11704,7 @@ int daAlink_c::checkNormalAction() {
         } else if (dComIfGp_getDoStatus() == BUTTON_STATUS_HELM_SPLITTER) {
             if (checkWolf()) {
                 return procWolfJumpAttackInit(1);
-            } else {
+            } else if (mSkillCooldown <= 150) {
                 return checkDoCutAction();
             }
         } else if (dComIfGp_getDoStatus() == BUTTON_STATUS_UNK_139) {
@@ -11901,10 +11901,10 @@ BOOL daAlink_c::checkItemAction() {
 
             // New shield attack handling
             // If R is held,
-            if (mDoCPd_c::getHoldLockR(PAD_1)) {
+            if (mDoCPd_c::getHoldLockR(PAD_1) && mSkillCooldown <= 150) {
                 // Let B display the shield attack prompt
                 setBStatus(BUTTON_STATUS_SHIELD_ATTACK);
-                if (mDoCPd_c::getTrigB(PAD_1))
+                if (mDoCPd_c::getTrigB(PAD_1) && mSkillCooldown <= 150)
                     return procGuardAttackInit();
             }
         }
@@ -16533,7 +16533,8 @@ int daAlink_c::procSideRoll() {
             checkNextAction(0);
         }
     } else if (mProcVar2.field_0x300c != 0 && !checkNotJumpSinkLimit() &&
-               frameCtrl_p->getFrame() > mpHIO->mGuard.mTurnMove.m.mTurnAnm.mCancelFrame)
+               frameCtrl_p->getFrame() > mpHIO->mGuard.mTurnMove.m.mTurnAnm.mCancelFrame
+               && mSkillCooldown <= 150)
     {
         procCutFinishJumpUpInit();
     } else if (frameCtrl_p->getFrame() > mpHIO->mGuard.mTurnMove.m.mTurnAnm.mCancelFrame) {
@@ -18246,12 +18247,16 @@ int daAlink_c::execute() {
             damageTimerCount();
         }
 
-        if (mDodgeTimer !=0) {
+        if (mDodgeTimer != 0) {
             mDodgeTimer--;
         }
 
-        if (mParryTimer !=0) {
+        if (mParryTimer != 0) {
             mParryTimer--;
+        }
+
+        if (mSkillCooldown != 0) {
+            mSkillCooldown--;
         }
 
         if (checkEquipHeavyBoots()) {

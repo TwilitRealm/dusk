@@ -27,6 +27,7 @@
 #if TARGET_PC
 #include "dusk/memory.h"
 #include "dusk/settings.h"
+#include "d/actor/d_a_alink.h"
 
 namespace {
 
@@ -283,6 +284,9 @@ int dMeter2_c::_execute() {
     moveLife();
     moveKantera();
     moveOxygen();
+#if TARGET_PC
+    moveSkill();
+#endif
     moveLightDrop();
     moveRupee();
     moveKey();
@@ -949,6 +953,35 @@ void dMeter2_c::moveOxygen() {
     alphaAnimeOxygen();
     dComIfGp_setNowOxygen(mNowOxygen);
 }
+
+#if TARGET_PC
+void dMeter2_c::moveSkill() {
+    static const s16 SKILL_COOLDOWN_MAX = 300;  // 10 ish seconds
+
+    daAlink_c* link = daAlink_getAlinkActorClass();
+    s16 charge = SKILL_COOLDOWN_MAX;
+    if (link != NULL) {
+        charge = SKILL_COOLDOWN_MAX - link->mSkillCooldown;
+    }
+
+    mpMeterDraw->drawSkill(SKILL_COOLDOWN_MAX, charge, g_drawHIO.mLanternMeterPosX,
+                           g_drawHIO.mMagicMeterPosY);
+    alphaAnimeSkill();
+}
+
+void dMeter2_c::alphaAnimeSkill() {
+    daAlink_c* link = daAlink_getAlinkActorClass();
+
+    // Hide during cutscenes/menus
+    if (link == NULL || (mStatus & 0x4000) || link->mSkillCooldown == 0) {
+        mpMeterDraw->setAlphaSkillAnimeMin();
+    } else {
+        mpMeterDraw->setAlphaSkillAnimeMax();
+    }
+
+    mpMeterDraw->setAlphaMagicChange(false);
+}
+#endif
 
 void dMeter2_c::moveLightDrop() {
     f32 scale;

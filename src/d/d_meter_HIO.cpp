@@ -1667,8 +1667,16 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
     mMagicMeterScale = 0.7f;
     mMagicMeterAlpha = 1.0f;
     mMagicMeterFrameAlpha = 0.55f;
+#if TARGET_PC
+    // Slot 0 now drives the skill cooldown gauge, so these place it just below the lantern
+    // bar instead of at the cut magic meter's old spot (-42, 0), which sits off to the left
+    // of the heart row.
+    mMagicMeterPosX = 8.0f;
+    mMagicMeterPosY = 32.0f;
+#else
     mMagicMeterPosX = -42.0f;
     mMagicMeterPosY = 0.0f;
+#endif
 
     mLanternMeterScale = 0.7f;
     mLanternMeterAlpha = 1.0f;

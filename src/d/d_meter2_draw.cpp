@@ -692,6 +692,9 @@ void dMeter2Draw_c::draw() {
     mpScreen->draw(0.0f, 0.0f, graf_ctx);
     drawKanteraScreen(1);
     drawKanteraScreen(2);
+#if TARGET_PC
+    drawKanteraScreen(0);
+#endif
 
 #if TARGET_PC
     if (!touchControlsEnabled) {
@@ -968,10 +971,18 @@ void dMeter2Draw_c::initMagic() {
         field_0x742[i] = 0;
     }
 
+#if TARGET_PC
+    // Seed slot 0 with a full bar so the first frame is not garbage; moveSkill() takes over
+    // from the next frame onward.
+    static const s16 SKILL_COOLDOWN_MAX = 300;
+    drawSkill(SKILL_COOLDOWN_MAX, SKILL_COOLDOWN_MAX, g_drawHIO.mLanternMeterPosX + offsetX,
+              g_drawHIO.mMagicMeterPosY + offsetY);
+#else
     u8 magic = dComIfGs_getMagic();
     u8 max_magic = dComIfGs_getMaxMagic();
     drawMagic(max_magic, magic, g_drawHIO.mMagicMeterPosX + offsetX,
               g_drawHIO.mMagicMeterPosY + offsetY);
+#endif
     setAlphaMagicChange(true);
 
     drawKantera(dComIfGs_getMaxOil(), dComIfGs_getOil(), g_drawHIO.mLanternMeterPosX + offsetX,
@@ -1722,7 +1733,8 @@ void dMeter2Draw_c::drawKanteraScreen(u8 i_meterType) {
         JUtility::TColor black = mpMagicMeter->getInitBlack();
         black.a = 255;
 
-        mpMagicMeter->setBlackWhite(black, mpMagicMeter->getInitWhite());
+        mpMagicMeter->setBlackWhite(JUtility::TColor(100, 255, 100, 255),
+                                    JUtility::TColor(10, 255, 10, 255));
         setAlphaMagicChange(true);
     } else if (i_meterType == 1) {
         mpMagicMeter->setBlackWhite(JUtility::TColor(255, 255, 140, 255),
@@ -1857,6 +1869,31 @@ void dMeter2Draw_c::drawKantera(s32 i_max, s32 i_oil, f32 i_posX, f32 i_posY) {
     field_0x5f0[1] = i_posY;
 }
 
+// Skill cooldown gauge
+void dMeter2Draw_c::drawSkill(s16 i_max, s16 i_charge, f32 i_posX, f32 i_posY) {
+    f32 frameSpan = mpMagicFrameR->getInitPosX() - mpMagicFrameL->getInitPosX();
+
+    f32 fillRate = 0.0f;
+    if (i_max > 0) {
+        fillRate = (f32)i_charge / (f32)i_max;
+    }
+
+    // Filled bar: only this shrinks/grows with the charge.
+    field_0x584[0] = fillRate * mpMagicMeter->getInitSizeX();
+    field_0x590[0] = mpMagicMeter->getInitSizeY();
+    // Right end cap and empty trough stay at full length -- unlike oil, the skill's
+    // capacity never changes, so there is no "max" ratio to scale them by.
+    field_0x59c[0] = frameSpan + mpMagicFrameL->getInitPosX();
+    field_0x5a8[0] = mpMagicFrameL->getInitPosY();
+    field_0x5b4[0] = mpMagicBase->getInitSizeX();
+    field_0x5c0[0] = mpMagicBase->getInitSizeY();
+
+    field_0x5cc[0] = g_drawHIO.mMagicMeterScale;
+    field_0x5d8[0] = g_drawHIO.mMagicMeterScale;
+    field_0x5e4[0] = i_posX;
+    field_0x5f0[0] = i_posY;
+}
+
 void dMeter2Draw_c::setAlphaKanteraChange(bool i_forceSet) {
     bool meter_parent_alpha_set = false;
     bool meter_alpha_set = false;
@@ -1910,6 +1947,24 @@ void dMeter2Draw_c::setAlphaKanteraAnimeMax() {
         }
 
         mMeterAlphaRate[1] = (field_0x742[1] / 5.0f) * g_drawHIO.mParentAlpha;
+    }
+}
+
+void dMeter2Draw_c::setAlphaSkillAnimeMin() {
+    if (field_0x742[0] <= 0) {
+        mMeterAlphaRate[0] = 0.0f;
+    } else {
+        field_0x742[0]--;
+        mMeterAlphaRate[0] = (field_0x742[0] / 5.0f) * g_drawHIO.mParentAlpha;
+    }
+}
+
+void dMeter2Draw_c::setAlphaSkillAnimeMax() {
+    if (field_0x742[0] >= 5) {
+        mMeterAlphaRate[0] = g_drawHIO.mParentAlpha;
+    } else {
+        field_0x742[0]++;
+        mMeterAlphaRate[0] = (field_0x742[0] / 5.0f) * g_drawHIO.mParentAlpha;
     }
 }
 

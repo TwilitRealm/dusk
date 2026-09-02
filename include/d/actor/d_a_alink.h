@@ -4594,6 +4594,7 @@ public:
     bool mIsRollstab = false;
 
     daPy_anmHeap_c mItemHeapZ_;  // third item heap; see mItemHeap_ above
+    s16 mSkillCooldown = 0;
 
 public:
     daPy_anmHeap_c& itemHeap(int i) { return i < 2 ? mItemHeap_[i] : mItemHeapZ_; }
