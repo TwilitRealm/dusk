@@ -1139,11 +1139,6 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .key = "Non-Stop Midna's Lament",
                 .helpText = "Prevents enemy music while Midna's Lament is playing.",
             });
-        config_bool_select(leftPane, rightPane, getSettings().game.noBattleMusic,
-            {
-                .key = "No Battle Music",
-                .helpText = "Disables battle music (except in Twilight).",
-            });
     });
 
     add_tab("Gameplay", [this](Rml::Element* content) {
@@ -1174,52 +1169,12 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Scales the size of the gameplay HUD (hearts, buttons, mini-map, etc.). Does not affect dialog boxes or menus.",
             50, 200, 5,
             [] { return getSettings().game.minimalHUD.getValue(); });
-        config_percent_select(leftPane, rightPane, getSettings().game.zItemScale,
-            "Z-Item Scale",
-            "Scales the size of item icons on Z. Re-equip item or reload area after changing.",
-            50, 200, 5);
         addOption("Restore Wii 1.0 Glitches", getSettings().game.restoreWiiGlitches,
             "Restores patched glitches from Wii USA 1.0, the first released version.");
         addOption("Enable Rotating Link Doll", getSettings().game.enableLinkDollRotation,
             "Enables rotating Link in the collection menu with the C-Stick.");
         addOption("Hide Owl Statue Markers", getSettings().game.removeQuestMapMarkers,
             "Removes completed Owl Statue markers from the map and Minimap.");
-        addOption("Always Show Gear As Wolf", getSettings().game.wolfGear,
-            "Makes the sword and shield always visible on Wolf Link.");
-        addOption("Invisible Midna", getSettings().game.invisibleMidna,
-            "Hides Midna on Wolf Link's back.");
-        leftPane.register_control(
-            leftPane.add_select_button({
-                .key = "Always Glowing Light Sword",
-                .getValue =
-                    [] {
-                        return kLightSwordModes[static_cast<u8>(getSettings().game.alwaysLightSword.getValue())];
-                    },
-                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
-                .isModified =
-                    [] {
-                        return getSettings().game.alwaysLightSword.getValue() !=
-                               getSettings().game.alwaysLightSword.getDefaultValue();
-                    },
-            }),
-            rightPane, [](Pane& pane) {
-                for (int i = 0; i < kLightSwordModes.size(); i++) {
-                    pane.add_button({
-                            .text = kLightSwordModes[i],
-                            .isSelected =
-                                [i] {
-                                    return getSettings().game.alwaysLightSword.getValue() == static_cast<LightSwordMode>(i);
-                                },
-                        })
-                        .on_pressed([i] {
-                            mDoAud_seStartMenu(kSoundItemChange);
-                            getSettings().game.alwaysLightSword.setValue(static_cast<LightSwordMode>(i));
-                            config::save();
-                        });
-                }
-                pane.add_rml(
-                    "<br/>Retain the Master Sword's glow effect after infusing it with the two Sols.");
-            });
 
         leftPane.add_section("Difficulty");
         leftPane.register_control(
@@ -1245,60 +1200,10 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 pane.clear();
                 pane.add_text("Multiplies incoming damage.");
             });
-        leftPane.register_control(
-            leftPane.add_child<NumberButton>(NumberButton::Props{
-                .key = "Sword Damage Multiplier",
-                .getValue = [] { return getSettings().game.swordMultiplier.getValue(); },
-                .setValue =
-                    [](int value) {
-                        getSettings().game.swordMultiplier.setValue(value);
-                        config::save();
-                    },
-                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
-                .isModified =
-                    [] {
-                        return getSettings().game.swordMultiplier.getValue() !=
-                               getSettings().game.swordMultiplier.getDefaultValue();
-                    },
-                .min = 0,
-                .max = 1000,
-                .step = 10,
-                .suffix = "%",
-            }),
-            rightPane, [](Pane& pane) {
-                pane.clear();
-                pane.add_text("Multiplies the damage Link's sword will do to most enemies. Set to 0 to make most enemies invulnerable to the sword, except for Ending Blow.");
-            });
-        leftPane.register_control(
-            leftPane.add_child<NumberButton>(NumberButton::Props{
-                .key = "Bow Damage Multiplier",
-                .getValue = [] { return getSettings().game.bowMultiplier.getValue(); },
-                .setValue =
-                    [](int value) {
-                        getSettings().game.bowMultiplier.setValue(value);
-                        config::save();
-                    },
-                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
-                .isModified =
-                    [] {
-                        return getSettings().game.bowMultiplier.getValue() !=
-                               getSettings().game.bowMultiplier.getDefaultValue();
-                    },
-                .min = 0,
-                .max = 1000,
-                .step = 10,
-                .suffix = "%",
-            }),
-            rightPane, [](Pane& pane) {
-                pane.clear();
-                pane.add_text("Multiplies the damage Link's arrows will do to most enemies. Set to 0 to make most enemies invulnerable to arrows. Does not affect Bomb Arrows.");
-            });
         addSpeedrunDisabledOption(
             "Instant Death", getSettings().game.instantDeath, "Any hit will instantly kill you.");
         addSpeedrunDisabledOption("No Heart Drops", getSettings().game.noHeartDrops,
             "Hearts will never drop from enemies, pots, and various other places.");
-        addSpeedrunDisabledOption("Lose Rupees On Death", getSettings().game.loseRupees,
-            "Half of Link's rupees will be lost upon death.");
 
         leftPane.add_section("Quality of Life");
         addOption("Bigger Wallets", getSettings().game.biggerWallets,
@@ -1322,8 +1227,6 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Always collect Rupees even if your Wallet is too full.");
         addOption("No Sword Recoil", getSettings().game.noSwordRecoil,
             "Link will not recoil when his sword hits walls.");
-        addOption("No Hitstop", getSettings().game.noHitstop,
-        "Removes the brief freeze-frame pause that occurs when attacks connect.");
         addOption("No 2nd Fish for Cat", getSettings().game.no2ndFishForCat,
             "Skip needing to catch a second fish for Sera's cat.");
         addOption("Button Fishing", getSettings().game.buttonFishing,
@@ -1377,6 +1280,126 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .helpText = "Display the RTA timer. IGT is always visible.",
                 .isDisabled = [] { return !dusk::speedrun::isActive(); },
             });
+    });
+
+    add_tab("Lazy Tweaks", [this](Rml::Element* content) {
+        auto& leftPane = add_child<Pane>(content, Pane::Type::Controlled);
+        auto& rightPane = add_child<Pane>(content, Pane::Type::Uncontrolled);
+
+        auto addOption = [&](const Rml::String& key, ConfigVar<bool>& value,
+                             const Rml::String& helpText) {
+            config_bool_select(leftPane, rightPane, value,
+                {
+                    .key = key,
+                    .helpText = helpText,
+                });
+        };
+        auto addSpeedrunDisabledOption = [&](const Rml::String& key, ConfigVar<bool>& value,
+                                             const Rml::String& helpText) {
+            add_speedrun_disabled_option(leftPane, rightPane, value, key, helpText);
+        };
+
+        leftPane.add_section("Combat");
+        leftPane.register_control(
+            leftPane.add_child<NumberButton>(NumberButton::Props{
+                .key = "Sword Damage Multiplier",
+                .getValue = [] { return getSettings().game.swordMultiplier.getValue(); },
+                .setValue =
+                    [](int value) {
+                        getSettings().game.swordMultiplier.setValue(value);
+                        config::save();
+                    },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
+                .isModified =
+                    [] {
+                        return getSettings().game.swordMultiplier.getValue() !=
+                               getSettings().game.swordMultiplier.getDefaultValue();
+                    },
+                .min = 0,
+                .max = 1000,
+                .step = 10,
+                .suffix = "%",
+            }),
+            rightPane, [](Pane& pane) {
+                pane.clear();
+                pane.add_text("Multiplies the damage Link's sword will do to most enemies. Set to 0 to make most enemies invulnerable to the sword, except for Ending Blow.");
+            });
+        leftPane.register_control(
+            leftPane.add_child<NumberButton>(NumberButton::Props{
+                .key = "Bow Damage Multiplier",
+                .getValue = [] { return getSettings().game.bowMultiplier.getValue(); },
+                .setValue =
+                    [](int value) {
+                        getSettings().game.bowMultiplier.setValue(value);
+                        config::save();
+                    },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
+                .isModified =
+                    [] {
+                        return getSettings().game.bowMultiplier.getValue() !=
+                               getSettings().game.bowMultiplier.getDefaultValue();
+                    },
+                .min = 0,
+                .max = 1000,
+                .step = 10,
+                .suffix = "%",
+            }),
+            rightPane, [](Pane& pane) {
+                pane.clear();
+                pane.add_text("Multiplies the damage Link's arrows will do to most enemies. Set to 0 to make most enemies invulnerable to arrows. Does not affect Bomb Arrows.");
+            });
+        addSpeedrunDisabledOption("Lose Rupees On Death", getSettings().game.loseRupees,
+            "Half of Link's rupees will be lost upon death.");
+
+        leftPane.add_section("Gamefeel Stuff");
+        addOption("No Hitstop", getSettings().game.noHitstop,
+        "Removes the brief freeze-frame pause that occurs when attacks connect.");
+        config_bool_select(leftPane, rightPane, getSettings().game.noBattleMusic,
+            {
+                .key = "No Battle Music",
+                .helpText = "Disables battle music (except in Twilight).",
+            });
+        addOption("Always Show Gear As Wolf", getSettings().game.wolfGear,
+            "Makes the sword and shield always visible on Wolf Link.");
+        addOption("Invisible Midna", getSettings().game.invisibleMidna,
+            "Hides Midna on Wolf Link's back.");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Always Glowing Light Sword",
+                .getValue =
+                    [] {
+                        return kLightSwordModes[static_cast<u8>(getSettings().game.alwaysLightSword.getValue())];
+                    },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
+                .isModified =
+                    [] {
+                        return getSettings().game.alwaysLightSword.getValue() !=
+                               getSettings().game.alwaysLightSword.getDefaultValue();
+                    },
+            }),
+            rightPane, [](Pane& pane) {
+                for (int i = 0; i < kLightSwordModes.size(); i++) {
+                    pane.add_button({
+                            .text = kLightSwordModes[i],
+                            .isSelected =
+                                [i] {
+                                    return getSettings().game.alwaysLightSword.getValue() == static_cast<LightSwordMode>(i);
+                                },
+                        })
+                        .on_pressed([i] {
+                            mDoAud_seStartMenu(kSoundItemChange);
+                            getSettings().game.alwaysLightSword.setValue(static_cast<LightSwordMode>(i));
+                            config::save();
+                        });
+                }
+                pane.add_rml(
+                    "<br/>Retain the Master Sword's glow effect after infusing it with the two Sols.");
+            });
+        leftPane.add_section("Other Shit");
+        config_percent_select(leftPane, rightPane, getSettings().game.zItemScale,
+            "Z-Item Scale",
+            "Scales the size of item icons on Z. Re-equip item or reload area after changing.",
+            50, 200, 5);
     });
 
     add_tab("Cheats", [this](Rml::Element* content) {
