@@ -2685,7 +2685,7 @@ static s32 THPVideoDecode(void*, size_t, void*, void*, void*, void*) {
 #endif
 #endif
 
-static BOOL THPInit() {
+BOOL THPInit() {
 #if !TARGET_PC
     u8* base;
     base = (u8*)(0xE000 << 16);

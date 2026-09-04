@@ -14323,7 +14323,7 @@ BOOL daAlink_c::checkMagicArmorWearAbility() const {
 J3DModelData* daAlink_c::loadAramBmd(u16 i_resIdx, u32 i_bufSize) {
     JKRArchive* anmArchive = dComIfGp_getAnmArchive();
 #if TARGET_PC
-    u8* tmpBuffer = (u8*)mItemHeap[field_0x2fa0].allocTempBuffer(i_resIdx, &i_bufSize);
+    u8* tmpBuffer = (u8*)mItemHeap_[field_0x2fa0].allocTempBuffer(i_resIdx, &i_bufSize);
 #else
     u8* tmpBuffer = JKR_NEW_ARRAY_ARGS(u8, i_bufSize, 0x20);
 #endif
@@ -14348,7 +14348,7 @@ J3DModelData* daAlink_c::loadAramBmd(u16 i_resIdx, u32 i_bufSize) {
 
 void* daAlink_c::loadAram(u16 i_resIdx, u32 i_bufSize) {
 #if TARGET_PC
-    u8* tmpBuffer = (u8*)mItemHeap[field_0x2fa0].allocTempBuffer(i_resIdx, &i_bufSize);
+    u8* tmpBuffer = (u8*)mItemHeap_[field_0x2fa0].allocTempBuffer(i_resIdx, &i_bufSize);
 #else
     u8* tmpBuffer = JKR_NEW_ARRAY_ARGS(u8, i_bufSize, 0x20);
 #endif
