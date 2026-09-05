@@ -6889,6 +6889,8 @@ void daAlink_c::setWolfLockDomeModel() {
     } else {
         field_0x0724->setFrame(0.0f);
     }
+
+    mSkillCooldown += 300;
 }
 
 void daAlink_c::setWolfBallModel() {
@@ -7202,7 +7204,7 @@ int daAlink_c::procWolfRollAttackMove() {
     if (mProcVar0.field_0x3008 != 0) {
         mProcVar0.field_0x3008--;
 
-        if (mProcVar0.field_0x3008 == 0 && checkWolfLockAttackChargeState()) {
+        if (mProcVar0.field_0x3008 == 0 && checkWolfLockAttackChargeState() && mSkillCooldown <= 0) {
             setWolfLockDomeModel();
         }
     } else {
