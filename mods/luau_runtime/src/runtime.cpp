@@ -365,14 +365,16 @@ ModResult runtime_deactivate(ModContext*, ModContext* subject, ModError*) {
         return MOD_OK;
     }
 
-    Vm& vm = *found->second;
-    DeadlineScope deadline{vm, kLifecycleBudget};
-    const size_t callbackCount = vm.shutdownRefs.size();
-    for (size_t i = callbackCount; i > 0; --i) {
-        std::string error;
-        const int ref = vm.shutdownRefs[i - 1];
-        if (!call_ref(vm, ref, 0, 0, kLifecycleBudget, error) && svc_log != nullptr) {
-            svc_log->write(subject, LOG_LEVEL_ERROR, error.c_str());
+    {
+        Vm& vm = *found->second;
+        DeadlineScope deadline{vm, kLifecycleBudget};
+        const size_t callbackCount = vm.shutdownRefs.size();
+        for (size_t i = callbackCount; i > 0; --i) {
+            std::string error;
+            const int ref = vm.shutdownRefs[i - 1];
+            if (!call_ref(vm, ref, 0, 0, kLifecycleBudget, error) && svc_log != nullptr) {
+                svc_log->write(subject, LOG_LEVEL_ERROR, error.c_str());
+            }
         }
     }
     s_vms.erase(found);

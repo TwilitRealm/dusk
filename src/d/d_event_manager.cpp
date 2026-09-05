@@ -15,7 +15,9 @@
 #include "SSystem/SComponent/c_counter.h"
 #include <cstring>
 
+#if TARGET_PC
 #include "helpers/string.hpp"
+#endif
 
 #if DEBUG
 static dEvM_HIO_c l_HIO;
