@@ -181,7 +181,6 @@ BOOL daAlink_c::checkGuardAccept() {
 void daAlink_c::setUpperGuardAnime(f32 param_0) {
     UNUSED(param_0);
     onNoResetFlg2(FLG2_UNK_8000000);
-    mParryTimer = 10;
 }
 
 BOOL daAlink_c::checkShieldCrouch() {
@@ -456,6 +455,7 @@ int daAlink_c::procGuardAttackInit() {
     mProcVar0.field_0x3008 = 0;
 
     mSkillCooldown += 150;
+    mParryTimer = 10;
     return 1;
 }
 
