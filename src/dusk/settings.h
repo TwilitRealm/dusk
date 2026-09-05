@@ -202,6 +202,8 @@ struct UserSettings {
         ConfigVar<bool> autoSave;
         ConfigVar<bool> enhancedMapMenus;
         ConfigVar<bool> aimingReticle;
+        ConfigVar<bool> sturdierWolfLink;
+        ConfigVar<bool> progressiveDefense;
 
         // Preferences
         ConfigVar<bool> enableMirrorMode;
@@ -292,6 +294,7 @@ struct UserSettings {
         ConfigVar<bool> fastSpinner;
         ConfigVar<MagicArmorMode> armorRupeeDrain;
         ConfigVar<bool> invincibleEnemies;
+        ConfigVar<bool> insulatedZoraArmor;
 
         // Technical
         ConfigVar<bool> restoreWiiGlitches;

@@ -63,6 +63,8 @@ UserSettings g_userSettings = {
         .autoSave {"game.autoSave", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
         .aimingReticle {"game.aimingReticle", false},
+        .sturdierWolfLink {"game.sturdierWolfLink", false},
+        .progressiveDefense {"game.progressiveDefense", false},
 
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
@@ -158,6 +160,7 @@ UserSettings g_userSettings = {
         .fastSpinner {"game.fastSpinner", false},
         .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
         .invincibleEnemies {"game.invincibleEnemies", false},
+        .insulatedZoraArmor {"game.insulatedZoraArmor", false},
 
         // Technical
         .restoreWiiGlitches {"game.restoreWiiGlitches", false},
@@ -300,6 +303,8 @@ void registerSettings() {
     Register(g_userSettings.game.autoSave);
     Register(g_userSettings.game.enhancedMapMenus);
     Register(g_userSettings.game.aimingReticle);
+    Register(g_userSettings.game.sturdierWolfLink);
+    Register(g_userSettings.game.progressiveDefense);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
     Register(g_userSettings.game.invertCameraYAxis);
@@ -370,6 +375,7 @@ void registerSettings() {
     Register(g_userSettings.game.superClawshot);
     Register(g_userSettings.game.alwaysGreatspin);
     Register(g_userSettings.game.invincibleEnemies);
+    Register(g_userSettings.game.insulatedZoraArmor);
     Register(g_userSettings.game.enableFrameInterpolation);
     Register(g_userSettings.game.enableGyroAim);
     Register(g_userSettings.game.enableGyroRollgoal);

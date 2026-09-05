@@ -1314,6 +1314,21 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             });
         addSpeedrunDisabledOption("Lose Rupees On Death", getSettings().game.loseRupees,
             "Half of Link's rupees will be lost upon death.");
+        config_bool_select(leftPane, rightPane, getSettings().game.insulatedZoraArmor,
+            {
+                .key = "Insulated Zora Armor",
+                .helpText = "Zora Armor is no longer weak to ice and fire.",
+            });
+        config_bool_select(leftPane, rightPane, getSettings().game.sturdierWolfLink,
+            {
+                .key = "Sturdier Wolf Link",
+                .helpText = "Wolf Link no longer takes twice as much damage as Link in human form.",
+            });
+        config_bool_select(leftPane, rightPane, getSettings().game.progressiveDefense,
+            {
+                .key = "Progressive Damage Multiplier",
+                .helpText = "Further multiply the damage Link takes by 2x halfway through the game.",
+            });
 
         leftPane.add_section("Gamefeel Stuff");
         addOption("No Hitstop", getSettings().game.noHitstop,

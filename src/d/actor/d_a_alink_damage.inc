@@ -164,12 +164,16 @@ f32 daAlink_c::damageMagnification(BOOL i_checkZoraMag, int param_1) {
     base_mag *= dusk::getSettings().game.damageMultiplier;
     #endif
 
-    if (checkWolf() && !checkCargoCarry() && param_1 == 0) {
+    if (checkWolf() && !checkCargoCarry() && param_1 == 0 && !dusk::getSettings().game.sturdierWolfLink) {
         return 2.0f * base_mag;
     }
 
-    if (checkZoraWearAbility() && i_checkZoraMag) {
+    if (checkZoraWearAbility() && i_checkZoraMag && !dusk::getSettings().game.insulatedZoraArmor) {
         return 10.0f * base_mag;
+    }
+
+    if (dusk::getSettings().game.progressiveDefense && dComIfGs_isEventBit(0xD04)) {
+        return 2.0f * base_mag;
     }
 
     return base_mag;
