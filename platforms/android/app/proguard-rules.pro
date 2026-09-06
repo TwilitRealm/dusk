@@ -1,1 +1,1 @@
--keep class dev.twilitrealm.dusk.DuskActivity { *; }
+-keep class dev.kamilink.lazytweaks.DuskActivity { *; }

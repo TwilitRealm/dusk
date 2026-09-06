@@ -1,4 +1,4 @@
-package dev.twilitrealm.dusk;
+package dev.kamilink.lazytweaks;
 
 import android.content.Intent;
 import android.os.Bundle;
