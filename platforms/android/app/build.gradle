@@ -8,8 +8,8 @@ def borealisDir = new File(duskRepoDir, 'extern/borealis')
 ext.borealisAndroid = [
     borealisDir: borealisDir,
     propertiesFile: new File(duskRepoDir, 'build/android-arm64/borealis-android.properties'),
-    namespace: 'dev.twilitrealm.dusk',
-    applicationId: 'dev.twilitrealm.dusk',
+    namespace: 'dev.kamilink.lazytweaks',
+    applicationId: 'dev.kamilink.lazytweaks',
     abis: ['arm64-v8a'],
     assets: [
         [

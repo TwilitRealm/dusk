@@ -38,7 +38,7 @@
         </provider>
 
         <activity
-            android:name="dev.twilitrealm.dusk.DuskActivity"
+            android:name="dev.kamilink.lazytweaks.DuskActivity"
             android:alwaysRetainTaskState="true"
             android:configChanges="layoutDirection|locale|grammaticalGender|fontScale|fontWeightAdjustment|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:exported="true"

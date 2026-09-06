@@ -76,9 +76,9 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: dusklight-${{env.APP_VERSION}}-linux-${{matrix.preset}}-${{matrix.artifact_arch}}
+          name: lazytweaks-${{env.APP_VERSION}}-linux-${{matrix.preset}}-${{matrix.artifact_arch}}
           path: |
-            build/install/Dusklight-*.AppImage
+            build/install/lazytweaks-*.AppImage
             build/install/debug.tar.*
             build/install/sdk/
 
@@ -145,9 +145,9 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: dusklight-${{env.APP_VERSION}}-${{matrix.artifact_name}}
+          name: lazytweaks-${{env.APP_VERSION}}-${{matrix.artifact_name}}
           path: |
-            build/install/Dusklight.app
+            build/install/lazytweaks.app
             build/install/debug.tar.*
             build/install/sdk/
 
@@ -221,7 +221,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: dusklight-${{env.APP_VERSION}}-android-${{matrix.artifact_arch}}
+          name: lazytweaks-${{env.APP_VERSION}}-android-${{matrix.artifact_arch}}
           path: upload/
 
   build-windows:
@@ -283,7 +283,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: dusklight-${{env.APP_VERSION}}-win32-msvc-${{matrix.artifact_arch}}
+          name: lazytweaks-${{env.APP_VERSION}}-win32-msvc-${{matrix.artifact_arch}}
           path: |
             build/install/*.exe
             build/install/*.dll
