@@ -336,7 +336,8 @@ void daAlink_c::initKandelaarSwing() {
 
     voiceStart(Z2SE_AL_V_SWING_BOTTLE);
     mAtSph.ResetAtHit();
-if (!checkEventRun() IF_DUSK(&& !checkLanternInWater())) {
+
+    if (!checkEventRun() IF_DUSK(&& !checkLanternInWater())) {
         dComIfGp_setItemOilCount(-mpHIO->mItem.mLantern.m.mShakeOilLoss);
     }
 
