@@ -48,8 +48,8 @@ enum B_BH_RES_FILE_ID {
 daB_BH_HIO_c::daB_BH_HIO_c() {
     no = -1;
     model_size = 1.25f;
-    attack_freq_a = 350;
-    attack_freq_b = 250;
+    attack_freq_a = 88;
+    attack_freq_b = 62;
     down_revive_time = 250;
 }
 

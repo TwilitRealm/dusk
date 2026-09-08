@@ -223,7 +223,7 @@ daB_BQ_HIO_c::daB_BQ_HIO_c() {
     field_0x4 = -1;
     mModelSize = 1.0f;
     mChanceTime = 200;
-    mWaterSprayTime = 150;
+    mWaterSprayTime = 210;
 }
 
 static void anm_init(b_bq_class* i_this, int i_anmID, f32 i_morf, u8 i_mode, f32 i_speed) {
@@ -612,7 +612,7 @@ static void b_bq_damage(b_bq_class* i_this) {
             fopAcM_effSmokeSet1(&i_this->field_0x1220, &i_this->field_0x1224, &a_this->eyePos, NULL,
                                 TREG_F(11) + 5.0f, &a_this->tevStr, 1);
 
-            if (i_this->mDamageBackCount >= 2) {
+            if (i_this->mDamageBackCount >= 3) {
                 i_this->onDownFlg();
                 a_this->health = 50;
             }
@@ -628,7 +628,7 @@ static void b_bq_damage(b_bq_class* i_this) {
         break;
     case 2:
         if (i_this->mTimers[2] == 0) {
-            i_this->mTimers[2] = cM_rndF(20) + 10.0f;
+            i_this->mTimers[2] = cM_rndF(10) + 5.0f;
             i_this->mSound.startCreatureVoice(Z2SE_EN_BQ_V_DAMAGEWAIT, -1);
         }
         break;
@@ -695,7 +695,7 @@ static void b_bq_damage(b_bq_class* i_this) {
         i_this->field_0x6fc = 10;
         i_this->field_0x6f6 = 0;
         i_this->mTimers[0] = 0;
-        i_this->mTimers[2] = 80;
+        i_this->mTimers[2] = 30;
         Z2GetAudioMgr()->changeBgmStatus(1);
     }
 
@@ -755,15 +755,15 @@ static s8 b_bq_attack(b_bq_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, BCK_BQ_ATTACK_A, 10.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
+        anm_init(i_this, BCK_BQ_ATTACK_A, 10.0f, J3DFrameCtrl::EMode_NONE, 2.0f);
         i_this->mMode = 1;
 
         if (cM_rndF(1.0f) < 0.5f) {
-            i_this->field_0x138e = 0x500;
-            i_this->field_0x1390 = -0x500;
+            i_this->field_0x138e = 0x250;
+            i_this->field_0x1390 = -0x250;
         } else {
-            i_this->field_0x138e = -0x500;
-            i_this->field_0x1390 = 0x500;
+            i_this->field_0x138e = -0x250;
+            i_this->field_0x1390 = 0x250;
         }
         break;
     case 1:
@@ -779,7 +779,7 @@ static s8 b_bq_attack(b_bq_class* i_this) {
         }
 
         if (i_this->mpMorf->isStop()) {
-            anm_init(i_this, BCK_BQ_ATTACK_B, 2.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
+            anm_init(i_this, BCK_BQ_ATTACK_B, 2.0f, J3DFrameCtrl::EMode_LOOP, 2.0f);
             i_this->mMode = 2;
             i_this->mTimers[0] = l_HIO.mWaterSprayTime;
         }
@@ -788,7 +788,7 @@ static s8 b_bq_attack(b_bq_class* i_this) {
         set_dokuhaki = true;
 
         if (i_this->mTimers[0] == 0) {
-            anm_init(i_this, BCK_BQ_ATTACK_B, 2.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
+            anm_init(i_this, BCK_BQ_ATTACK_B, 2.0f, J3DFrameCtrl::EMode_NONE, 2.0f);
             i_this->mMode = 3;
         }
         break;
@@ -967,12 +967,12 @@ static void action(b_bq_class* i_this) {
             head_rot_target /= 6;
         } else {
             head_rot_target =
-                ((i_this->mAngleToPlayer + i_this->field_0x138c) - a_this->shape_angle.y) / 3;
+                ((i_this->mAngleToPlayer + i_this->field_0x138c) - a_this->shape_angle.y) / 1.5;
 
-            if (head_rot_target > 3500) {
-                head_rot_target = 3500;
-            } else if (head_rot_target < -3500) {
-                head_rot_target = -3500;
+            if (head_rot_target > 7000) {
+                head_rot_target = 7000;
+            } else if (head_rot_target < -7000) {
+                head_rot_target = -7000;
             }
         }
     }
