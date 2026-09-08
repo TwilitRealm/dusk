@@ -179,12 +179,18 @@ ModuleOpenFn module_factory(std::string_view name) {
 }
 
 int module_require(lua_State* state);
+int print(lua_State* state);
 
 void install_module_require(lua_State* state, Vm& vm, std::string_view currentPath) {
     lua_pushlightuserdata(state, &vm);
     lua_pushlstring(state, currentPath.data(), currentPath.size());
     lua_pushcclosure(state, module_require, "require", 2);
     lua_setglobal(state, "require");
+}
+
+void install_globals(Vm& vm) {
+    push_vm_closure(vm.state, vm, print, "print");
+    lua_setglobal(vm.state, "print");
 }
 
 bool load_source_module(
@@ -299,6 +305,29 @@ int module_require(lua_State* state) {
     return 1;
 }
 
+int print(lua_State* state) {
+    Vm& vm = vm_from_upvalue(state);
+    if (svc_log == nullptr) {
+        service_unavailable(state, "LogService");
+    }
+
+    std::string value;
+    int const numArgs = lua_gettop(state);
+    for (int i = 0; i < numArgs; i += 1) {
+        if (i != 0) {
+            value.push_back('\t');
+        }
+
+        size_t length;
+        char const* str = luaL_tolstring(state, i + 1, &length);
+        value.append(str, length);
+        lua_pop(state, 1);
+    }
+
+    svc_log->info(vm.subject, value.data());
+    return 0;
+}
+
 ModResult runtime_activate(ModContext*, ModContext* subject, ModError* outError) {
     if (subject == nullptr) {
         return set_error(outError, MOD_INVALID_ARGUMENT, "Delegated mod context is null");
@@ -325,6 +354,7 @@ ModResult runtime_activate(ModContext*, ModContext* subject, ModError* outError)
     };
 #endif
     luaL_openlibs(vm->state);
+    install_globals(*vm);
     luaL_sandbox(vm->state);
 
     std::string error;
