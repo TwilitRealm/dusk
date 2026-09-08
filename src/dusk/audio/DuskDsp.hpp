@@ -1,12 +1,13 @@
 #pragma once
+// ReSharper disable once CppUnusedIncludeDirective
+#include "global.h"
 
 #include "JSystem/JAudio2/JASDSPInterface.h"
 
+#include <SDL3/SDL_audio.h>
+
 #include <array>
 #include <cassert>
-
-// ReSharper disable once CppUnusedIncludeDirective
-#include "global.h"
 
 namespace dusk::audio {
     constexpr int SampleRate = 32000;
