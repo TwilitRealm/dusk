@@ -10,7 +10,7 @@
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include <cstring>
 
-const daNpcAshB_HIOParam daNpcAshB_Param_c::m = {
+DUSK_GAME_DATA const daNpcAshB_HIOParam daNpcAshB_Param_c::m = {
     205.0f,   // attention_offset
     -3.0f,    // gravity
     1.0f,     // scale
@@ -49,20 +49,20 @@ const daNpcAshB_HIOParam daNpcAshB_Param_c::m = {
 
 static NPC_ASHB_HIO_CLASS l_HIO;
 
-static daNpc_GetParam2 l_bckGetParamList[21] = {
+static DUSK_CONSTEXPR daNpc_GetParam2 l_bckGetParamList[21] = {
     {-1, 2, 0}, {13, 0, 0}, {14, 0, 0}, {11, 0, 0}, {10, 0, 0}, {9, 0, 0},  {12, 0, 0},
     {24, 2, 0}, {25, 2, 0}, {24, 2, 0}, {21, 0, 0}, {22, 0, 0}, {20, 0, 0}, {23, 0, 0},
     {7, 0, 0},  {8, 0, 0},  {18, 0, 0}, {15, 0, 0}, {16, 0, 0}, {17, 2, 0}, {19, 0, 0},
 };
 
-static daNpc_GetParam2 l_btpGetParamList[4] = {
+static DUSK_CONSTEXPR daNpc_GetParam2 l_btpGetParamList[4] = {
     {38, 2, 0},
     {41, 0, 0},
     {40, 0, 0},
     {39, 0, 0},
 };
 
-static daNpc_GetParam2 l_btkGetParamList[4] = {
+static DUSK_CONSTEXPR daNpc_GetParam2 l_btkGetParamList[4] = {
     {32, 2, 0},
     {34, 0, 0},
     {33, 0, 0},
@@ -70,16 +70,16 @@ static daNpc_GetParam2 l_btkGetParamList[4] = {
 
 };
 
-static char* l_arcNames[1] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcNames[1] = {
     "AshB",
 };
 
-static char* l_evtNames[2] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_evtNames[2] = {
     NULL,
     "ASHB_APPEAR",
 };
 
-static char* l_myName = "AshB";
+static DUSK_CONSTEXPR char DUSK_CONST* l_myName = "AshB";
 
 #if DEBUG
 daNpcAshB_HIO_c::daNpcAshB_HIO_c() {
@@ -93,7 +93,7 @@ void daNpcAshB_HIO_c::genMessage(JORMContext* ctext) {
 }
 #endif
 
-daNpcAshB_c::EventFn daNpcAshB_c::mEvtSeqList[2] = {
+DUSK_GAME_DATA daNpcAshB_c::EventFn DUSK_CONST daNpcAshB_c::mEvtSeqList[2] = {
     NULL,
     &daNpcAshB_c::EvCut_Appear,
 };
@@ -1001,8 +1001,9 @@ BOOL daNpcAshB_c::EvCut_Appear(int i_staffID) {
         case '0008':
             local_30[0] = 0;
             if (mFlow.getEventId(local_30) == 1) {
-                mItemPartnerId =
-                    fopAcM_createItemForPresentDemo(&current.pos, local_30[0], 0, -1, -1, 0, 0);
+                DUSK_ITEM_CHECK("ashei_sketch", local_30[0], this);
+                mItemPartnerId = fopAcM_createItemForPresentDemo(
+                    &current.pos, local_30[0], 0, -1, -1, 0, 0 DUSK_GIVE_TAG("ashei_sketch"));
                 dComIfGp_event_setItemPartnerId(mItemPartnerId);
                 mItemPartnerId = -1;
             }
@@ -1187,13 +1188,13 @@ BOOL daNpcAshB_c::drawDbgInfo() {
     return false;
 }
 
-static actor_method_class daNpcAshB_MethodTable = {
+static DUSK_CONST actor_method_class daNpcAshB_MethodTable = {
     (process_method_func)daNpcAshB_Create,  (process_method_func)daNpcAshB_Delete,
     (process_method_func)daNpcAshB_Execute, (process_method_func)daNpcAshB_IsDelete,
     (process_method_func)daNpcAshB_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_ASHB = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_ASHB = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

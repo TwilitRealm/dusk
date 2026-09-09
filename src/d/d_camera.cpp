@@ -29,10 +29,16 @@
 #endif
 
 #if TARGET_PC
+#include "dusk/action_bindings.h"
+#include "dusk/camera_operators.hpp"
+#include "dusk/commands.hpp"
 #include "dusk/frame_interpolation.h"
 #include "dusk/logging.h"
-#include "dusk/action_bindings.h"
-#include "imgui.h"
+#include "dusk/mouse.h"
+#include "dusk/settings.h"
+#include "dusk/touch_camera.h"
+
+#include <imgui.h>
 #endif
 
 namespace {
@@ -193,7 +199,7 @@ int dCamMapToolData::Set(s32 param_0, s32 roomNo, fopAc_ac_c* param_2, u16 param
     return 0;
 }
 
-engine_fn dCamera_c::engine_tbl[] = {
+DUSK_GAME_DATA engine_fn dCamera_c::engine_tbl[] = {
     &dCamera_c::letCamera,        &dCamera_c::chaseCamera,    &dCamera_c::lockonCamera,
     &dCamera_c::talktoCamera,     &dCamera_c::subjectCamera,  &dCamera_c::fixedPositionCamera,
     &dCamera_c::fixedFrameCamera, &dCamera_c::towerCamera,    &dCamera_c::rideCamera,
@@ -1050,7 +1056,12 @@ void dCamera_c::debugDrawInit() {
 bool dCamera_c::Run() {
 #if TARGET_PC
     ResetView();
-    if (executeDebugFlyCam()) {
+    if (dusk::isCameraDetached()) {
+        mFrameCounter++;
+        mTicks++;
+        return true;
+    }
+    if (executeDebugFlyCam() || dusk::mods::camera_run_operators(this)) {
         mFrameCounter++;
         mTicks++;
         return true;
@@ -7497,6 +7508,15 @@ static constexpr s16 FLYCAM_ROLL_SPEED = 256;
 static ImVec2 sFlyCamLastMousePos = {-1.f, -1.f};
 
 #if TARGET_PC
+static constexpr f32 TOUCH_CAMERA_CSTICK_EXIT_THRESHOLD = 0.05f;
+static bool sTouchFreeCameraActive = false;
+
+bool dCamera_c::isAimActive() {
+    auto* link = daAlink_getAlinkActorClass();
+    return link != nullptr && link->checkAimInputContext() &&
+           dComIfGp_checkCameraAttentionStatus(link->field_0x317c, 0x10);
+}
+
 bool dCamera_c::executeDebugFlyCam() {
     if (!dusk::getSettings().game.debugFlyCam) {
         if (mDebugFlyCam.initialized) {
@@ -7582,12 +7602,16 @@ bool dCamera_c::executeDebugFlyCam() {
             if (ImGui::IsKeyDown(ImGuiKey_Q)) rollInput -= 1.0f;
             if (ImGui::IsKeyDown(ImGuiKey_E)) rollInput += 1.0f;
         }
-        bool mouseValid = !io.WantCaptureMouse && io.MousePos.x >= 0.0f && io.MousePos.y >= 0.0f;
+        bool mouseValid = !io.WantCaptureMouse && io.MousePos.x >= 0.0f && io.MousePos.y >= 0.0f && ImGui::IsMouseDown(ImGuiMouseButton_Right);
         if (mouseValid && sFlyCamLastMousePos.x >= 0.0f) {
             cStickX -= (io.MousePos.x - sFlyCamLastMousePos.x) * 2.0f;
             cStickY -= (io.MousePos.y - sFlyCamLastMousePos.y) * 2.0f;
         }
         sFlyCamLastMousePos = mouseValid ? io.MousePos : ImVec2{-1.0f, -1.0f};
+    }
+
+    if (dusk::getSettings().game.enableMirrorMode) {
+        stickX *= -1.0f;
     }
 
     f32 verticalDisp = 0.0f;
@@ -7639,11 +7663,29 @@ void dCamera_c::deactivateDebugFlyCam() {
 }
 
 bool dCamera_c::freeCamera() {
-    if (dusk::getSettings().game.freeCamera && mGear == 1) {
+    f32 touchYawDp = 0.0f;
+    f32 touchPitchDp = 0.0f;
+    bool touchCameraMoved = false;
+    const bool touchControlsEnabled = dusk::getSettings().game.enableTouchControls;
+    if (touchControlsEnabled && !isAimActive()) {
+        touchCameraMoved = dusk::touch_camera::consume_delta(touchYawDp, touchPitchDp);
+    }
+    if (!touchControlsEnabled ||
+        mPadInfo.mCStick.mLastValue > TOUCH_CAMERA_CSTICK_EXIT_THRESHOLD)
+    {
+        sTouchFreeCameraActive = false;
+    }
+    if (touchCameraMoved) {
+        sTouchFreeCameraActive = true;
+    }
+
+    const bool useFreeCamera = dusk::getSettings().game.freeCamera ||
+                               dusk::getSettings().game.enableMouseCamera || sTouchFreeCameraActive;
+    if (useFreeCamera && mGear == 1) {
         mGear = 0;
     }
 
-    if (!dusk::getSettings().game.freeCamera || mCamStyle == 70)
+    if (!useFreeCamera || mCamStyle == 70)
     {
         mCamParam.mManualMode = 0;
         return false;
@@ -7652,6 +7694,17 @@ bool dCamera_c::freeCamera() {
     if (!mCamParam.mManualMode) {
         mCamParam.freeXAngle = mViewCache.mDirection.mAzimuth.Degree();
         mCamParam.freeYAngle = mViewCache.mDirection.mInclination.Degree();
+    }
+
+    if (touchCameraMoved) {
+        mCamParam.mManualMode = 1;
+        const f32 yawInput = dusk::getSettings().game.invertCameraXAxis ? -touchYawDp : touchYawDp;
+        const f32 pitchInput =
+            touchPitchDp * (dusk::getSettings().game.invertCameraYAxis ? -1.0f : 1.0f);
+        mCamParam.freeXAngle += yawInput * dusk::getSettings().game.touchCameraXSensitivity *
+                                dusk::touch_camera::YAW_DEGREES_PER_DP;
+        mCamParam.freeYAngle += pitchInput * dusk::getSettings().game.touchCameraYSensitivity *
+                                dusk::touch_camera::PITCH_DEGREES_PER_DP;
     }
 
     cXyz camMovement = {mPadInfo.mCStick.mLastPosX, mPadInfo.mCStick.mLastPosY, 0.0f};
@@ -7665,8 +7718,19 @@ bool dCamera_c::freeCamera() {
         mCamParam.mManualMode = 1;
         camMovement = camMovement.normalize();
         camMovement.y *= dusk::getSettings().game.invertCameraYAxis ? 1.0f : -1.0f;
-        mCamParam.freeXAngle += camMovement.x * magnitude * dusk::getSettings().game.freeCameraSensitivity * 5.0f;
-        mCamParam.freeYAngle += camMovement.y * magnitude * dusk::getSettings().game.freeCameraSensitivity * 5.0f;
+        mCamParam.freeXAngle += camMovement.x * magnitude * dusk::getSettings().game.freeCameraXSensitivity * 5.0f;
+        mCamParam.freeYAngle += camMovement.y * magnitude * dusk::getSettings().game.freeCameraYSensitivity * 5.0f;
+    }
+
+    f32 yaw_rad = 0.0f;
+    f32 pitch_rad = 0.0f;
+    dusk::mouse::get_camera_deltas(yaw_rad, pitch_rad);
+    if (dusk::getSettings().game.enableMouseCamera && (yaw_rad != 0.0f || pitch_rad != 0.0f) &&
+        !dComIfGp_checkCameraAttentionStatus(dComIfGp_getPlayerCameraID(0), 0x8))
+    {
+        mCamParam.mManualMode = 1;
+        mCamParam.freeXAngle += MTXRadToDeg(yaw_rad);
+        mCamParam.freeYAngle += -MTXRadToDeg(pitch_rad);
     }
 
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
@@ -9350,6 +9414,10 @@ bool dCamera_c::rideCamera(s32 param_0) {
             mStyleSettle.mFinished = true;
         }
 
+#if TARGET_PC
+        freeCamera();
+#endif
+
         return true;
     }
 
@@ -9478,6 +9546,10 @@ bool dCamera_c::rideCamera(s32 param_0) {
         mViewCache.mBank += (cSAngle::_0 - mViewCache.mBank) * 0.05f;
         setFlag(0x400);
     }
+
+#if TARGET_PC
+    freeCamera();
+#endif
 
     return true;
 }
@@ -10233,7 +10305,7 @@ bool dCamera_c::eventCamera(s32 param_0) {
     int var_r29 = -1;
 
     typedef bool (dCamera_c::*func)();
-    func l_func[] = {
+    DUSK_CONSTEXPR func l_func[] = {
         &dCamera_c::pauseEvCamera,
         &dCamera_c::pauseEvCamera,
         &dCamera_c::talktoEvCamera,
@@ -10270,7 +10342,7 @@ bool dCamera_c::eventCamera(s32 param_0) {
         &dCamera_c::maptoolIdEvCamera,
     };
 
-    static char* ActionNames[34] = {
+    static DUSK_CONSTEXPR char DUSK_CONST* ActionNames[34] = {
         "PAUSE",
         "WAIT",
         "TALK",
@@ -10431,7 +10503,7 @@ bool dCamera_c::eventCamera(s32 param_0) {
 #endif
 
 #if TARGET_PC
-        if (dusk::getSettings().game.enableFrameInterpolation) {
+        if (dusk::frame_interp::is_enabled()) {
             switch (var_r29) {
                 case 3:
                 case 4:
@@ -11058,6 +11130,9 @@ camera_class* dCam_getCamera() {
 
 dCamera_c* dCam_getBody() {
     camera_process_class* camera = (camera_process_class*)dCam_getCamera();
+#if TARGET_PC
+    if (camera == nullptr) { return nullptr; }
+#endif
     return &camera->mCamera;
 }
 
@@ -11322,7 +11397,7 @@ static int camera_execute(camera_process_class* i_this) {
 #ifdef TARGET_PC
     widezoom_correction(i_this, i_this->mCamera.TrimHeight());
 
-    if (dusk::getSettings().game.enableFrameInterpolation) {
+    if (dusk::frame_interp::is_enabled()) {
         dusk::frame_interp::add_interpolation_callback([](bool _, void* pUserWork) {
             const auto i_this = static_cast<camera_process_class*>(pUserWork);
             const auto camera = &i_this->mCamera;
@@ -11334,7 +11409,7 @@ static int camera_execute(camera_process_class* i_this) {
                 const auto target = get_target_trim_height(i_this);
                 const auto step = dusk::frame_interp::get_interpolation_step();
                 const auto cur = camera->TrimHeight();
-                const auto prev = (4.0f * cur - target) / 3.0f; 
+                const auto prev = (4.0f * cur - target) / 3.0f;
                 const auto trim_height = prev + (cur - prev) * step;
 
                 widezoom_correction(i_this, trim_height);
@@ -11627,7 +11702,7 @@ static leafdraw_method_class method = {
     (process_method_func)camera_draw,
 };
 
-camera_process_profile_definition g_profile_CAMERA = {
+DUSK_PROFILE camera_process_profile_definition DUSK_CONST g_profile_CAMERA = {
     /* Layer ID           */ fpcLy_CURRENT_e,
     /* List ID            */ 11,
     /* List Prio          */ fpcPi_CURRENT_e,
@@ -11648,7 +11723,7 @@ camera_process_profile_definition g_profile_CAMERA = {
                              0,
 };
 
-camera_process_profile_definition g_profile_CAMERA2 = {
+DUSK_PROFILE camera_process_profile_definition DUSK_CONST g_profile_CAMERA2 = {
     /* Layer ID           */ fpcLy_CURRENT_e,
     /* List ID            */ 11,
     /* List Prio          */ fpcPi_CURRENT_e,

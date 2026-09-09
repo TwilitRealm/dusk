@@ -13,24 +13,21 @@
 #include <gf/GFGeometry.h>
 #include <gf/GFLight.h>
 #include "m_Do/m_Do_lib.h"
+
 #if TARGET_PC
 #include "dusk/frame_interpolation.h"
-#endif
-
-#ifndef __MWERKS__
-#include "dusk/math.h"
 #endif
 
 static BOOL daMirror_c_createHeap(fopAc_ac_c* i_this) {
     return ((daMirror_c*)i_this)->createHeap();
 }
 
-static char* l_arcName = "Mirror";
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcName = "Mirror";
 
-static char* l_arcName2 = "MR-Table";
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcName2 = "MR-Table";
 
 dMirror_packet_c::dMirror_packet_c() {
-#ifdef TARGET_PC
+#if TARGET_PC
     GXInitTexObj(&mTexObj, nullptr, 0, 0, static_cast<GXTexFmt>(-1), GX_MAX_TEXWRAPMODE,
                  GX_MAX_TEXWRAPMODE, GX_FALSE);
 #endif
@@ -105,6 +102,7 @@ int dMirror_packet_c::entryModel(J3DModel* i_model) {
 
 void dMirror_packet_c::mirrorZdraw(f32* param_0, f32* param_1, f32 param_2, f32 param_3,
                                    f32 param_4, f32 param_5, f32 param_6, f32 param_7) {
+    ZoneScoped;
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTexGens(0);
@@ -265,6 +263,7 @@ void dMirror_packet_c::modelDraw(J3DModel* i_model, Mtx param_1) {
 }
 
 void dMirror_packet_c::mainDraw() {
+    ZoneScoped;
     j3dSys.reinitGX();
 
     cXyz sp19C[5];
@@ -646,13 +645,13 @@ int daMirror_c::entryModel(J3DModel* i_model) {
     return mPacket.entryModel(i_model);
 }
 
-static actor_method_class daMirror_METHODS = {
+static DUSK_CONST actor_method_class daMirror_METHODS = {
     (process_method_func)daMirror_create,  (process_method_func)daMirror_Delete,
     (process_method_func)daMirror_execute, (process_method_func)NULL,
     (process_method_func)daMirror_draw,
 };
 
-actor_process_profile_definition g_profile_MIRROR = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_MIRROR = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

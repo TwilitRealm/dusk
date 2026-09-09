@@ -42,7 +42,10 @@
 #if TARGET_PC
 #include "dusk/autosave.h"
 #include "dusk/memory.h"
+#include "dusk/mods/item.hpp"
+#include "dusk/trigger_viewer.h"
 #include "dusk/ui/ui.hpp"
+#include "mods/items.h"
 #endif
 
 #if DEBUG
@@ -93,9 +96,9 @@ static OSTime resPreLoadTime1;
 
 static dScnPly_preLoad_HIO_c g_preLoadHIO;
 
-s8 dScnPly_c::pauseTimer;
+DUSK_GAME_DATA s8 dScnPly_c::pauseTimer;
 
-s8 dScnPly_c::nextPauseTimer;
+DUSK_GAME_DATA s8 dScnPly_c::nextPauseTimer;
 
 #if DEBUG
 u8 dScnPly_c::debugPause;
@@ -163,22 +166,22 @@ void dScnPly_reg_childHIO_c::genMessage(JORMContext* mctx) {
     char textbuf[8];
 
     for (int i = 0; i < 20; i++) {
-        sprintf(textbuf, " F(%02d)", i);
+        SAFE_SPRINTF(textbuf, " F(%02d)", i);
         mctx->genSlider(textbuf, &mFloatReg[i], -100000.0f, 100000.0f);
     }
 
     for (int i = 20; i < 25; i++) {
-        sprintf(textbuf, " F(%02d)", i);
+        SAFE_SPRINTF(textbuf, " F(%02d)", i);
         mctx->genSlider(textbuf, &mFloatReg[i], 0.0f, 1.0f);
     }
 
     for (int i = 25; i < 30; i++) {
-        sprintf(textbuf, " F(%02d)", i);
+        SAFE_SPRINTF(textbuf, " F(%02d)", i);
         mctx->genSlider(textbuf, &mFloatReg[i], -1.0f, 1.0f);
     }
 
     for (int i = 0; i < 10; i++) {
-        sprintf(textbuf, " S(%02d)", i);
+        SAFE_SPRINTF(textbuf, " S(%02d)", i);
         mctx->genSlider(textbuf, &mShortReg[i], -0x8000, 0x7FFF);
     }
 }
@@ -674,6 +677,10 @@ static int dScnPly_Draw(dScnPly_c* i_this) {
 
         dComIfG_Ccsp()->Draw();
         dComIfG_Bgsp().Draw();
+
+        #if TARGET_PC
+        dusk::TriggerView::execute();
+        #endif
 
         #if DEBUG
         dPath_Draw();
@@ -1192,11 +1199,35 @@ static int phase_1(dScnPly_c* i_this) {
     }
 
     // Stage: Ordon Spring, Room: Ordon Spring
+#if TARGET_PC
+    const bool iliaMemoryArrival =
+        !strcmp(dComIfGp_getStartStageName(), "F_SP104") && dComIfGp_getStartStageRoomNo() == 1 &&
+        dComIfGp_getStartStagePoint() == 23 && dComIfGp_getStartStageLayer() == 12;
+    const u32 iliaMemoryTag = dusk::mods::item_give_tag(ITEM_CHECK_ILIA_MEMORY);
+    if (!iliaMemoryArrival) {
+        dusk::mods::item_check_cancel(iliaMemoryTag);
+    }
+    if (iliaMemoryArrival)
+#else
     if (!strcmp(dComIfGp_getStartStageName(), "F_SP104") && dComIfGp_getStartStageRoomNo() == 1 &&
         dComIfGp_getStartStagePoint() == 23 && dComIfGp_getStartStageLayer() == 12)
+#endif
     {
-        dComIfGs_onItemFirstBit(dItemNo_HORSE_FLUTE_e);
-        dComIfGs_setItem(SLOT_21, dItemNo_HORSE_FLUTE_e);
+#if TARGET_PC
+        const auto itemCheck =
+            dusk::mods::item_check_commit(iliaMemoryTag, dItemNo_HORSE_FLUTE_e, nullptr);
+        if (itemCheck.itemNo == dItemNo_HORSE_FLUTE_e) {
+#endif
+            dComIfGs_onItemFirstBit(dItemNo_HORSE_FLUTE_e);
+            dComIfGs_setItem(SLOT_21, dItemNo_HORSE_FLUTE_e);
+#if TARGET_PC
+            dusk::mods::item_check_complete(itemCheck, nullptr);
+        } else if (itemCheck.itemNo == dItemNo_NONE_e) {
+            dusk::mods::item_check_complete(itemCheck, nullptr);
+        } else {
+            dusk::mods::item_check_enqueue(itemCheck, dusk::mods::ItemGiveMode::Silent);
+        }
+#endif
     }
 
     if ((u8)dKy_darkworld_stage_check(dComIfGp_getStartStageName(),
@@ -1393,9 +1424,9 @@ static int phase_3(dScnPly_c* i_this) {
     return cPhs_NEXT_e;
 }
 
-dScnPly_reg_HIO_c g_regHIO;
+DUSK_GAME_DATA dScnPly_reg_HIO_c g_regHIO;
 
-dScnPly_env_HIO_c g_envHIO;
+DUSK_GAME_DATA dScnPly_env_HIO_c g_envHIO;
 
 #if DEBUG
 dScnPly_preset_HIO_c g_presetHIO;
@@ -1636,7 +1667,7 @@ static scene_method_class l_dScnPly_Method = {
     (process_method_func)dScnPly_Draw,
 };
 
-scene_process_profile_definition g_profile_PLAY_SCENE = {
+DUSK_PROFILE scene_process_profile_definition DUSK_CONST g_profile_PLAY_SCENE = {
     /* Layer ID     */ fpcLy_ROOT_e,
     /* List ID      */ 1,
     /* List Prio    */ fpcPi_CURRENT_e,
@@ -1649,7 +1680,7 @@ scene_process_profile_definition g_profile_PLAY_SCENE = {
     /* Scene SubMtd */ &l_dScnPly_Method,
 };
 
-scene_process_profile_definition g_profile_OPENING_SCENE = {
+DUSK_PROFILE scene_process_profile_definition DUSK_CONST g_profile_OPENING_SCENE = {
     /* Layer ID     */ fpcLy_ROOT_e,
     /* List ID      */ 1,
     /* List Prio    */ fpcPi_CURRENT_e,

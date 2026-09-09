@@ -5,25 +5,25 @@
 
 #include "d/dolzel.h" // IWYU pragma: keep
 
+#include "d/d_s_name.h"
 #include "JSystem/JKernel/JKRExpHeap.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_meter2_info.h"
-#include "d/d_s_name.h"
-#include "dusk/imgui/ImGuiConsole.hpp"
-#include "dusk/livesplit.h"
-#include "dusk/memory.h"
-#include "dusk/speedrun.h"
-#include "dusk/settings.h"
-#include "f_op/f_op_overlap_mng.h"
 #include "f_op/f_op_scene_mng.h"
 #include "m_Do/m_Do_Reset.h"
 #include "m_Do/m_Do_graphic.h"
 #include "m_Do/m_Do_machine.h"
-#include "m_Do/m_Do_main.h"
 #include "m_Do/m_Do_mtx.h"
-#include <dusk/autosave.h>
+#include "m_Do/m_Do_main.h"
+#include "f_op/f_op_overlap_mng.h"
 
 #if TARGET_PC
+#include "dusk/autosave.h"
+#include "dusk/game_mode.hpp"
+#include "dusk/imgui/ImGuiConsole.hpp"
+#include "dusk/memory.h"
+#include "dusk/settings.h"
+
 #define SHOW_TV_SETTINGS_SCREEN (this->mShowTvSettingsScreen)
 #else
 #define SHOW_TV_SETTINGS_SCREEN (1)
@@ -46,7 +46,7 @@ void dSn_HIO_c::genMessage(JORMContext* mctx) {
 }
 #endif
 
-static s32 phase_1(char* i_resName) {
+static s32 phase_1(DUSK_CONST char* i_resName) {
     mDoAud_bgmStart(-1);
     if (dComIfG_setObjectRes(i_resName, (u8)0, NULL) == 0) {
         return cPhs_ERROR_e;
@@ -55,7 +55,7 @@ static s32 phase_1(char* i_resName) {
     return cPhs_NEXT_e;
 }
 
-static s32 phase_2(char* i_resName) {
+static s32 phase_2(DUSK_CONST char* i_resName) {
     int rt = dComIfG_syncObjectRes(i_resName);
     if (rt < 0) {
         return cPhs_ERROR_e;
@@ -68,13 +68,13 @@ static s32 phase_2(char* i_resName) {
     }
 }
 
-static s32 resLoad(request_of_phase_process_class* i_phase, char* i_resName) {
+static s32 resLoad(request_of_phase_process_class* i_phase, char DUSK_CONST* i_resName) {
     static request_of_phase_process_fn l_method[2] = {
         (request_of_phase_process_fn)phase_1, 
         (request_of_phase_process_fn)phase_2
     };
 
-    return dComLbG_PhaseHandler(i_phase, l_method, i_resName);
+    return dComLbG_PhaseHandler(i_phase, l_method, IF_DUSK((void*)) i_resName);
 }
 
 s32 dScnName_c::create() {
@@ -418,15 +418,6 @@ void dScnName_c::changeGameScene() {
         dComIfGs_setRestartRoomParam(0);
 
 #if TARGET_PC
-        if (dusk::getSettings().game.speedrunMode && dusk::getSettings().game.hideTvSettingsScreen) {
-            // start a new run on file load if a run isn't already in progress
-            if (!dusk::m_speedrunInfo.m_isRunStarted) {
-                dusk::resetForSpeedrunMode();
-                dusk::m_speedrunInfo.startRun();
-                dusk::speedrun::start();
-            }
-        }
-
         toggleAutoSave(true);
 #endif
     }
@@ -472,7 +463,7 @@ static scene_method_class l_dScnName_Method = {
     (process_method_func)dScnName_Draw,
 };
 
-scene_process_profile_definition g_profile_NAME_SCENE = {
+DUSK_PROFILE scene_process_profile_definition DUSK_CONST g_profile_NAME_SCENE = {
     /* Layer ID     */ fpcLy_ROOT_e,
     /* List ID      */ 1,
     /* List Prio    */ fpcPi_CURRENT_e,
@@ -486,7 +477,7 @@ scene_process_profile_definition g_profile_NAME_SCENE = {
                        0,
 };
 
-scene_process_profile_definition g_profile_NAMEEX_SCENE = {
+DUSK_PROFILE scene_process_profile_definition DUSK_CONST g_profile_NAMEEX_SCENE = {
     /* Layer ID     */ fpcLy_ROOT_e,
     /* List ID      */ 1,
     /* List Prio    */ fpcPi_CURRENT_e,

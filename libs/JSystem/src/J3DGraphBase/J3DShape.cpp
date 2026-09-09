@@ -1,15 +1,17 @@
 #include "JSystem/JSystem.h" // IWYU pragma: keep
 
 #include "JSystem/J3DGraphBase/J3DShape.h"
-
-#include <dolphin/gd.h>
-#include <gd.h>
-#include <gx.h>
-#include "JSystem/J3DGraphBase/J3DFifo.h"
 #include "JSystem/J3DGraphBase/J3DPacket.h"
 #include "JSystem/J3DGraphBase/J3DVertex.h"
+#include "JSystem/J3DGraphBase/J3DFifo.h"
+#include <gd.h>
+
+#if TARGET_PC
 #include "JSystem/JKernel/JKRHeap.h"
-#include "tracy/Tracy.hpp"
+
+#include <dolphin/gx.h>
+#include <tracy/Tracy.hpp>
+#endif
 
 void J3DGDSetVtxAttrFmtv(GXVtxFmt, GXVtxAttrFmtList const*, bool);
 void J3DFifoLoadPosMtxImm(Mtx, u32);
@@ -136,8 +138,8 @@ void J3DLoadCPCmd(u8 addr, u32 val) {
 #if TARGET_PC
 static void J3DLoadArrayBasePtr(GXAttr attr, void* data, u32 size, bool le) {
     u32 idx = (attr == GX_VA_NBT) ? 1 : (attr - GX_VA_POS);
-    GXCmd1u8(GX_LOAD_AURORA);
-    GXCmd1u16(GX_LOAD_AURORA_ARRAYBASE | idx);
+    GXCmd1u8(GX_AURORA);
+    GXCmd1u16(GX_AURORA_LOAD_ARRAYBASE | idx);
     GXCmd1u64((u64)data);
     GXCmd1u32(size);
     GXCmd1u8(le ? 1 : 0);
@@ -289,7 +291,7 @@ void J3DShape::makeVcdVatCmd() {
     OSRestoreInterrupts(sInterruptFlag);
 }
 
-void* J3DShape::sOldVcdVatCmd;
+DUSK_GAME_DATA void* J3DShape::sOldVcdVatCmd;
 
 void J3DShape::loadCurrentMtx() const {
     mCurrentMtx.load();
@@ -304,7 +306,7 @@ void J3DShape::loadPreDrawSetting() const {
     mCurrentMtx.load();
 }
 
-bool J3DShape::sEnvelopeFlag;
+DUSK_GAME_DATA bool J3DShape::sEnvelopeFlag;
 
 void J3DShape::setArrayAndBindPipeline() const {
     J3DShapeMtx::setCurrentPipeline((mFlags & 0x1C) >> 2);

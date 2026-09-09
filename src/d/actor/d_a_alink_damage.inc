@@ -157,10 +157,11 @@ f32 daAlink_c::damageMagnification(BOOL i_checkZoraMag, int param_1) {
     }
 
     #if TARGET_PC
-    base_mag *= dusk::getSettings().game.damageMultiplier;
     if (dusk::getSettings().game.instantDeath) {
-        base_mag = 9999.0f;
+        return 9999.0f; // don't need to multiply this further, 9999 is plenty
     }
+
+    base_mag *= dusk::getSettings().game.damageMultiplier;
     #endif
 
     if (checkWolf() && !checkCargoCarry() && param_1 == 0) {
@@ -192,7 +193,7 @@ int daAlink_c::setDamagePoint(int i_dmgAmount, BOOL i_checkZoraMag, BOOL i_setDm
 
     if (checkMagicArmorNoDamage()) {
 #if TARGET_PC
-        if(dusk::getSettings().game.freeMagicArmor) {
+        if(dusk::getSettings().game.armorRupeeDrain.getValue() == dusk::MagicArmorMode::INVINCIBLE) {
             i_dmgAmount = 0;
         }
 #endif
@@ -202,6 +203,11 @@ int daAlink_c::setDamagePoint(int i_dmgAmount, BOOL i_checkZoraMag, BOOL i_setDm
     if (!mpHIO->mDamage.m.mInvincible && g_debugHpMode == 0)
     #endif
     {
+#if TARGET_PC
+        if(checkMagicArmorWearAbility() && dusk::getSettings().game.armorRupeeDrain.getValue() == dusk::MagicArmorMode::DOUBLE_DEFENSE) {
+            i_dmgAmount /= 2;
+        }
+#endif
         dComIfGp_setItemLifeCount(-i_dmgAmount, 0);
     }
 
@@ -281,7 +287,26 @@ BOOL daAlink_c::checkIcePolygonDamage(cBgS_PolyInfo* i_poly) {
 }
 
 BOOL daAlink_c::checkMagicArmorNoDamage() {
+#ifdef TARGET_PC
+    if (!checkMagicArmorWearAbility()) {
+        return false;
+    }
+
+    switch(dusk::getSettings().game.armorRupeeDrain) {
+        case dusk::MagicArmorMode::NORMAL:
+            return !checkMagicArmorHeavy();
+        case dusk::MagicArmorMode::ON_DAMAGE:
+            return dComIfGs_getRupee() != 0;
+        case dusk::MagicArmorMode::DOUBLE_DEFENSE:
+            return false;
+        case dusk::MagicArmorMode::INVINCIBLE:
+            return true;
+        case dusk::MagicArmorMode::COSMETIC:
+            return false;
+    }
+#else
     return checkMagicArmorWearAbility() && !checkMagicArmorHeavy();
+#endif
 }
 
 int daAlink_c::checkPolyDamage() {

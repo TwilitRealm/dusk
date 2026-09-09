@@ -22,7 +22,7 @@ public:
         /* 0x8 */ u32 mParam3;
     };
 
-    static param const mParam;
+    static DUSK_GAME_DATA param const mParam;
 };
 
 
@@ -34,12 +34,12 @@ public:
     int destroy();
     int execute();
     int draw();
-    char* getResName();
+    char DUSK_CONST* getResName();
     void getParam();
     int getFlowNodeNum();
     int isDelete();
     int init();
-    J3DAnmTransform* getTrnsfrmAnmP(int, char**);
+    J3DAnmTransform* getTrnsfrmAnmP(int, char DUSK_CONST* DUSK_CONST*);
     int setBckAnm(J3DAnmTransform*, f32, int, int, int, bool);
     int setCollision();
     int checkEvent();
@@ -52,7 +52,7 @@ public:
     int wait(void*);
     int talk(void*);
 
-    static dCcD_SrcCyl const mCylDat;
+    static DUSK_GAME_DATA dCcD_SrcCyl const mCylDat;
 
     /* 0x56c */ u8 mParam;
     /* 0x570 */ mDoExt_bckAnm mBckAnm;

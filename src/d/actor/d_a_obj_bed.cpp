@@ -12,7 +12,7 @@
 #include "d/actor/d_a_npc.h"
 #include "f_pc/f_pc_name.h"
 
-static char* l_resName = "KH_Bed";
+static DUSK_CONSTEXPR char DUSK_CONST* l_resName = "KH_Bed";
 
 static OBJ_BED_HIO_CLASS l_HIO;
 
@@ -30,7 +30,7 @@ void daObj_Bed_HIO_c::genMessage(JORMContext* ctx) {
 }
 #endif
 
-daObj_Bed_HIOParam const daObj_Bed_Param_c::m = {0, -3.0f, 1.0f, 600.0f};
+DUSK_GAME_DATA daObj_Bed_HIOParam const daObj_Bed_Param_c::m = {0, -3.0f, 1.0f, 600.0f};
 
 daObj_Bed_c::~daObj_Bed_c() {
     if (mpCollider != NULL) {
@@ -149,7 +149,7 @@ u8 daObj_Bed_c::getType() {
     return 0;
 }
 
-char* daObj_Bed_c::getResName() {
+char DUSK_CONST* daObj_Bed_c::getResName() {
     return l_resName;
 }
 
@@ -199,7 +199,7 @@ static int daObj_Bed_IsDelete(void* param_0) {
     return 1;
 }
 
-static actor_method_class daObj_Bed_MethodTable = {
+static DUSK_CONST actor_method_class daObj_Bed_MethodTable = {
     (process_method_func)daObj_Bed_Create,
     (process_method_func)daObj_Bed_Delete,
     (process_method_func)daObj_Bed_Execute,
@@ -207,7 +207,7 @@ static actor_method_class daObj_Bed_MethodTable = {
     (process_method_func)daObj_Bed_Draw,
 };
 
-actor_process_profile_definition g_profile_OBJ_BED = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_OBJ_BED = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

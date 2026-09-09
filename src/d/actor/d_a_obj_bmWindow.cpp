@@ -45,7 +45,7 @@ int daBmWindow_c::CreateHeap() {
     return mModel != NULL ? 1 : 0;
 }
 
-dCcD_SrcGObjInf const daBmWindow_c::mCcDObjInfo = {
+DUSK_GAME_DATA dCcD_SrcGObjInf const daBmWindow_c::mCcDObjInfo = {
     {0, {{0, 0, 0}, {0xd8fafdbf, 0x11}, {0}}},
     {1, 0, 0, 0, 0},
     {0xa, 0, 0, 0, 0xa6},
@@ -122,7 +122,7 @@ int daBmWindow_c::Execute(Mtx** param_1) {
 
 static daBmWindow_HIO_c l_HIO;
 
-dCcD_SrcCyl daBmWindow_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daBmWindow_c::mCcDCyl = {
     daBmWindow_c::mCcDObjInfo,
     {
         {
@@ -326,13 +326,13 @@ static int daBmWindow_Create(fopAc_ac_c* i_this) {
     return static_cast<daBmWindow_c*>(i_this)->create();
 }
 
-static actor_method_class l_daBmWindow_Method = {
+static DUSK_CONST actor_method_class l_daBmWindow_Method = {
     (process_method_func)daBmWindow_Create,  (process_method_func)daBmWindow_Delete,
     (process_method_func)daBmWindow_Execute, (process_method_func)NULL,
     (process_method_func)daBmWindow_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_BmWindow = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_BmWindow = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

@@ -11,7 +11,7 @@ static int daObjNagaisu_c_createHeap(fopAc_ac_c* i_this) {
     return ((daObjNagaisu_c*)i_this)->createHeap();
 }
 
-static char* l_arcName = "Nagaisu";
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcName = "Nagaisu";
 
 daObjNagaisu_c::daObjNagaisu_c() {}
 
@@ -40,7 +40,7 @@ int daObjNagaisu_c::createHeap() {
     return 1;
 }
 
-const int daObjNagaisu_c::REMOVE_ISU_IDX[] = {
+DUSK_GAME_DATA const int daObjNagaisu_c::REMOVE_ISU_IDX[] = {
     6,
     7,
     11,
@@ -50,7 +50,7 @@ const int daObjNagaisu_c::REMOVE_ISU_IDX[] = {
     29,
 };
 
-const dCcD_SrcCyl daObjIsuChild_c::s_CcDCyl = {
+DUSK_GAME_DATA const dCcD_SrcCyl daObjIsuChild_c::s_CcDCyl = {
     {
         {0, {{0, 0, 0}, {0x400020, 0x11}, 0}},
         {dCcD_SE_NONE, 0, 0, 0, 0},
@@ -312,7 +312,7 @@ static int daObjNagaisu_draw(daObjNagaisu_c* i_this) {
     return i_this->draw();
 }
 
-static actor_method_class daObjNagaisu_METHODS = {
+static DUSK_CONST actor_method_class daObjNagaisu_METHODS = {
     (process_method_func)daObjNagaisu_create,
     (process_method_func)daObjNagaisu_Delete,
     (process_method_func)daObjNagaisu_execute,
@@ -320,7 +320,7 @@ static actor_method_class daObjNagaisu_METHODS = {
     (process_method_func)daObjNagaisu_draw,
 };
 
-actor_process_profile_definition g_profile_Obj_Nagaisu = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Nagaisu = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

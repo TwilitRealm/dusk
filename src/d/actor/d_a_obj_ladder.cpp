@@ -171,7 +171,7 @@ Hio_c L_hio;
 
 }
 
-char const Act_c::M_arcname[5] = "Mhsg";
+DUSK_GAME_DATA char const Act_c::M_arcname[5] = "Mhsg";
 
 int Act_c::CreateHeap() {
     J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes(M_arcname, attr_type(mType).field_0x0);
@@ -344,7 +344,7 @@ void Act_c::mode_fell_init() {
 void Act_c::mode_fell() {
 }
 
-Mtx Act_c::M_tmp_mtx;
+DUSK_GAME_DATA Mtx Act_c::M_tmp_mtx;
 
 void Act_c::set_mtx() {
     mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
@@ -408,7 +408,7 @@ namespace {
         return ((Act_c*)i_this)->MoveBGIsDelete();
     }
 
-    static actor_method_class Mthd_Table = {
+    static DUSK_CONST actor_method_class Mthd_Table = {
         (process_method_func)Mthd_Create, 
         (process_method_func)Mthd_Delete, 
         (process_method_func)Mthd_Execute, 
@@ -419,7 +419,7 @@ namespace {
 
 }
 
-actor_process_profile_definition g_profile_Obj_Ladder = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Ladder = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

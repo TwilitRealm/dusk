@@ -1,19 +1,14 @@
+#include "dusk/logging.h"
+#include "dusk/main.h"
+
 #include <dolphin/dolphin.h>
 #include <dolphin/gx.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
-#include <cstdlib>
-#include <cstdint>
+#include <tracy/Tracy.hpp>
+
+#include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <condition_variable>
 #include <unordered_map>
-#include <memory>
-#include <dusk/logging.h>
-#include <dusk/main.h>
-
-#include "tracy/Tracy.hpp"
 
 #ifndef _WIN32
 #include <sys/time.h>
@@ -177,14 +172,6 @@ int OSJamMessage(OSMessageQueue* mq, void* msg, s32 flags) {
 
     data.cvReceive.notify_one();
     return 1;
-}
-
-// ==========================================================================
-// Arena Functions
-// ==========================================================================
-
-void* OSInitAlloc(void* arenaStart, void* arenaEnd, int maxHeaps) {
-    return arenaStart;
 }
 
 // ==========================================================================
@@ -916,7 +903,7 @@ void AIInit(u8* stack) {
     // In a real scenario, it would set up the audio interface and prepare it for use.
 }
 
-void AIInitDMA(u32 start_addr, u32 length) {
+void AIInitDMA(uintptr_t start_addr, u32 length) {
     STUB_LOG();
 }
 

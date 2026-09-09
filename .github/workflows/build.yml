@@ -5,7 +5,16 @@ on:
     paths-ignore:
       - '*.md'
       - '*LICENSE'
+      - 'docs/**'
   pull_request:
+    paths-ignore:
+      - '*.md'
+      - '*LICENSE'
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   SCCACHE_GHA_ENABLED: "true"
@@ -22,13 +31,13 @@ jobs:
       matrix:
         include:
           - name: GCC x86_64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
             preset: gcc
             artifact_arch: x86_64
-          # - name: GCC aarch64
-          #   runner: ubuntu-24.04-arm
-          #   preset: gcc
-          #   artifact_arch: aarch64
+          - name: GCC aarch64
+            runner: ubuntu-24.04-arm
+            preset: gcc
+            artifact_arch: aarch64
           # - name: Clang x86_64
           #   runner: ubuntu-latest
           #   preset: clang
@@ -43,7 +52,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -y install ninja-build clang lld openssl libcurl4-openssl-dev \
+          sudo apt-get -y install ninja-build clang lld mold openssl libcurl4-openssl-dev \
             zlib1g-dev libglu1-mesa-dev libdbus-1-dev libvulkan-dev libxi-dev libxrandr-dev libasound2-dev \
             libpulse-dev libudev-dev libpng-dev libncurses5-dev libx11-xcb-dev libfreetype-dev \
             libxinerama-dev libxcursor-dev python3-markupsafe libgtk-3-dev libssl-dev \
@@ -67,10 +76,11 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: dusklight-${{env.DUSK_VERSION}}-linux-${{matrix.preset}}-${{matrix.artifact_arch}}
+          name: dusklight-${{env.APP_VERSION}}-linux-${{matrix.preset}}-${{matrix.artifact_arch}}
           path: |
             build/install/Dusklight-*.AppImage
             build/install/debug.tar.*
+            build/install/sdk/
 
   build-apple:
     name: Build Apple (${{matrix.name}})
@@ -135,10 +145,11 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: dusklight-${{env.DUSK_VERSION}}-${{matrix.artifact_name}}
+          name: dusklight-${{env.APP_VERSION}}-${{matrix.artifact_name}}
           path: |
             build/install/Dusklight.app
             build/install/debug.tar.*
+            build/install/sdk/
 
   build-android:
     name: Build Android (${{matrix.name}})
@@ -194,18 +205,24 @@ jobs:
       - name: Build native library
         run: cmake --build --preset ${{matrix.preset}} --target dusklight
 
-      - name: Stage stripped JNI library
-        run: ANDROID_STAGE_ABIS="${{matrix.abi}}" platforms/android/scripts/stage-jni-libs.sh
+      - name: Build bundled mods
+        run: cmake --build --preset ${{matrix.preset}} --target dusklight_mods
 
       - name: Build APK
         working-directory: platforms/android
         run: ./gradlew :app:assembleRelease --rerun-tasks
 
+      - name: Stage artifacts
+        run: |
+          mkdir -p upload/sdk
+          cp build/*/stub-android-*.so upload/sdk/
+          cp platforms/android/app/build/outputs/apk/release/app-${{matrix.abi}}-release-unsigned.apk upload/
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: dusklight-${{env.DUSK_VERSION}}-android-${{matrix.artifact_arch}}
-          path: platforms/android/app/build/outputs/apk/release/app-${{matrix.abi}}-release-unsigned.apk
+          name: dusklight-${{env.APP_VERSION}}-android-${{matrix.artifact_arch}}
+          path: upload/
 
   build-windows:
     name: Build Windows (${{matrix.name}})
@@ -221,12 +238,12 @@ jobs:
             msvc_arch: amd64
             vcpkg_arch: x64
             artifact_arch: x86_64
-          # - name: MSVC arm64
-          #   runner: windows-11-arm
-          #   preset: arm64-msvc
-          #   msvc_arch: arm64
-          #   vcpkg_arch: arm64
-          #   artifact_arch: arm64
+          - name: MSVC arm64
+            runner: windows-latest
+            preset: arm64-msvc
+            msvc_arch: amd64_arm64
+            vcpkg_arch: arm64
+            artifact_arch: arm64
           # - name: Clang x86_64
           #   runner: windows-latest
           #   preset: clang
@@ -255,7 +272,7 @@ jobs:
       - name: Install dependencies
         run: |
           choco install ninja
-          vcpkg install freetype:${{matrix.vcpkg_arch}}-windows-static zstd:${{matrix.vcpkg_arch}}-windows-static
+          vcpkg install freetype:${{matrix.vcpkg_arch}}-windows zstd:${{matrix.vcpkg_arch}}-windows
 
       - name: Configure CMake
         run: cmake --preset x-windows-ci-${{matrix.preset}}
@@ -266,9 +283,11 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: dusklight-${{env.DUSK_VERSION}}-win32-msvc-${{matrix.artifact_arch}}
+          name: dusklight-${{env.APP_VERSION}}-win32-msvc-${{matrix.artifact_arch}}
           path: |
             build/install/*.exe
             build/install/*.dll
             build/install/res/
+            build/install/mods/
             build/install/debug.7z
+            build/install/sdk/

@@ -1,14 +1,15 @@
 #include "dusk/frame_interpolation.h"
 
-#include <memory>
-#include "mtx.h"
 #include "f_op/f_op_camera_mng.h"
 #include "m_Do/m_Do_graphic.h"
+#include "mtx.h"
+
+#include <absl/container/flat_hash_map.h>
 
 namespace {
 
 struct Recording {
-    std::unordered_map<uintptr_t, Mtx> matrix_values;
+    absl::flat_hash_map<uintptr_t, Mtx> matrix_values;
 };
 
 bool s_initialized = false;
@@ -26,7 +27,7 @@ uint64_t g_sim_tick_seq = 0;
 Recording g_current_recording;
 Recording g_previous_recording;
 
-std::unordered_map<uintptr_t, Mtx> g_replacements;
+absl::flat_hash_map<uintptr_t, Mtx> g_replacements;
 
 struct CameraSnapshot {
     cXyz eye{};
@@ -142,10 +143,14 @@ uint64_t sim_tick_seq() {
     return g_sim_tick_seq;
 }
 
-void begin_frame(bool enabled, bool is_sim_frame, float step) {
-    g_enabled = enabled;
+void begin_frame(FrameInterpMode mode, bool is_sim_frame, float step) {
+    g_enabled = mode != FrameInterpMode::Off;
     g_is_sim_frame = is_sim_frame;
     g_step = std::clamp(step, 0.0f, 1.0f);
+    if (!g_enabled) {
+        g_interpolating = false;
+        clear_replacements();
+    }
 }
 
 bool is_enabled() {

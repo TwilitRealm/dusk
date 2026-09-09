@@ -21,7 +21,7 @@ public:
     int Execute();
     int Draw();
     static int createHeapCallBack(fopAc_ac_c*);
-    char* getResName();
+    char DUSK_CONST* getResName();
     u8 getTypeFromParam();
     u8 getSwitchFromParam();
     u8 getCapacityFromParam();
@@ -47,10 +47,9 @@ public:
     virtual ~daObj_SSDrink_c();
     virtual void setSoldOut();
 
-    static dCcD_SrcGObjInf const mCcDObjInfo;
-    static dCcD_SrcCyl mCcDCyl;
+    static DUSK_GAME_DATA dCcD_SrcGObjInf const mCcDObjInfo;
+    static DUSK_GAME_DATA dCcD_SrcCyl DUSK_CONST mCcDCyl;
 
-private:
     /* 0x578 */ mDoExt_btpAnm* mpBtpAnm;
     /* 0x57C */ mDoExt_brkAnm* mpBrkAnm;
     /* 0x580 */ u8 field_0x580;

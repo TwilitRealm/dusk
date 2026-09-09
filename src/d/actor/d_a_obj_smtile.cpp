@@ -13,7 +13,7 @@ static u32 l_bmdData[1][2] = {
     4, 1,
 };
 
-static char* l_resNameList[2] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_resNameList[2] = {
     "",
     "A_SMTile",
 };
@@ -29,7 +29,7 @@ static s8 l_tileMoveData[21][4] = {
 
 static OBJ_SMTILE_HIO_CLASS l_HIO;
 
-daObj_SMTile_HIOParam const daObj_SMTile_Param_c::m = {600.0f, 20.0f};
+DUSK_GAME_DATA daObj_SMTile_HIOParam const daObj_SMTile_Param_c::m = {600.0f, 20.0f};
 
 #if DEBUG
 daObj_SMTile_HIO_c::daObj_SMTile_HIO_c() {
@@ -340,7 +340,7 @@ static int daObj_SMTile_IsDelete(void* i_this) {
     return 1;
 }
 
-static actor_method_class daObj_SMTile_MethodTable = {
+static DUSK_CONST actor_method_class daObj_SMTile_MethodTable = {
     (process_method_func)daObj_SMTile_Create,
     (process_method_func)daObj_SMTile_Delete,
     (process_method_func)daObj_SMTile_Execute,
@@ -348,7 +348,7 @@ static actor_method_class daObj_SMTile_MethodTable = {
     (process_method_func)daObj_SMTile_Draw,
 };
 
-actor_process_profile_definition g_profile_OBJ_SMTILE = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_OBJ_SMTILE = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

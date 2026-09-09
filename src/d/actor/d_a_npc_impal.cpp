@@ -9,7 +9,7 @@
 #include "d/actor/d_a_npc.h"
 #include <cstring>
 
-daNpcImpal_HIOParam const daNpcImpal_Param_c::m = {
+DUSK_GAME_DATA daNpcImpal_HIOParam const daNpcImpal_Param_c::m = {
     135.0f,        // attention_offset
     -3.0f,         // gravity
     1.0f,          // scale
@@ -48,36 +48,36 @@ daNpcImpal_HIOParam const daNpcImpal_Param_c::m = {
 
 static NPC_IMPAL_HIO_CLASS l_HIO;
 
-static daNpc_GetParam2 l_bckGetParamList[18] = {
+static DUSK_CONSTEXPR daNpc_GetParam2 l_bckGetParamList[18] = {
     {-1, 2, 0}, {14, 0, 0}, {8, 0, 0},  {7, 2, 0},  {11, 0, 0}, {13, 0, 0},
     {12, 0, 0}, {15, 2, 0}, {17, 2, 0}, {16, 2, 0}, {22, 2, 0}, {19, 2, 0},
     {23, 2, 0}, {18, 0, 0}, {21, 0, 0}, {20, 0, 0}, {10, 0, 0}, {9, 2, 0},
 };
 
-static daNpc_GetParam2 l_btpGetParamList[10] = {
+static DUSK_CONSTEXPR daNpc_GetParam2 l_btpGetParamList[10] = {
     {35, 2, 0}, {41, 2, 0}, {37, 0, 0}, {36, 2, 0}, {38, 2, 0},
     {40, 2, 0}, {39, 0, 0}, {42, 2, 0}, {44, 2, 0}, {43, 2, 0},
 };
 
-static daNpc_GetParam2 l_btkGetParamList[4] = {
+static DUSK_CONSTEXPR daNpc_GetParam2 l_btkGetParamList[4] = {
     {29, 2, 0},
     {32, 2, 0},
     {31, 0, 0},
     {30, 2, 0},
 };
 
-static char* l_arcNames[1] = {"impal"};
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcNames[1] = {"impal"};
 
-static char* l_evtNames[4] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_evtNames[4] = {
     NULL,
     "IMPAL_APPEAR1",
     "IMPAL_APPEAR2",
     "IMPAL_COPYROD",
 };
 
-static Vec l_resetPos = {2536.763671875f, 99.99166107177734f, -1154.2318115234375f};
+static DUSK_CONSTEXPR Vec l_resetPos = {2536.763671875f, 99.99166107177734f, -1154.2318115234375f};
 
-static char* l_myName = "impal";
+static DUSK_CONSTEXPR char DUSK_CONST* l_myName = "impal";
 
 #if DEBUG
 daNpcImpal_HIO_c::daNpcImpal_HIO_c() {
@@ -91,7 +91,7 @@ void daNpcImpal_HIO_c::genMessage(JORMContext* ctext) {
 }
 #endif
 
-daNpcImpal_c::EventFn daNpcImpal_c::mEvtSeqList[4] = {
+DUSK_GAME_DATA daNpcImpal_c::EventFn daNpcImpal_c::mEvtSeqList[4] = {
     NULL,
     &daNpcImpal_c::EvCut_ImpalAppear1,
     &daNpcImpal_c::EvCut_ImpalAppear2,
@@ -328,13 +328,13 @@ int daNpcImpal_c::step(s16 i_angle, int i_animate) {
 }
 
 void daNpcImpal_c::playExpression() {
-    daNpcF_anmPlayData dat0 = {ANM_1, mpHIO->m.common.morf_frame, 1};
+    daNpcF_anmPlayData dat0 = {ANM_1, mpHIO->m.common.morf_frame, DUSK_IF_ELSE(0, 1)};
     daNpcF_anmPlayData* pDat0[1] = {&dat0};
-    daNpcF_anmPlayData dat1 = {ANM_5, mpHIO->m.common.morf_frame, 1};
+    daNpcF_anmPlayData dat1 = {ANM_5, mpHIO->m.common.morf_frame, DUSK_IF_ELSE(0, 1)};
     daNpcF_anmPlayData* pDat1[1] = {&dat1};
-    daNpcF_anmPlayData dat2 = {ANM_4, mpHIO->m.common.morf_frame, 1};
+    daNpcF_anmPlayData dat2 = {ANM_4, mpHIO->m.common.morf_frame, DUSK_IF_ELSE(0, 1)};
     daNpcF_anmPlayData* pDat2[1] = {&dat2};
-    daNpcF_anmPlayData dat3 = {ANM_6, mpHIO->m.common.morf_frame, 1};
+    daNpcF_anmPlayData dat3 = {ANM_6, mpHIO->m.common.morf_frame, DUSK_IF_ELSE(0, 1)};
     daNpcF_anmPlayData* pDat3[1] = {&dat3};
     daNpcF_anmPlayData dat4 = {ANM_8, mpHIO->m.common.morf_frame, 0};
     daNpcF_anmPlayData* pDat4[1] = {&dat4};
@@ -971,8 +971,9 @@ BOOL daNpcImpal_c::EvCut_ImpalAppear1(int i_cut_index) {
         if (talkProc(NULL, 1, NULL)) {
             int evt_id = 0;
             if (mFlow.getEventId(&evt_id) == 1) {
-                mItemPartnerId =
-                    fopAcM_createItemForPresentDemo(&current.pos, evt_id, 0, -1, -1, 0, 0);
+                DUSK_ITEM_CHECK("ilia_charm", evt_id, this);
+                mItemPartnerId = fopAcM_createItemForPresentDemo(
+                    &current.pos, evt_id, 0, -1, -1, 0, 0 DUSK_GIVE_TAG("ilia_charm"));
                 if (mItemPartnerId != 0xffffffff) {
                     s16 evt_idx =
                         dComIfGp_getEventManager().getEventIdx(this, "DEFAULT_GETITEM", 0xff);
@@ -1060,8 +1061,9 @@ BOOL daNpcImpal_c::EvCut_CopyRod(int i_cut_index) {
         case '0003':
             int evt_id = 0;
             if (mFlow.getEventId(&evt_id) == 1) {
-                mItemPartnerId =
-                    fopAcM_createItemForPresentDemo(&current.pos, evt_id, 0, -1, -1, 0, 0);
+                DUSK_ITEM_CHECK("skybook", evt_id, this);
+                mItemPartnerId = fopAcM_createItemForPresentDemo(
+                    &current.pos, evt_id, 0, -1, -1, 0, 0 DUSK_GIVE_TAG("skybook"));
                 dComIfGp_event_setItemPartnerId(mItemPartnerId);
                 mItemPartnerId = -1;
             }
@@ -1231,13 +1233,13 @@ BOOL daNpcImpal_c::drawDbgInfo() {
     return FALSE;
 }
 
-static actor_method_class daNpcImpal_MethodTable = {
+static DUSK_CONST actor_method_class daNpcImpal_MethodTable = {
     (process_method_func)daNpcImpal_Create,  (process_method_func)daNpcImpal_Delete,
     (process_method_func)daNpcImpal_Execute, (process_method_func)daNpcImpal_IsDelete,
     (process_method_func)daNpcImpal_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_IMPAL = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_IMPAL = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

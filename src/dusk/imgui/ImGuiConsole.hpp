@@ -1,15 +1,14 @@
 #ifndef DUSK_IMGUI_HPP
 #define DUSK_IMGUI_HPP
+#include "ImGuiMenuTools.hpp"
 
-#include <deque>
-#include <string>
-#include <string_view>
+#include "dusk/main.h"
 
 #include <aurora/aurora.h>
+#include <imgui.h>
 
-#include "ImGuiMenuTools.hpp"
-#include "dusk/main.h"
-#include "imgui.h"
+#include <string>
+#include <string_view>
 
 union SDL_Event;
 struct ImGuiWindow;
@@ -24,30 +23,17 @@ public:
     void PostDraw();
 
     static bool CheckMenuViewToggle(ImGuiKey key, bool& active);
-    void AddToast(std::string_view message, float duration = 3.f);
 
 private:
-    struct Toast {
-        std::string message;
-        float remain;
-        float current = 0.f;
-        Toast(std::string message, float duration) noexcept : message(std::move(message)),
-                                                              remain(duration) {}
-    };
-
-    float mouseHideTimer = 0.0f;
 
     bool m_isHidden = true;
     bool m_isLaunchInitialized = false;
     ImGuiWindow* m_dragScrollWindow = nullptr;
     ImVec2 m_dragScrollLastMousePos = {};
-    std::deque<Toast> m_toasts;
 
     // Keep always last
     ImGuiMenuTools m_menuTools;
 
-    void ShowToasts();
-    void ShowPipelineProgress();
     void UpdateDragScroll();
 };
 
@@ -60,7 +46,6 @@ std::string BytesToString(size_t bytes);
 void SetOverlayWindowLocation(int corner);
 bool ShowCornerContextMenu(int& corner, int avoidCorner);
 void ImGuiStringViewText(std::string_view text);
-void DuskToast(std::string_view message, float duration = 3.f);
 void ImGuiBeginGroupPanel(const char* name, const ImVec2& size);
 void ImGuiEndGroupPanel();
 void ImGuiTextCenter(std::string_view text);

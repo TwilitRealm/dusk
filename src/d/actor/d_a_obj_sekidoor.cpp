@@ -18,11 +18,11 @@ static struct {
     u32 resIdx;
 } l_dzbData[1] = {7, 1};
 
-static char* l_resNameList[2] = {"", "SekiDoor"};
+static DUSK_CONSTEXPR char DUSK_CONST* l_resNameList[2] = {"", "SekiDoor"};
 
 static OBJ_SEKIDOOR_HIO_CLASS l_HIO;
 
-const daObj_SekiDoor_HIOParam daObj_SekiDoor_Param_c::m = {0};
+DUSK_GAME_DATA const daObj_SekiDoor_HIOParam daObj_SekiDoor_Param_c::m = {0};
 
 static const f32 reference_posy = 460.0f;
 
@@ -269,7 +269,7 @@ static int daObj_SekiDoor_IsDelete(void* param_0) {
     return 1;
 }
 
-static actor_method_class daObj_SekiDoor_MethodTable = {
+static DUSK_CONST actor_method_class daObj_SekiDoor_MethodTable = {
     (process_method_func)daObj_SekiDoor_Create,
     (process_method_func)daObj_SekiDoor_Delete,
     (process_method_func)daObj_SekiDoor_Execute,
@@ -277,7 +277,7 @@ static actor_method_class daObj_SekiDoor_MethodTable = {
     (process_method_func)daObj_SekiDoor_Draw,
 };
 
-actor_process_profile_definition g_profile_OBJ_SEKIDOOR = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_OBJ_SEKIDOOR = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

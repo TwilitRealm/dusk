@@ -16,7 +16,24 @@
 #include "f_op/f_op_overlap_mng.h"
 #include "m_Do/m_Do_controller_pad.h"
 #include "d/d_camera.h"
+#if TARGET_PC
+#include "dusk/settings.h"
+#include <algorithm>
+#endif
 #include <cstring>
+
+#if TARGET_PC
+#include "dusk/action_bindings.h"
+
+namespace {
+
+// Reads the user HUD scale setting, clamped to a safe range.
+f32 dGetUserHudScale() {
+    return std::clamp(dusk::getSettings().game.hudScale.getValue(), 0.5f, 2.0f);
+}
+
+}  // namespace
+#endif
 
 #if (PLATFORM_WII || PLATFORM_SHIELD)
 dMeter_map_HIO_c g_meter_mapHIO;
@@ -318,7 +335,7 @@ f32 dMeterMap_c::getMapDispEdgeTop() {
               mMap->getTexelPerCm() * (mMap->getPackZ() + -mMap->getPackPlusZ()) -
               mMap->getTopEdgePlus();
     }
-    f32 rv = getMapDispEdgeBottomY_Layout() - tmp;
+    f32 rv = getMapDispEdgeBottomY_Layout() - tmp IF_DUSK(* dGetUserHudScale());
     return rv;
 }
 
@@ -535,6 +552,12 @@ void dMeterMap_c::_move(u32 param_0) {
     }
     #endif
 
+#if TARGET_PC
+    if (mMap->refreshTextureSize()) {
+        mMapJ2DPicture->changeTexture(mMap->getResTIMGPointer(), 0);
+    }
+#endif
+
     int stayNo = dComIfGp_roomControl_getStayNo();
 
     field_0x14 = param_0;
@@ -621,8 +644,15 @@ void dMeterMap_c::draw() {
         mMapJ2DPicture->setAlpha(alpha);
 
         #if TARGET_PC
-        mMapJ2DPicture->draw(mDoGph_gInf_c::ScaleHUDXLeft(drawPosX), drawPosY, sizeX, sizeY, false,
-                             false, false);
+        // Scale the minimap with the user HUD scale and shift down so its bottom-left
+        // corner stays anchored to the same screen position as at scale 1.0.
+        const f32 userHudScale = dGetUserHudScale();
+        const f32 scaledSizeX = sizeX * userHudScale;
+        const f32 scaledSizeY = sizeY * userHudScale;
+        const f32 mapBottomShift = sizeY - scaledSizeY;
+        mMapJ2DPicture->draw(mDoGph_gInf_c::ScaleHUDXLeft(drawPosX),
+                             drawPosY + mapBottomShift, scaledSizeX, scaledSizeY,
+                             false, false, false);
         #else
         mMapJ2DPicture->draw(drawPosX, drawPosY, sizeX, sizeY, false, false, false);
         #endif
@@ -720,7 +750,38 @@ void dMeterMap_c::ctrlShowMap() {
                 }
             }
 
-        } else if (!mDoCPd_c::getTrigUp(PAD_1) && !mDoCPd_c::getTrigDown(PAD_1)) {
+        }
+#if TARGET_PC
+        else if (!isEventRunCheck() &&
+                 (dMeter2Info_getMapStatus() == 0 || dMeter2Info_getMapStatus() == 1) &&
+                 !dMeter2Info_isSub2DStatus(1) && (isFmapScreen() || isDmapScreen()) &&
+                 dusk::getActionBindTrig(dusk::ActionBinds::OPEN_MAP_SCREEN, PAD_1))
+        {
+            dMeter2Info_setMapStatus(2);
+            dMeter2Info_setMapKeyDirection(0x400);
+            Z2GetAudioMgr()->seStart(Z2SE_SY_MAP_OPEN_S, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                        -1.0f, 0);
+            dMeter2Info_set2DVibration();
+        } else if (!isEventRunCheck() &&
+                   (dMeter2Info_getMapStatus() == 0 || dMeter2Info_getMapStatus() == 1) &&
+                   isEnableDispMapAndMapDispSizeTypeNo() &&
+                   dusk::getActionBindTrig(dusk::ActionBinds::TOGGLE_MINIMAP, PAD_1))
+        {
+            if (isDispPosInsideFlg()) {
+                setDispPosOutsideFlg_SE_On();
+                Z2GetAudioMgr()->seStart(Z2SE_SY_MAP_CLOSE_S, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                         -1.0f, 0);
+                dMeter2Info_setMapStatus(0);
+            } else {
+                setDispPosInsideFlg_SE_On();
+                Z2GetAudioMgr()->seStart(Z2SE_SY_MAP_OPEN_S, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                         -1.0f, 0);
+                dMeter2Info_set2DVibration();
+                dMeter2Info_setMapStatus(1);
+            }
+        }
+#endif
+        else if (!mDoCPd_c::getTrigUp(PAD_1) && !mDoCPd_c::getTrigDown(PAD_1)) {
             keyCheck();
         }
 
@@ -815,7 +876,21 @@ void dMeterMap_c::meter_map_move(u32 param_0) {
                 dMeter2Info_set2DVibration();
             }
             dMeter2Info_resetPauseStatus();
-        } else if (
+        }
+#if TARGET_PC
+        else if (!dComIfGp_event_runCheck() && !dMsgObject_isTalkNowCheck() &&
+                 (dMeter2Info_getMapStatus() == 0 || dMeter2Info_getMapStatus() == 1) &&
+                 !dMeter2Info_isSub2DStatus(1) && (isFmapScreen() || isDmapScreen()) &&
+                 dusk::getActionBindTrig(dusk::ActionBinds::OPEN_MAP_SCREEN, PAD_1))
+        {
+            dMeter2Info_setMapStatus(2);
+            dMeter2Info_setMapKeyDirection(0x400);
+            Z2GetAudioMgr()->seStart(Z2SE_SY_MAP_OPEN_S, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                        -1.0f, 0);
+            dMeter2Info_set2DVibration();
+        }
+#endif
+        else if (
             #if DEBUG
             dMw_RIGHT_TRIGGER() &&
             #else

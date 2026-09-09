@@ -21,7 +21,7 @@ void daFireWood_c::setBaseMtx() {
 
 static daFireWood_HIO_c l_HIO;
 
-dCcD_SrcCyl daFireWood_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daFireWood_c::mCcDCyl = {
     daFireWood_c::mCcDObjInfo,
     {
         {
@@ -32,14 +32,14 @@ dCcD_SrcCyl daFireWood_c::mCcDCyl = {
     }
 };
 
-const dCcD_SrcGObjInf daFireWood_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daFireWood_c::mCcDObjInfo = {
     {0, {{AT_TYPE_LANTERN_SWING, 0, 0x13}, {0xD8FBFFFF, 0x1F}, {0x0}}},
     {dCcD_SE_SWORD, 0, 0, dCcD_MTRL_NONE, 0},
     {dCcD_SE_STONE, 0, 0, dCcD_MTRL_NONE, 0},
     {0},
 };
 
-static cull_box l_cull_box = {
+static DUSK_CONSTEXPR cull_box l_cull_box = {
     {-50.0f, 0.0f, -50.0f},
     {50.0f, 100.0f, 50.0f},
 };
@@ -184,13 +184,13 @@ static int daFireWood_Create(fopAc_ac_c* i_this) {
 }
 
 
-static actor_method_class l_daFireWood_Method = {
+static DUSK_CONST actor_method_class l_daFireWood_Method = {
     (process_method_func)daFireWood_Create,  (process_method_func)daFireWood_Delete,
     (process_method_func)daFireWood_Execute, (process_method_func)NULL,
     (process_method_func)daFireWood_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_FireWood = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_FireWood = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

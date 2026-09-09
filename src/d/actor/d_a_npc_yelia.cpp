@@ -9,13 +9,17 @@
 #include "d/actor/d_a_demo_item.h"
 #include <cstring>
 
-static daNpc_GetParam1 l_bmdData[3] = {
+#if TARGET_PC
+#include "helpers/string.hpp"
+#endif
+
+static DUSK_CONSTEXPR daNpc_GetParam1 l_bmdData[3] = {
     {3, 1},
     {3, 4},
     {8, 7},
 };
 
-static daNpcT_evtData_c l_evtList[6] = {
+static DUSK_CONSTEXPR daNpcT_evtData_c l_evtList[6] = {
     {"", 0},
     {"NO_RESPONSE", 0},
     {"TW_RESISTANCE1", 7},
@@ -24,7 +28,7 @@ static daNpcT_evtData_c l_evtList[6] = {
     {"THANK_YOU", 6},
 };
 
-static char* l_resNameList[8] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_resNameList[8] = {
     "",
     "Yelia",
     "Yelia0",
@@ -35,26 +39,26 @@ static char* l_resNameList[8] = {
     "yelB_TW",
 };
 
-static s8 l_loadResPtrn0[4] = {1, 2, 3, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn0[4] = {1, 2, 3, -1};
 
-static s8 l_loadResPtrn1[3] = {2, 4, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn1[3] = {2, 4, -1};
 
-static s8 l_loadResPtrn2[4] = {1, 2, 5, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn2[4] = {1, 2, 5, -1};
 
-static s8 l_loadResPtrn3[4] = {2, 4, 6, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn3[4] = {2, 4, 6, -1};
 
-static s8 l_loadResPtrn4[4] = {2, 7, 6, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn4[4] = {2, 7, 6, -1};
 
-static s8 l_loadResPtrn5[5] = {2, 4, 7, 6, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn5[5] = {2, 4, 7, 6, -1};
 
-static s8 l_loadResPtrn9[8] = {1, 2, 3, 4, 5, 6, 7, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn9[8] = {1, 2, 3, 4, 5, 6, 7, -1};
 
-static s8* l_loadResPtrnList[10] = {
+static DUSK_CONSTEXPR s8 DUSK_CONST* l_loadResPtrnList[10] = {
     l_loadResPtrn0, l_loadResPtrn1, l_loadResPtrn2, l_loadResPtrn3, l_loadResPtrn4,
     l_loadResPtrn5, l_loadResPtrn3, l_loadResPtrn3, l_loadResPtrn9, l_loadResPtrn0,
 };
 
-static daNpcT_faceMotionAnmData_c l_faceMotionAnmData[] = {
+static DUSK_CONSTEXPR daNpcT_faceMotionAnmData_c l_faceMotionAnmData[] = {
     {-1, J3DFrameCtrl::EMode_NONE, 0, 19, J3DFrameCtrl::EMode_LOOP, 2, TRUE},
     {7, J3DFrameCtrl::EMode_NONE, 2, 19, J3DFrameCtrl::EMode_LOOP, 2, TRUE},
     {-1, J3DFrameCtrl::EMode_NONE, 0, -1, J3DFrameCtrl::EMode_NONE, 0, FALSE},
@@ -85,7 +89,7 @@ static daNpcT_faceMotionAnmData_c l_faceMotionAnmData[] = {
     {9, J3DFrameCtrl::EMode_LOOP, 2, 23, J3DFrameCtrl::EMode_LOOP, 2, FALSE},
 };
 
-static daNpcT_motionAnmData_c l_motionAnmData[] = {
+static DUSK_CONSTEXPR daNpcT_motionAnmData_c l_motionAnmData[] = {
     {13, J3DFrameCtrl::EMode_LOOP, 2, 16, J3DFrameCtrl::EMode_NONE, 2, TRUE},
     {-1, J3DFrameCtrl::EMode_NONE, 0, -1, J3DFrameCtrl::EMode_NONE, 0, FALSE},
     {-1, J3DFrameCtrl::EMode_NONE, 0, -1, J3DFrameCtrl::EMode_NONE, 0, FALSE},
@@ -123,7 +127,7 @@ static daNpcT_motionAnmData_c l_motionAnmData[] = {
     {11, J3DFrameCtrl::EMode_NONE, 2, 16, J3DFrameCtrl::EMode_NONE, 2, TRUE},
 };
 
-static daNpcT_MotionSeqMngr_c::sequenceStepData_c l_faceMotionSequenceData[] = {
+static DUSK_CONSTEXPR daNpcT_MotionSeqMngr_c::sequenceStepData_c l_faceMotionSequenceData[] = {
     {1, -1, 1}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
     {2, -1, 1}, {3, -1, 0}, {-1, 0, 0}, {-1, 0, 0},
     {7, -1, 1}, {9, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
@@ -153,7 +157,7 @@ static daNpcT_MotionSeqMngr_c::sequenceStepData_c l_faceMotionSequenceData[] = {
     {0, -1, 0}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
 };
 
-static daNpcT_MotionSeqMngr_c::sequenceStepData_c l_motionSequenceData[] = {
+static DUSK_CONSTEXPR daNpcT_MotionSeqMngr_c::sequenceStepData_c l_motionSequenceData[] = {
     {0, -1, 0}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
     {2, -1, 1}, {0, -1, 0}, {-1, 0, 0}, {-1, 0, 0},
     {3, -1, 1}, {1, -1, 0}, {-1, 0, 0}, {-1, 0, 0},
@@ -190,7 +194,7 @@ static daNpcT_MotionSeqMngr_c::sequenceStepData_c l_motionSequenceData[] = {
     {32, -1, 0}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
 };
 
-char* daNpc_Yelia_c::mCutNameList[6] = {
+DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST daNpc_Yelia_c::mCutNameList[6] = {
     "",
     "CONVERSATION_ABOUT_LOOPHOLE",
     "TW_RESISTANCE",
@@ -199,7 +203,7 @@ char* daNpc_Yelia_c::mCutNameList[6] = {
     "THANK_YOU",
 };
 
-BOOL (daNpc_Yelia_c::*daNpc_Yelia_c::mCutList[6])(int) = {
+DUSK_GAME_DATA BOOL (daNpc_Yelia_c::*daNpc_Yelia_c::mCutList[6])(int) = {
     NULL,
     &daNpc_Yelia_c::cutConversationAboutLoopHole,
     &daNpc_Yelia_c::cutTWResistance,
@@ -296,7 +300,7 @@ enum Motion {
     /* 0x21 */ MOTION_KIZUKU_WAIT,
 };
 
-daNpc_Yelia_HIOParam const daNpc_Yelia_Param_c::m = {
+DUSK_GAME_DATA daNpc_Yelia_HIOParam const daNpc_Yelia_Param_c::m = {
     170.0f,   // mAttnOffsetY
     -3.0f,    // mGravity
     1.0f,     // mScale
@@ -1137,8 +1141,8 @@ BOOL daNpc_Yelia_c::cutTakeWoodStatue(int i_staffId) {
             mItemId = fpcM_ERROR_PROCESS_ID_e;
             mEventTimer = timer;
             Z2GetAudioMgr()->muteSceneBgm(90, 0.0f);
-            strcpy(name, l_evtList[EVENT_TAKE_WOODSTATUE].eventName);
-            strcat(name, "@");
+            SAFE_STRCPY(name, l_evtList[EVENT_TAKE_WOODSTATUE].eventName);
+            SAFE_STRCAT(name, "@");
             dComIfGp_getEvent()->setSkipZev(this, name);
             dComIfGp_getEvent()->onSkipFade();
             break;
@@ -1580,7 +1584,7 @@ static int daNpc_Yelia_IsDelete(void* i_this) {
     return 1;
 }
 
-static actor_method_class daNpc_Yelia_MethodTable = {
+static DUSK_CONST actor_method_class daNpc_Yelia_MethodTable = {
     (process_method_func)daNpc_Yelia_Create,
     (process_method_func)daNpc_Yelia_Delete,
     (process_method_func)daNpc_Yelia_Execute,
@@ -1588,7 +1592,7 @@ static actor_method_class daNpc_Yelia_MethodTable = {
     (process_method_func)daNpc_Yelia_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_YELIA = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_YELIA = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

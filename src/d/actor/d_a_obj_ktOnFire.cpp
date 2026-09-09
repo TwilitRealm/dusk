@@ -20,19 +20,19 @@ public:
 
 static daKtOnFire_HIO_c l_HIO;
 
-static cull_box l_cull_box = {
+static DUSK_CONSTEXPR cull_box l_cull_box = {
     {-50.0f, 0.0f, -50.0f},
     {50.0f, 100.0f, 50.0f},
 };
 
-const dCcD_SrcGObjInf daKtOnFire_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daKtOnFire_c::mCcDObjInfo = {
     {0x0, {{0x200, 0x0, 0x13}, {0xD8FBFFFF, 0x11}, 0x0}}, // mObj
     {dCcD_SE_SWORD, 0x0, 0x0, 0x0, 0x0}, // mGObjAt
     {dCcD_SE_STONE, 0x0, 0x0, 0x0, 0x0}, // mGObjTg
     {0x0}, // mGObjCo
 };
 
-dCcD_SrcCyl daKtOnFire_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daKtOnFire_c::mCcDCyl = {
     mCcDObjInfo,
     {
         {
@@ -194,7 +194,7 @@ static int daKtOnFire_Create(fopAc_ac_c* i_this) {
     return ((daKtOnFire_c*)i_this)->create();
 }
 
-static actor_method_class l_daKtOnFire_Method = {
+static DUSK_CONST actor_method_class l_daKtOnFire_Method = {
     (process_method_func)daKtOnFire_Create,
     (process_method_func)daKtOnFire_Delete,
     (process_method_func)daKtOnFire_Execute,
@@ -202,7 +202,7 @@ static actor_method_class l_daKtOnFire_Method = {
     (process_method_func)daKtOnFire_Draw,
 };
 
-actor_process_profile_definition g_profile_Tag_KtOnFire = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Tag_KtOnFire = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

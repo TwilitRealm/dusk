@@ -1,32 +1,31 @@
-#include "fmt/format.h"
-#include "imgui.h"
-#include "aurora/gfx.h"
-
-#include "ImGuiConfig.hpp"
-#include "dusk/hotkeys.h"
-#include "dusk/settings.h"
-#include "ImGuiConsole.hpp"
 #include "ImGuiMenuTools.hpp"
 
+#include "ImGuiConfig.hpp"
+#include "ImGuiConsole.hpp"
 #include "ImGuiEngine.hpp"
+
+#include "dusk/data.hpp"
+#include "dusk/dusk.h"
+#include "dusk/hotkeys.h"
+#include "dusk/main.h"
+#include "dusk/os.h"
+#include "dusk/settings.h"
+#include "dusk/speedrun.h"
+
 #include "d/actor/d_a_alink.h"
 #include "d/actor/d_a_horse.h"
 #include "d/d_com_inf_game.h"
-#include "dusk/data.hpp"
-#include "dusk/dusk.h"
-#include "dusk/main.h"
 #include "m_Do/m_Do_main.h"
 
+#include <aurora/gfx.h>
 #include <aurora/lib/internal.hpp>
+#include <fmt/format.h>
+#include <imgui.h>
 #include <SDL3/SDL_misc.h>
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
 #endif
-
-namespace aurora::gx {
-extern bool enableLodBias;
-}
 
 namespace dusk {
     ImGuiMenuTools::ImGuiMenuTools() {}
@@ -37,7 +36,7 @@ namespace dusk {
                 ImGui::BeginDisabled();
             }
 
-            ImGui::BeginDisabled(getSettings().game.speedrunMode);
+            ImGui::BeginDisabled(dusk::speedrun::isActive());
 
             ImGui::MenuItem("Save Editor", hotkeys::SHOW_SAVE_EDITOR, &m_showSaveEditor);
             ImGui::MenuItem("State Share", hotkeys::SHOW_STATE_SHARE, &m_showStateShare);
@@ -59,7 +58,7 @@ namespace dusk {
         }
 
         if (ImGui::BeginMenu("Debug")) {
-            ImGui::BeginDisabled(getSettings().game.speedrunMode);
+            ImGui::BeginDisabled(dusk::speedrun::isActive());
 
             bool developmentMode = mDoMain::developmentMode == 1;
             if (ImGui::Checkbox("Development Mode", &developmentMode)) {
@@ -73,9 +72,8 @@ namespace dusk {
                 bool disableWaterRefraction = getSettings().game.disableWaterRefraction;
                 if (ImGui::Checkbox("Disable Water Refraction", &disableWaterRefraction)) {
                     getSettings().game.disableWaterRefraction.setValue(disableWaterRefraction);
-                    config::Save();
+                    config::save();
                 }
-                ImGui::Checkbox("Enable LOD Bias", &aurora::gx::enableLodBias);
                 ImGui::EndMenu();
             }
 
@@ -89,6 +87,26 @@ namespace dusk {
                 ImGui::Checkbox("Enable Target Collider view", &collisionView.enableTgView);
                 ImGui::Checkbox("Enable Push Collider view", &collisionView.enableCoView);
                 ImGui::SliderFloat("Opacity##colliders", &collisionView.colliderViewOpacity, 0.0f, 100.0f);
+                ImGui::EndMenu();
+            }
+
+            auto& triggerView = getTransientSettings().triggerView;
+            if (ImGui::BeginMenu("Trigger View")) {
+                ImGui::Checkbox("Load Zones", &triggerView.loadZones);
+                ImGui::Checkbox("Event Areas", &triggerView.eventAreas);
+                ImGui::Checkbox("Event Tags", &triggerView.eventTags);
+                ImGui::Checkbox("Switch Areas", &triggerView.switchAreas);
+                ImGui::Checkbox("Midna Stops", &triggerView.midnaStops);
+                ImGui::Checkbox("Twilight Gates", &triggerView.twilightGates);
+                ImGui::Checkbox("Checkpoints", &triggerView.checkpoints);
+                ImGui::Checkbox("Paths", &triggerView.paths);
+                ImGui::Separator();
+                ImGui::Checkbox("Transform Distances", &triggerView.transformDists);
+                ImGui::Checkbox("Attention Distances", &triggerView.attentionDists);
+                ImGui::Checkbox("Purple Mist Avoid", &triggerView.purpleMistAvoid);
+                ImGui::Checkbox("Leever Ranges", &triggerView.leevers);
+                ImGui::Separator();
+                ImGui::SliderFloat("Opacity##triggers", &triggerView.opacity, 0.0f, 100.0f);
                 ImGui::EndMenu();
             }
 
@@ -208,6 +226,27 @@ namespace dusk {
             daAlink_c* player = (daAlink_c*)dComIfGp_getPlayer(0);
             daHorse_c* horse = dComIfGp_getHorseActor();
 
+            double speedXzy = 0.0;
+            if (player != nullptr) {
+                speedXzy = sqrtf(player->speed.x * player->speed.x
+                    + player->speed.z * player->speed.z
+                    + player->speed.y * player->speed.y);
+            }
+
+            ImGui::Text("Global");
+            ImGuiStringViewText(
+                player != nullptr
+                ? fmt::format("Stage: {}\n", dComIfGp_getStartStageName()) 
+                : "Stage: ?\n"
+            );
+
+            ImGuiStringViewText(
+                player != nullptr
+                ? fmt::format("Layer: {0}\n", dComIfG_play_c::getLayerNo(0))
+                : "Layer: ?\n"
+            );
+
+            ImGui::Separator();
             ImGui::Text("Link");
             ImGuiStringViewText(
                 player != nullptr
@@ -217,14 +256,38 @@ namespace dusk {
 
             ImGuiStringViewText(
                 player != nullptr
-                ? fmt::format("Angle: {0}\n", player->shape_angle.y)
-                : "Angle: ?\n"
+                ? fmt::format("Velocity (XYZ): {: .4f}, {: .4f}, {: .4f}\n", player->speed.x, player->speed.y, player->speed.z)
+                : "Velocity (XYZ): ?, ?, ?\n"
             );
 
             ImGuiStringViewText(
                 player != nullptr
-                ? fmt::format("Speed: {: .4f}\n", player->speedF)
-                : "Speed: ?\n"
+                ? fmt::format("Speed (SpeedF): {: .4f}\n", player->speedF)
+                : "Speed (SpeedF): ?\n"
+            );
+
+            ImGuiStringViewText(
+                player != nullptr
+                ? fmt::format("Speed (3D): {: .4f}\n", speedXzy)
+                : "Speed (3D): ?\n"
+            );
+
+            ImGuiStringViewText(
+                 player != nullptr
+                 ? fmt::format("Angle: {0}\n", player->shape_angle.y)
+                 : "Angle: ?\n"
+            );
+
+            ImGuiStringViewText(
+                player != nullptr
+                ? fmt::format("Room: {0}\n", fopAcM_GetRoomNo(player))
+                : "Room: ?\n"
+            );
+
+            ImGuiStringViewText(
+                player != nullptr
+                ? fmt::format("Entry: {0}\n", dComIfGp_getStartStagePoint())
+                : "Entry: ?\n"
             );
 
             ImGui::Separator();
@@ -236,6 +299,18 @@ namespace dusk {
             );
 
             ImGuiStringViewText(
+                 horse != nullptr
+                 ? fmt::format("Velocity (XYZ): {: .4f}, {: .4f}, {: .4f}\n", horse->speed.x, horse->speed.y, horse->speed.z)
+                 : "Velocity (XYZ): ?, ?, ?\n"
+            );
+
+            ImGuiStringViewText(
+                horse != nullptr
+                ? fmt::format("Speed (SpeedF): {: .4f}\n", horse->speedF)
+                : "Speed (SpeedF): ?\n"
+            );
+
+            ImGuiStringViewText(
                 horse != nullptr
                 ? fmt::format("Angle: {0}\n", horse->shape_angle.y)
                 : "Angle: ?\n"
@@ -243,8 +318,20 @@ namespace dusk {
 
             ImGuiStringViewText(
                 horse != nullptr
-                ? fmt::format("Speed: {: .4f}\n", horse->speedF)
-                : "Speed: ?\n"
+                ? fmt::format("Room: {0}\n", fopAcM_GetRoomNo(horse))
+                : "Room: ?\n"
+            );
+
+            ImGuiStringViewText(
+                player != nullptr
+                ? fmt::format("Saved Stage: {}\n", dComIfGs_getHorseRestartStageName())
+                : "Saved Stage: ?\n"
+            );
+
+            ImGuiStringViewText(
+                player != nullptr
+                ? fmt::format("Saved Room: {0}\n", dComIfGs_getHorseRestartRoomNo())
+                : "Saved Room: ?\n"
             );
 
             ShowCornerContextMenu(m_playerInfoOverlayCorner, m_debugOverlayCorner);

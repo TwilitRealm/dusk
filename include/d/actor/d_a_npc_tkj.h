@@ -11,7 +11,7 @@ class daNpc_Tkj_Param_c {
 public:
     virtual ~daNpc_Tkj_Param_c() {}
 
-    static const daNpc_Tkj_HIOParam m;
+    static DUSK_GAME_DATA const daNpc_Tkj_HIOParam m;
 };
 
 #if DEBUG
@@ -67,7 +67,7 @@ public:
                               daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_faceMotionSequenceData,
                               int i_faceMotionStepNum,
                               daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData, int i_motionStepNum,
-                              daNpcT_evtData_c const* i_evtData, char** i_arcNames)
+                              daNpcT_evtData_c const* i_evtData, char DUSK_CONST* DUSK_CONST* i_arcNames)
                     : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
                                i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
                                i_arcNames)
@@ -94,10 +94,9 @@ public:
 
     int getPath() { return (fopAcM_GetParam(this) & 0xFF00) >> 8; }
 
-    static char* mCutNameList[2];
-    static int (daNpcTkj_c::*mCutList[])(int);
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[2];
+    static DUSK_GAME_DATA int (daNpcTkj_c::* DUSK_CONST mCutList[])(int);
 
-private:
     /* 0xE40 */ NPC_TKJ_HIO_CLASS* mpHIO;
     /* 0xE44 */ dCcD_Cyl mCcCyl;
     /* 0xF80 */ u8 mType;

@@ -16,15 +16,18 @@
 #include "m_Do/m_Do_graphic.h"
 #include <cstring>
 
+#if TARGET_PC
 #include "dusk/version.hpp"
+#include "helpers/string.hpp"
+#endif
 
 typedef void (dMenu_Fishing_c::*initFunc)();
-initFunc map_init_process[] = {
+DUSK_GAME_DATA initFunc map_init_process[] = {
     &dMenu_Fishing_c::wait_init,
 };
 
 typedef void (dMenu_Fishing_c::*moveFunc)();
-moveFunc map_move_process[] = {
+DUSK_GAME_DATA moveFunc map_move_process[] = {
     &dMenu_Fishing_c::wait_move,
 };
 
@@ -304,7 +307,16 @@ void dMenu_Fishing_c::screenSetBase() {
     mpFishInfoParent[0] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('info_blu'), 0, NULL);
     mpFishInfoParent[1] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('info_red'), 0, NULL);
 
-    #if (VERSION == VERSION_GCN_JPN) || (VERSION == VERSION_WII_JPN)
+    #if TARGET_PC
+    J2DTextBox* textBox;
+    if (dusk::version::isRegionJpn()) {
+        textBox = (J2DTextBox*)mpScreen->search(MULTI_CHAR('t_t00'));
+        mpScreen->search(MULTI_CHAR('f_t00'))->hide();
+    } else {
+        textBox = (J2DTextBox*)mpScreen->search(MULTI_CHAR('f_t00'));
+        mpScreen->search(MULTI_CHAR('t_t00'))->hide();
+    }
+    #elif (VERSION == VERSION_GCN_JPN) || (VERSION == VERSION_WII_JPN)
     J2DTextBox* textBox = (J2DTextBox*)mpScreen->search(MULTI_CHAR('t_t00'));
     mpScreen->search(MULTI_CHAR('f_t00'))->hide();
     #else
@@ -333,7 +345,9 @@ void dMenu_Fishing_c::screenSetBase() {
         field_0x19c[1][i]->setString(0x20, "");
 
         mpFishNameString[i] = (J2DTextBox*)mpScreen->search(name_0[i]);
+        IF_DUSK_BLOCK(dusk::version::isGcn())
         mpScreen->search(fname_0[i])->hide();
+        IF_DUSK_BLOCK_END
         mpFishNameString[i]->setFont(mDoExt_getSubFont());
         mpFishNameString[i]->setString(0x20, "");
         dMeter2Info_getStringKanji(name_id[i], mpFishNameString[i]->getStringPtr(), NULL);
@@ -372,7 +386,7 @@ void dMenu_Fishing_c::screenSetDoIcon() {
 void dMenu_Fishing_c::setAButtonString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 5; i++) {
-            strcpy(mpAButtonString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpAButtonString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 5; i++) {
@@ -384,7 +398,7 @@ void dMenu_Fishing_c::setAButtonString(u16 i_stringID) {
 void dMenu_Fishing_c::setBButtonString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 5; i++) {
-            strcpy(mpBButtonString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpBButtonString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 5; i++) {
@@ -419,29 +433,29 @@ void dMenu_Fishing_c::setFishParam(int i_fishIdx, u16 i_fishCount, u8 i_fishSize
         dComIfGp_setMessageCountNumber(i_fishSize);
         mpString->getString(0x597, field_0x10c[i][i_fishIdx], NULL, NULL, NULL, 0); // "inches"
         char* stringPtr = field_0x10c[i][i_fishIdx]->getStringPtr();
-        strcpy(strBuff1, stringPtr);
+        SAFE_STRCPY(strBuff1, stringPtr);
         int j;
         for (j = 0; strBuff1[j + fishSizeFigure] != 0; j++) {
             strBuff2[j] = strBuff1[j + fishSizeFigure];
         }
         strBuff2[j] = 0;
         strBuff1[fishSizeFigure] = 0;
-        strcpy(field_0x10c[i][i_fishIdx]->getStringPtr(), strBuff1);
-        strcpy(field_0x16c[i][i_fishIdx]->getStringPtr(), strBuff2);
+        SAFE_STRCPY(field_0x10c[i][i_fishIdx]->getStringPtr(), strBuff1);
+        SAFE_STRCPY(field_0x16c[i][i_fishIdx]->getStringPtr(), strBuff2);
 
         // part two, i_fishCount
         dComIfGp_setMessageCountNumber(i_fishCount);
         mpString->getString(0x598, field_0x13c[i][i_fishIdx], NULL, NULL, NULL, 0); // "fish"
         stringPtr = field_0x13c[i][i_fishIdx]->getStringPtr();
-        strcpy(strBuff1, stringPtr);
+        SAFE_STRCPY(strBuff1, stringPtr);
         int k;
         for (k = 0; strBuff1[k + fishCountFigure] != 0; k++) {
             strBuff2[k] = strBuff1[k + fishCountFigure];
         }
         strBuff2[k] = 0;
         strBuff1[fishCountFigure] = 0;
-        strcpy(field_0x13c[i][i_fishIdx]->getStringPtr(), strBuff1);
-        strcpy(field_0x19c[i][i_fishIdx]->getStringPtr(), strBuff2);
+        SAFE_STRCPY(field_0x13c[i][i_fishIdx]->getStringPtr(), strBuff1);
+        SAFE_STRCPY(field_0x19c[i][i_fishIdx]->getStringPtr(), strBuff2);
     }
 }
 

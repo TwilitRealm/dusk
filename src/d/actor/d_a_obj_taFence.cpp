@@ -106,14 +106,14 @@ int daTaFence_c::CreateHeap() {
     return 1;
 }
 
-const dCcD_SrcGObjInf daTaFence_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daTaFence_c::mCcDObjInfo = {
     {0, {{0x0, 0x0, 0x0}, {0x400032, 0x11}, {0x0}}},
     {dCcD_SE_SWORD, 0, 0, 0, 0},
     {dCcD_SE_STONE, 0, 0, 0, 0},
     {0},
 };
 
-dCcD_SrcCyl daTaFence_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daTaFence_c::mCcDCyl = {
     daTaFence_c::mCcDObjInfo,
     {
         {
@@ -407,7 +407,7 @@ static int daTaFence_Create(fopAc_ac_c* i_this) {
     return ((daTaFence_c*)i_this)->create();
 }
 
-static actor_method_class l_daTaFence_Method = {
+static DUSK_CONST actor_method_class l_daTaFence_Method = {
     (process_method_func)daTaFence_Create,
     (process_method_func)daTaFence_Delete,
     (process_method_func)daTaFence_Execute,
@@ -415,7 +415,7 @@ static actor_method_class l_daTaFence_Method = {
     (process_method_func)daTaFence_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_TaFence = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_TaFence = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

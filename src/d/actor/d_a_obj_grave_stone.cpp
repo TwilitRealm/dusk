@@ -12,14 +12,14 @@
 
 static char const* l_arcName = "H_Haka";
 
-dCcD_SrcGObjInf const daGraveStone_c::mCcDObjInfo = {
+DUSK_GAME_DATA dCcD_SrcGObjInf const daGraveStone_c::mCcDObjInfo = {
     {0, {{0, 0, 0}, {0, 0}, {0x79}}},
     {0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0},
     {0},
 };
 
-dCcD_SrcCyl const daGraveStone_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl const daGraveStone_c::mCcDCyl = {
     {
         {0, {{0, 0, 0}, {0, 0}, {0x79}}},
         {0, 0, 0, 0, 0},
@@ -215,7 +215,7 @@ static cPhs_Step daGraveStone_create(fopAc_ac_c* i_this) {
     return static_cast<daGraveStone_c*>(i_this)->create();
 }
 
-static actor_method_class l_daGraveStone_Method = {
+static DUSK_CONST actor_method_class l_daGraveStone_Method = {
     (process_method_func)daGraveStone_create,
     (process_method_func)daGraveStone_Delete,
     (process_method_func)daGraveStone_Execute,
@@ -223,7 +223,7 @@ static actor_method_class l_daGraveStone_Method = {
     (process_method_func)daGraveStone_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_GraveStone = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_GraveStone = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

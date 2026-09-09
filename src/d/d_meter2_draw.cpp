@@ -20,10 +20,68 @@
 #include "d/d_msg_class.h"
 #include "d/d_msg_object.h"
 #include "d/d_pane_class.h"
-#include "dusk/frame_interpolation.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/frame_interpolation.h"
+#include "dusk/settings.h"
+#include "dusk/ui/icon_provider.hpp"
+#include "dusk/version.hpp"
+
+#include <algorithm>
+
+namespace {
+
+// Reads the user HUD scale setting, clamped to a safe range.
+f32 dGetUserHudScale() {
+    return std::clamp(dusk::getSettings().game.hudScale.getValue(), 0.5f, 2.0f);
+}
+
+// The screen corner each HUD group is anchored to. A pane scales around its own origin,
+// so without correction it drifts away from the screen edge; this names the corner that
+// must stay put.
+enum class HudCorner { TopLeft, TopRight, BottomLeft, BottomRight };
+
+// Adds the paneTrans offset that keeps i_corner pinned in place while the user HUD scale
+// grows or shrinks the pane. The shift is half the change in size pushed toward the
+// anchor corner, so it depends only on the pane's size (not its on-screen position) and
+// works whether the HUD is scaled down or up. i_pull < 1 applies a partial horizontal
+// push for a pane whose content sits inset from its box edge (the heart row).
+void dAnchorHudScale(CPaneMgr* i_pane, HudCorner i_corner, f32* io_x, f32* io_y, f32 i_pull = 1.0f) {
+    const f32 half = (1.0f - dGetUserHudScale()) * 0.5f;
+    const f32 dirX =
+        (i_corner == HudCorner::TopRight || i_corner == HudCorner::BottomRight) ? 1.0f : -1.0f;
+    const f32 dirY =
+        (i_corner == HudCorner::BottomLeft || i_corner == HudCorner::BottomRight) ? 1.0f : -1.0f;
+    *io_x += dirX * i_pane->getInitSizeX() * half * i_pull;
+    *io_y += dirY * i_pane->getInitSizeY() * half;
+}
+
+}  // namespace
+#endif
+
 dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
+#if TARGET_PC
+    // correct hio data here because we can't do runtime disc checks in sinit data constructors
+    if (dusk::version::isRegionJpn()) {
+        g_drawHIO.mButtonATextSpacing = -2.0f;
+        for (int i = 0; i < 6; i++) {
+            static f32 const finfoPosX_jpn[6] = {-27.0f, 0.0f, -12.0f, 0.0f, -12.0f, -32.8f};
+            static f32 const fishnPosX_jpn[6] = {-27.0f, 0.0f, -12.0f, 0.0f, -12.0f, -32.8f};
+            g_drawHIO.mFishListScreen.mFishCountSizePosX[i] = finfoPosX_jpn[i];
+            g_drawHIO.mFishListScreen.mFishInfoPosX[i] = fishnPosX_jpn[i];
+        }
+    } else {
+        g_drawHIO.mButtonATextSpacing = 1.0f;
+        for (int i = 0; i < 6; i++) {
+            static f32 const finfoPosX[6] = {-17.0f, 0.0f, -14.0f, 0.0f, -12.0f, -32.8f};
+            static f32 const fishnPosX[6] = {-17.0f, 0.0f, -14.0f, 0.0f, -12.0f, -32.8f};
+            g_drawHIO.mFishListScreen.mFishCountSizePosX[i] = finfoPosX[i];
+            g_drawHIO.mFishListScreen.mFishInfoPosX[i] = fishnPosX[i];
+        }
+    }
+#endif
+
     OS_REPORT("enter dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap *mp_heap)\n");
 
     heap = mp_heap;
@@ -126,7 +184,8 @@ dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
     }
 
     J2DTextBox::TFontSize font_size;
-#if VERSION != VERSION_GCN_JPN
+#if TARGET_PC || VERSION != VERSION_GCN_JPN
+    IF_DUSK_BLOCK(!dusk::version::isRegionJpn())
     font_size.mSizeX = 17.0f;
     font_size.mSizeY = 20.0f;
     for (int i = 0; i < 5; i++) {
@@ -135,6 +194,21 @@ dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
         static_cast<J2DTextBox*>(mpXYText[i][0]->getPanePtr())->setFontSize(font_size);
         static_cast<J2DTextBox*>(mpXYText[i][1]->getPanePtr())->setFontSize(font_size);
         static_cast<J2DTextBox*>(mpXYText[i][2]->getPanePtr())->setFontSize(font_size);
+    }
+    IF_DUSK_BLOCK_END
+#endif
+
+#if TARGET_PC
+    if (dusk::version::isLessThanWiiJpn()) {
+        if (J2DPicture* b_btn = static_cast<J2DPicture*>(mpScreen->search(MULTI_CHAR('b_btn')))) {
+            b_btn->setAlpha(255);
+            b_btn->setWhite(JUtility::TColor(195, 63, 63, 255));
+        }
+
+        for (int i = 0; i < 5; i++) {
+            static_cast<J2DTextBox*>(mpXYText[i][0]->getPanePtr())->setCharSpace(0.0f);
+            static_cast<J2DTextBox*>(mpXYText[i][1]->getPanePtr())->setCharSpace(0.0f);
+        }
     }
 #endif
 
@@ -536,6 +610,12 @@ void dMeter2Draw_c::init() {
 }
 
 void dMeter2Draw_c::exec(u32 i_status) {
+#if TARGET_PC
+    // n_all keeps the vanilla scale. Scaling the root pane shrinks every child toward
+    // its centred origin; per-child scaling in each drawXxx() path keeps each HUD group
+    // anchored to its own pane origin and also pulls it toward the screen corner.
+    const f32 userHudScale = dGetUserHudScale();
+#endif
     if (mParentScale != g_drawHIO.mParentScale) {
         mParentScale = g_drawHIO.mParentScale;
         mpParent->scale(g_drawHIO.mParentScale, g_drawHIO.mParentScale);
@@ -546,6 +626,39 @@ void dMeter2Draw_c::exec(u32 i_status) {
         mpParent->setAlphaRate(g_drawHIO.mParentAlpha);
     }
 
+#if TARGET_PC
+    if (i_status & 0x1000000) {
+        f32 ringPosX = g_drawHIO.mRingHUDButtonsPosX;
+        f32 ringPosY = g_drawHIO.mRingHUDButtonsPosY;
+        dAnchorHudScale(mpButtonParent, HudCorner::TopRight, &ringPosX, &ringPosY);
+        if (mButtonsPosX != ringPosX || mButtonsPosY != ringPosY) {
+            mButtonsPosX = ringPosX;
+            mButtonsPosY = ringPosY;
+            mpButtonParent->paneTrans(ringPosX, ringPosY);
+        }
+
+        const f32 ringButtonsScale = g_drawHIO.mRingHUDButtonsScale * userHudScale;
+        if (mButtonsScale != ringButtonsScale) {
+            mButtonsScale = ringButtonsScale;
+            mpButtonParent->scale(ringButtonsScale, ringButtonsScale);
+        }
+    } else {
+        f32 mainPosX = g_drawHIO.mMainHUDButtonsPosX;
+        f32 mainPosY = g_drawHIO.mMainHUDButtonsPosY;
+        dAnchorHudScale(mpButtonParent, HudCorner::TopRight, &mainPosX, &mainPosY);
+        if (mButtonsPosX != mainPosX || mButtonsPosY != mainPosY) {
+            mButtonsPosX = mainPosX;
+            mButtonsPosY = mainPosY;
+            mpButtonParent->paneTrans(mainPosX, mainPosY);
+        }
+
+        const f32 mainButtonsScale = g_drawHIO.mMainHUDButtonsScale * userHudScale;
+        if (mButtonsScale != mainButtonsScale) {
+            mButtonsScale = mainButtonsScale;
+            mpButtonParent->scale(mainButtonsScale, mainButtonsScale);
+        }
+    }
+#else
     if (i_status & 0x1000000) {
         if (mButtonsPosX != g_drawHIO.mRingHUDButtonsPosX ||
             mButtonsPosY != g_drawHIO.mRingHUDButtonsPosY)
@@ -574,20 +687,36 @@ void dMeter2Draw_c::exec(u32 i_status) {
             mpButtonParent->scale(g_drawHIO.mMainHUDButtonsScale, g_drawHIO.mMainHUDButtonsScale);
         }
     }
+#endif
 }
 
 void dMeter2Draw_c::draw() {
     J2DGrafContext* graf_ctx = dComIfGp_getCurrentGrafPort();
     graf_ctx->setup2D();
 
+#if TARGET_PC
+    const bool touchControlsEnabled = dusk::getSettings().game.enableTouchControls;
+    if (touchControlsEnabled) {
+        mpButtonParent->hide();
+    } else {
+        mpButtonParent->show();
+    }
+#endif
+
     mpScreen->draw(0.0f, 0.0f, graf_ctx);
     drawKanteraScreen(1);
     drawKanteraScreen(2);
 
+#if TARGET_PC
+    if (!touchControlsEnabled) {
+#endif
     for (int i = 0; i < 2; i++) {
         if (mpItemXY[i] != NULL) {
             for (int j = 0; j < 3; j++) {
                 f32 temp_f30 = mItemParams[i].num_scale * 16.0f;
+#if TARGET_PC
+                temp_f30 *= dGetUserHudScale();
+#endif
 
                 Vec vtx0 = mpItemXY[i]->getPanePtr()->getGlbVtx(0);
                 Vec vtx3 = mpItemXY[i]->getPanePtr()->getGlbVtx(3);
@@ -629,6 +758,9 @@ void dMeter2Draw_c::draw() {
             }
         }
     }
+#if TARGET_PC
+    }
+#endif
 
     if (mpLightDropParent->getAlphaRate() != 0.0f) {
         f32 var_f28 = g_drawHIO.mLightDrop.mPikariScaleNormal;
@@ -711,7 +843,11 @@ void dMeter2Draw_c::draw() {
         }
     }
 
+#if TARGET_PC
+    if (!touchControlsEnabled && field_0x738 > 0.0f) {
+#else
     if (field_0x738 > 0.0f) {
+#endif
         drawPikari(mpButtonMidona, &field_0x738, g_drawHIO.mMidnaIconPikariScale,
                    g_drawHIO.mMidnaIconPikariFrontOuter, g_drawHIO.mMidnaIconPikariFrontInner,
                    g_drawHIO.mMidnaIconPikariBackOuter, g_drawHIO.mMidnaIconPikariBackInner,
@@ -1264,6 +1400,22 @@ void dMeter2Draw_c::initButtonCross() {
     dMeter2Info_getString(
         0x62, static_cast<J2DTextBox*>(mpScreen->search(MULTI_CHAR('cont_ju9')))->getStringPtr(), NULL);
 
+#if TARGET_PC
+    // These panes are not wide enough for French text (and possibly other languages)
+    // on Wii PAL. Resize them to always match their counterparts in later releases.
+    static u64 const juTags[] = {
+        MULTI_CHAR('cont_ju0'), MULTI_CHAR('cont_ju1'), MULTI_CHAR('cont_ju2'),
+        MULTI_CHAR('cont_ju3'), MULTI_CHAR('cont_ju4'), MULTI_CHAR('cont_ju5'),
+        MULTI_CHAR('cont_ju6'), MULTI_CHAR('cont_ju7'), MULTI_CHAR('cont_ju8'),
+        MULTI_CHAR('cont_ju9'),
+    };
+
+    for (u64 tag : juTags) {
+        J2DPane* pane = mpScreen->search(tag);
+        pane->resize(120.0f, pane->getHeight());
+    }
+#endif
+
     mpButtonCrossParent->setAlphaRate(0.0f);
     drawButtonCross(g_drawHIO.mButtonCrossOFFPosX, g_drawHIO.mButtonCrossOFFPosY);
 }
@@ -1478,7 +1630,12 @@ void dMeter2Draw_c::drawLife(s16 i_maxLife, s16 i_life, f32 i_posX, f32 i_posY) 
         }
     }
 
+#if TARGET_PC
+    const f32 lifeParentScale = g_drawHIO.mLifeParentScale * dGetUserHudScale();
+    mpLifeParent->scale(lifeParentScale, lifeParentScale);
+#else
     mpLifeParent->scale(g_drawHIO.mLifeParentScale, g_drawHIO.mLifeParentScale);
+#endif
 
     for (int i = 0; i < 20; i++) {
         mpHeartMark[i]->scale(g_drawHIO.mHeartMarkScale, g_drawHIO.mHeartMarkScale);
@@ -1488,7 +1645,16 @@ void dMeter2Draw_c::drawLife(s16 i_maxLife, s16 i_life, f32 i_posX, f32 i_posY) 
         mpBigHeart->scale(g_drawHIO.mBigHeartScale, g_drawHIO.mBigHeartScale);
     }
 
+#if TARGET_PC
+    f32 lifePosX = i_posX;
+    f32 lifePosY = i_posY;
+    // The heart row sits inset from its box's left edge, so use a partial horizontal pull
+    // to keep it from jamming against the screen edge.
+    dAnchorHudScale(mpLifeParent, HudCorner::TopLeft, &lifePosX, &lifePosY, 0.6f);
+    mpLifeParent->paneTrans(lifePosX, lifePosY);
+#else
     mpLifeParent->paneTrans(i_posX, i_posY);
+#endif
 }
 
 void dMeter2Draw_c::setAlphaLifeChange(bool param_0) {
@@ -1601,9 +1767,22 @@ void dMeter2Draw_c::drawKanteraScreen(u8 i_meterType) {
     mpMagicMeter->resize(field_0x584[i_meterType], field_0x590[i_meterType]);
     mpMagicFrameR->move(field_0x59c[i_meterType], field_0x5a8[i_meterType]);
     mpMagicBase->resize(field_0x5b4[i_meterType], field_0x5c0[i_meterType]);
+#if TARGET_PC
+    const f32 magicUserScale = dGetUserHudScale();
+    mpMagicParent->scale(field_0x5cc[i_meterType] * magicUserScale,
+                         field_0x5d8[i_meterType] * magicUserScale);
+
+    f32 magicPosX = field_0x5e4[i_meterType];
+    f32 magicPosY = field_0x5f0[i_meterType];
+    // The oil/magic bar sits inset within its pane box, so use a reduced horizontal pull
+    // (like the heart row) to keep it from overshooting off the left edge when shrunk.
+    dAnchorHudScale(mpMagicParent, HudCorner::TopLeft, &magicPosX, &magicPosY, 0.3f);
+    mpMagicParent->paneTrans(magicPosX, magicPosY);
+#else
     mpMagicParent->scale(field_0x5cc[i_meterType], field_0x5d8[i_meterType]);
 
     mpMagicParent->paneTrans(field_0x5e4[i_meterType], field_0x5f0[i_meterType]);
+#endif
 
     mpKanteraScreen->draw(0.0f, 0.0f, graf_ctx);
 }
@@ -1867,10 +2046,21 @@ void dMeter2Draw_c::drawLightDrop(u8 i_num, u8 i_needNum, f32 i_posX, f32 i_posY
 
     field_0x6fc = param_5;
     mLightDropVesselScale = i_vesselScale;
+#if TARGET_PC
+    const f32 lightDropUserScale = dGetUserHudScale();
+    const f32 lightDropScale = mLightDropVesselScale * field_0x6f8 * lightDropUserScale;
+    mpLightDropParent->scale(lightDropScale, lightDropScale);
+
+    f32 lightDropPosX = i_posX;
+    f32 lightDropPosY = i_posY;
+    dAnchorHudScale(mpLightDropParent, HudCorner::TopRight, &lightDropPosX, &lightDropPosY);
+    mpLightDropParent->paneTrans(lightDropPosX, lightDropPosY);
+#else
     mpLightDropParent->scale(mLightDropVesselScale * field_0x6f8,
                              mLightDropVesselScale * field_0x6f8);
 
     mpLightDropParent->paneTrans(i_posX, i_posY);
+#endif
 }
 
 void dMeter2Draw_c::setAlphaLightDropChange(bool unused) {}
@@ -1943,8 +2133,13 @@ void dMeter2Draw_c::setAlphaLightDropAnimeMax() {
             field_0x6f8 = 1.0f;
         }
 
+#if TARGET_PC
+        const f32 dropAnimScale = mLightDropVesselScale * field_0x6f8 * dGetUserHudScale();
+        mpLightDropParent->scale(dropAnimScale, dropAnimScale);
+#else
         mpLightDropParent->scale(mLightDropVesselScale * field_0x6f8,
                                  mLightDropVesselScale * field_0x6f8);
+#endif
 
         if (g_drawHIO.mLightDrop.mDropGetScaleAnimFrameNum == mpLightDropParent->getAlphaTimer()) {
             dMeter2Info_setLightDropGetFlag(dComIfGp_getStartStageDarkArea(), 0xFF);
@@ -2015,10 +2210,22 @@ void dMeter2Draw_c::drawRupee(s16 i_rupeeNum) {
     static_cast<J2DPicture*>(mpRupeeTexture[0][0]->getPanePtr())->changeTexture(timg, 0);
     static_cast<J2DPicture*>(mpRupeeTexture[0][1]->getPanePtr())->changeTexture(timg, 0);
 
+#if TARGET_PC
+    const f32 rupeeKeyUserScale = dGetUserHudScale();
+    const f32 rupeeKeyScale = g_drawHIO.mRupeeKeyScale * field_0x718 * rupeeKeyUserScale;
+    mpRupeeKeyParent->scale(rupeeKeyScale, rupeeKeyScale);
+
+    f32 rupeeKeyPosX = g_drawHIO.mRupeeKeyPosX;
+    f32 rupeeKeyPosY = g_drawHIO.mRupeeKeyPosY;
+    // Rupees/keys read better anchored to the bottom-right corner than the top-right.
+    dAnchorHudScale(mpRupeeKeyParent, HudCorner::BottomRight, &rupeeKeyPosX, &rupeeKeyPosY);
+    mpRupeeKeyParent->paneTrans(rupeeKeyPosX, rupeeKeyPosY);
+#else
     mpRupeeKeyParent->scale(g_drawHIO.mRupeeKeyScale * field_0x718,
                             g_drawHIO.mRupeeKeyScale * field_0x718);
 
     mpRupeeKeyParent->paneTrans(g_drawHIO.mRupeeKeyPosX, g_drawHIO.mRupeeKeyPosY);
+#endif
 
     mpRupeeParent[0]->scale(g_drawHIO.mRupeeScale, g_drawHIO.mRupeeScale);
     mpRupeeParent[0]->paneTrans(g_drawHIO.mRupeePosX, g_drawHIO.mRupeePosY);
@@ -2137,8 +2344,18 @@ void dMeter2Draw_c::drawKey(s16 i_keyNum) {
         }
     }
 
+#if TARGET_PC
+    const f32 keyScale = g_drawHIO.mKeyScale * dGetUserHudScale();
+    mpKeyParent->scale(keyScale, keyScale);
+
+    f32 keyPosX = g_drawHIO.mKeyPosX;
+    f32 keyPosY = g_drawHIO.mKeyPosY;
+    dAnchorHudScale(mpKeyParent, HudCorner::BottomRight, &keyPosX, &keyPosY);
+    mpKeyParent->paneTrans(keyPosX, keyPosY);
+#else
     mpKeyParent->scale(g_drawHIO.mKeyScale, g_drawHIO.mKeyScale);
     mpKeyParent->paneTrans(g_drawHIO.mKeyPosX, g_drawHIO.mKeyPosY);
+#endif
 }
 
 void dMeter2Draw_c::setAlphaKeyChange(bool param_0) {
@@ -2245,11 +2462,11 @@ void dMeter2Draw_c::drawButtonA(u8 i_action, f32 i_posX, f32 i_posY, f32 i_textP
         mp_string = getActionString(0x15, 1, NULL);
 
         for (int i = 0; i < 5; i++) {
-            strcpy(static_cast<J2DTextBox*>(mpAText[i]->getPanePtr())->getStringPtr(), mp_string);
+            SAFE_STRCPY(static_cast<J2DTextBox*>(mpAText[i]->getPanePtr())->getStringPtr(), mp_string);
         }
     } else {
         for (int i = 0; i < 5; i++) {
-            strcpy(static_cast<J2DTextBox*>(mpAText[i]->getPanePtr())->getStringPtr(), mp_string);
+            SAFE_STRCPY(static_cast<J2DTextBox*>(mpAText[i]->getPanePtr())->getStringPtr(), mp_string);
         }
     }
 
@@ -2257,7 +2474,7 @@ void dMeter2Draw_c::drawButtonA(u8 i_action, f32 i_posX, f32 i_posY, f32 i_textP
     mpButtonA->paneTrans(i_posX, i_posY);
     mpTextA->scale(var_f30 * i_scale, var_f30 * i_scale);
     mpTextA->paneTrans(g_drawHIO.mButtonATextPosX + i_textPosX,
-                       g_drawHIO.mButtonATextPosY + i_textPosY);
+                       g_drawHIO.mButtonATextPosY + i_textPosY IF_DUSK(+ (dusk::version::isLessThanWiiJpn() ? 6.0f : 0.0f)));
 }
 
 void dMeter2Draw_c::drawButtonB(u8 i_action, bool param_1, f32 i_posX, f32 i_posY, f32 i_textPosX,
@@ -2308,9 +2525,14 @@ void dMeter2Draw_c::drawButtonB(u8 i_action, bool param_1, f32 i_posX, f32 i_pos
     JUT_ASSERT(0, strlen(mp_string) < (64));
 
     for (int i = 0; i < 5; i++) {
-        strcpy(static_cast<J2DTextBox*>(mpBText[i]->getPanePtr())->getStringPtr(), mp_string);
+        SAFE_STRCPY(static_cast<J2DTextBox*>(mpBText[i]->getPanePtr())->getStringPtr(), mp_string);
     }
 
+#if TARGET_PC
+    if (dusk::getSettings().game.enableTouchControls) {
+        mpScreen->search(MULTI_CHAR('item_b_n'))->hide();
+    } else
+#endif
     if (i_action == 0x26 || i_action == 0x2E) {
         mpScreen->search(MULTI_CHAR('item_b_n'))->show();
         var_r31 = 1;
@@ -2391,7 +2613,7 @@ void dMeter2Draw_c::drawButtonZ(u8 i_action) {
     JUT_ASSERT(0, strlen(mp_string) < (64));
 
     for (int i = 0; i < 5; i++) {
-        strcpy(static_cast<J2DTextBox*>(mpXYText[i][2]->getPanePtr())->getStringPtr(), mp_string);
+        SAFE_STRCPY(static_cast<J2DTextBox*>(mpXYText[i][2]->getPanePtr())->getStringPtr(), mp_string);
     }
 
     mpButtonXY[2]->scale(g_drawHIO.mButtonZScale, g_drawHIO.mButtonZScale);
@@ -2450,6 +2672,11 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
 
     static u64 const tag[] = {MULTI_CHAR('item_x_n'), MULTI_CHAR('item_y_n')};
 
+#if TARGET_PC
+    const float btnXOffsetX = dusk::version::isLessThanWiiJpn() ? 2.0f : 0.0f;
+    const float btnXOffsetY = dusk::version::isLessThanWiiJpn() ? 38.0f : 0.0f;
+#endif
+
     if (!param_3) {
         mpScreen->search(tag[i_no])->hide();
 
@@ -2490,13 +2717,14 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
         JUT_ASSERT(0, strlen(mp_string) < (64));
 
         for (int i = 0; i < 5; i++) {
-            strcpy(static_cast<J2DTextBox*>(mpXYText[i][i_no]->getPanePtr())->getStringPtr(),
+            SAFE_STRCPY(static_cast<J2DTextBox*>(mpXYText[i][i_no]->getPanePtr())->getStringPtr(),
                    mp_string);
         }
 
         if (i_no == SELECT_X_e) {
             mpTextXY[i_no]->scale(g_drawHIO.mButtonXYTextScale, g_drawHIO.mButtonXYTextScale);
-            mpTextXY[i_no]->paneTrans(g_drawHIO.mButtonXYTextPosX, g_drawHIO.mButtonXYTextPosY);
+            mpTextXY[i_no]->paneTrans(g_drawHIO.mButtonXYTextPosX IF_DUSK(- btnXOffsetX),
+                                      g_drawHIO.mButtonXYTextPosY IF_DUSK(+ btnXOffsetY));
         } else if (i_no == SELECT_Y_e) {
             mpTextXY[i_no]->scale(g_drawHIO.mButtonXYTextScale, g_drawHIO.mButtonXYTextScale);
             mpTextXY[i_no]->paneTrans(g_drawHIO.mButtonXYTextPosX, g_drawHIO.mButtonXYTextPosY);
@@ -2558,7 +2786,8 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
             mpLightXY[0]->setAlphaRate(mButtonXItemBaseAlpha[var_r29] * field_0x7f0);
 
             mpTextXY[i_no]->scale(g_drawHIO.mButtonXYTextScale, g_drawHIO.mButtonXYTextScale);
-            mpTextXY[i_no]->paneTrans(g_drawHIO.mButtonXYTextPosX, g_drawHIO.mButtonXYTextPosY);
+            mpTextXY[i_no]->paneTrans(g_drawHIO.mButtonXYTextPosX IF_DUSK(- btnXOffsetX),
+                                      g_drawHIO.mButtonXYTextPosY IF_DUSK(+ btnXOffsetY));
         } else if (i_no == SELECT_Y_e) {
             mpButtonXY[1]->scale(g_drawHIO.mButtonYScale, g_drawHIO.mButtonYScale);
             mpButtonXY[1]->paneTrans(g_drawHIO.mButtonYPosX, g_drawHIO.mButtonYPosY);
@@ -2588,6 +2817,12 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
             mpTextXY[i_no]->scale(g_drawHIO.mButtonXYTextScale, g_drawHIO.mButtonXYTextScale);
             mpTextXY[i_no]->paneTrans(g_drawHIO.mButtonXYTextPosX, g_drawHIO.mButtonXYTextPosY);
         }
+
+#if TARGET_PC
+        if (dusk::getSettings().game.enableTouchControls) {
+            mpScreen->search(tag[i_no])->hide();
+        }
+#endif
     }
 }
 
@@ -2596,11 +2831,24 @@ f32 dMeter2Draw_c::getButtonCrossParentInitTransY() {
 }
 
 void dMeter2Draw_c::drawButtonCross(f32 i_posX, f32 i_posY) {
+#if TARGET_PC
+    const f32 buttonCrossUserScale = dGetUserHudScale();
+    const f32 buttonCrossScale = g_drawHIO.mButtonCrossScale * buttonCrossUserScale;
+    mpButtonCrossParent->scale(buttonCrossScale, buttonCrossScale);
+#else
     mpButtonCrossParent->scale(g_drawHIO.mButtonCrossScale, g_drawHIO.mButtonCrossScale);
+#endif
     mpTextI->scale(g_drawHIO.mButtonCrossTextScale, g_drawHIO.mButtonCrossTextScale);
     mpTextM->scale(g_drawHIO.mButtonCrossTextScale, g_drawHIO.mButtonCrossTextScale);
 
+#if TARGET_PC
+    f32 buttonCrossPosX = i_posX;
+    f32 buttonCrossPosY = i_posY;
+    dAnchorHudScale(mpButtonCrossParent, HudCorner::BottomLeft, &buttonCrossPosX, &buttonCrossPosY);
+    mpButtonCrossParent->paneTrans(buttonCrossPosX, buttonCrossPosY);
+#else
     mpButtonCrossParent->paneTrans(i_posX, i_posY);
+#endif
 }
 
 void dMeter2Draw_c::setAlphaButtonCrossAnimeMin() {
@@ -3140,6 +3388,10 @@ void dMeter2Draw_c::setButtonIconMidonaAlpha(u32 param_0) {
     }
 
     mpButtonXY[2]->setAlpha(255.0f * field_0x724 * temp_f30_2);
+
+#if TARGET_PC
+    dusk::ui::update_midna_icon_texture(mpButtonMidona != NULL ? mpButtonMidona->getPanePtr() : NULL);
+#endif
 }
 
 void dMeter2Draw_c::setButtonIconAlpha(int i_no, u8 unused0, u32 unused1, bool unused2) {
@@ -3243,7 +3495,7 @@ char* dMeter2Draw_c::getActionString(u8 i_action, u8 i_type, u8* param_2) {
     };
 
     static char i_text_buf[32];
-    strcpy(i_text_buf, "");
+    SAFE_STRCPY(i_text_buf, "");
 
     if (param_2 != NULL) {
         *param_2 = 1;
@@ -3260,7 +3512,7 @@ char* dMeter2Draw_c::getActionString(u8 i_action, u8 i_type, u8* param_2) {
             }
 
             if (param_2 != NULL) {
-                *param_2 = mesg_entry.output_type;
+                *param_2 = mesg_entry.draw_type;
 
                 if (g_drawHIO.mButtonATextActionID == 0x3E6) {
                     *param_2 = 7;
@@ -3277,7 +3529,7 @@ char* dMeter2Draw_c::getActionString(u8 i_action, u8 i_type, u8* param_2) {
         }
 
         if (param_2 != NULL) {
-            *param_2 = mesg_entry.output_type;
+            *param_2 = mesg_entry.draw_type;
 
             if (i_action_num[i_action] == 0x3E6) {
                 *param_2 = 7;
@@ -3505,9 +3757,16 @@ void dMeter2Draw_c::drawKanteraMeter(u8 i_button, f32 i_alphaRate) {
     Vec vtx0 = pane->getPanePtr()->getGlbVtx(0);
     Vec vtx3 = pane->getPanePtr()->getGlbVtx(3);
 
+#if TARGET_PC
+    const f32 oilUserScale = dGetUserHudScale();
+    mpKanteraMeter[i_button]->setPos(((vtx0.x + vtx3.x) * 0.5f) + 9.0f * oilUserScale + sp10[i_button],
+                                     vtx3.y + sp8[i_button]);
+    mpKanteraMeter[i_button]->setScale(0.6f * oilUserScale, 0.6f * oilUserScale);
+#else
     mpKanteraMeter[i_button]->setPos(((vtx0.x + vtx3.x) * 0.5f) + 9.0f + sp10[i_button],
                                      vtx3.y + sp8[i_button]);
     mpKanteraMeter[i_button]->setScale(0.6f, 0.6f);
+#endif
     mpKanteraMeter[i_button]->setNowGauge(dComIfGs_getMaxOil(), dComIfGs_getOil());
     mpKanteraMeter[i_button]->setAlphaRate(i_alphaRate);
 }

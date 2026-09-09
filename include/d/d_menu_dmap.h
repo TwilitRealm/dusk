@@ -183,6 +183,11 @@ public:
     /* 0xDD8 */ u8 field_0xdd8;
     /* 0xDD9 */ u8 field_0xdd9;
     /* 0xDDA */ u8 field_0xdda;
+
+#if TARGET_PC
+    J2DTextBox* mpPoeCountPane;
+    J2DPicture* mpPoeCountIcon;
+#endif
 };
 
 class dMenu_Dmap_c {
@@ -248,9 +253,8 @@ public:
     s8 getFloorPos(s8 param_0) { return param_0 - mBottomFloor; }
     u16 getCMessageNum() { return mCMessageNum; }
 
-    static dMenu_Dmap_c* myclass;
+    static DUSK_GAME_DATA dMenu_Dmap_c* myclass;
 
-private:
     /* 0x004 */ dMenu_DmapMapCtrl_c* mMapCtrl;
     /* 0x008 */ dMenu_DmapBg_c* mpDrawBg;
     /* 0x00C */ u8 field_0xc[0x10 - 0xC];

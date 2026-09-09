@@ -11,7 +11,7 @@ class daNpc_Yelia_Param_c {
 public:
     virtual ~daNpc_Yelia_Param_c() {}
 
-    static daNpc_Yelia_HIOParam const m;
+    static DUSK_GAME_DATA daNpc_Yelia_HIOParam const m;
 };
 
 #if DEBUG
@@ -82,7 +82,7 @@ public:
                         int i_faceMotionStepNum,
                         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData,
                         int i_motionStepNum,
-                        daNpcT_evtData_c const* i_evtData, char** i_arcNames)
+                        daNpcT_evtData_c const* i_evtData, char DUSK_CONST* DUSK_CONST* i_arcNames)
                         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
                         i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
                         i_arcNames) {}
@@ -102,9 +102,8 @@ public:
         return no;
     }
 
-    static char* mCutNameList[6];
-    static int (daNpc_Yelia_c::*mCutList[6])(int);
-private:
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[6];
+    static DUSK_GAME_DATA int (daNpc_Yelia_c::*mCutList[6])(int);
     /* 0xE40 */ NPC_YELIA_HIO_CLASS* mpHIO;
     /* 0xE44 */ dCcD_Cyl mCcCyl;
     /* 0xF80 */ u8 mType;

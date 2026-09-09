@@ -41,7 +41,7 @@ public:
         BASE_ROOM5,
         BASE_DEMO,
 
-        #if DEBUG
+        #if PARTIAL_DEBUG || DEBUG
         BASE_DEBUG,
         #endif
 
@@ -53,7 +53,7 @@ public:
     dEvent_manager_c();
     ~dEvent_manager_c() {}
     int create();
-    bool setObjectArchive(char* arcname);
+    bool setObjectArchive(DUSK_CONST char* arcname);
     void demoInit();
     void roomInit(int roomNo);
     void roomFinish(int roomNo);
@@ -112,7 +112,6 @@ public:
     dEvM_HIO_c& getEventHIO();
     #endif
 
-private:
     /* 0x000 */ dEvDtBase_c mEventList[BASE_MAX];
     /* 0x18C */ int mCameraPlay;
     /* 0x190 */ dEvent_exception_c mException;

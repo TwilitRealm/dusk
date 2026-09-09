@@ -24,13 +24,13 @@ void daLv6FurikoTrap_HIO_c::genMessage(JORMContext* context) {
 
 static daLv6FurikoTrap_HIO_c l_HIO;
 
-const dCcD_SrcGObjInf daLv6FurikoTrap_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daLv6FurikoTrap_c::mCcDObjInfo = {
     {0, {{0x800, 1, 0x1f}, {0, 0}, {0x79}}},
     {1, 0, 1, 0, 1},
     {0xa, 5, 0, 0, 0},
     {0},
 };
-dCcD_SrcSph daLv6FurikoTrap_c::mCcDSph = {mCcDObjInfo};
+DUSK_GAME_DATA dCcD_SrcSph daLv6FurikoTrap_c::mCcDSph = {mCcDObjInfo};
 
 void daLv6FurikoTrap_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
@@ -185,7 +185,7 @@ static int daLv6FurikoTrap_Create(fopAc_ac_c* i_this) {
     return this_trap->create();
 }
 
-static actor_method_class l_daLv6FurikoTrap_Method = {
+static DUSK_CONST actor_method_class l_daLv6FurikoTrap_Method = {
     (process_method_func)daLv6FurikoTrap_Create,
     (process_method_func)daLv6FurikoTrap_Delete,
     (process_method_func)daLv6FurikoTrap_Execute,
@@ -193,7 +193,7 @@ static actor_method_class l_daLv6FurikoTrap_Method = {
     (process_method_func)daLv6FurikoTrap_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_Lv6FuriTrap = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Lv6FuriTrap = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

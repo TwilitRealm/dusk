@@ -33,7 +33,7 @@ typedef struct base_process_class {
     /* 0x34 */ line_tag line_tag_;
     /* 0x4C */ delete_tag_class delete_tag;
     /* 0x68 */ process_priority_class priority;
-    /* 0xA8 */ process_method_class* methods;
+    /* 0xA8 */ process_method_class DUSK_CONST* methods;
     /* 0xAC */ void* append;
     /* 0xB0 */ u32 parameters;
     /* 0xB4 */ int subtype;
@@ -57,6 +57,6 @@ int fpcBs_Delete(base_process_class* i_proc);
 base_process_class* fpcBs_Create(s16 i_profname, fpc_ProcID i_procID, void* i_append);
 int fpcBs_SubCreate(base_process_class* i_proc);
 
-extern int g_fpcBs_type;
+DUSK_GAME_EXTERN int g_fpcBs_type;
 
 #endif

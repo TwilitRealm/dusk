@@ -31,7 +31,7 @@ static void* daHoZelda_searchGanon(fopAc_ac_c* i_actor, void* i_data) {
     return NULL;
 }
 
-const daHoZelda_hio_c1 daHoZelda_hio_c0::m = {
+DUSK_GAME_DATA const daHoZelda_hio_c1 daHoZelda_hio_c0::m = {
     0x38E,
     0x2AAA,
     0x4000,
@@ -40,8 +40,8 @@ const daHoZelda_hio_c1 daHoZelda_hio_c0::m = {
     4000.0f,
 };
 
-u8 daHoZelda_matAnm_c::mEyeMoveFlg;
-u8 daHoZelda_matAnm_c::mMorfFrame;
+DUSK_GAME_DATA u8 daHoZelda_matAnm_c::mEyeMoveFlg;
+DUSK_GAME_DATA u8 daHoZelda_matAnm_c::mMorfFrame;
 
 void daHoZelda_matAnm_c::init() {
     field_0xf4 = 0.0f;
@@ -930,7 +930,7 @@ static int daHoZelda_Draw(daHoZelda_c* i_this) {
     return i_this->draw();
 }
 
-static actor_method_class l_daHoZelda_Method = {
+static DUSK_CONST actor_method_class l_daHoZelda_Method = {
     (process_method_func)daHoZelda_Create,
     (process_method_func)daHoZelda_Delete,
     (process_method_func)daHoZelda_Execute,
@@ -938,7 +938,7 @@ static actor_method_class l_daHoZelda_Method = {
     (process_method_func)daHoZelda_Draw,
 };
 
-actor_process_profile_definition g_profile_HOZELDA = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_HOZELDA = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

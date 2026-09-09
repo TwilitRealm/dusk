@@ -20,7 +20,7 @@ class daNpc_ZelRo_Param_c {
 public:
     virtual ~daNpc_ZelRo_Param_c() {}
 
-    static daNpc_ZelRo_HIOParam const m;
+    static DUSK_GAME_DATA daNpc_ZelRo_HIOParam const m;
 };
 
 #if DEBUG
@@ -135,7 +135,7 @@ public:
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_faceMotionSequenceData,
         int i_faceMotionStepNum,
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData, int i_motionStepNum,
-        daNpcT_evtData_c const* i_evtData, char** i_arcNames)
+        daNpcT_evtData_c const* i_evtData, char DUSK_CONST* DUSK_CONST* i_arcNames)
         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
                    i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
                    i_arcNames) {}
@@ -147,10 +147,9 @@ public:
     BOOL checkChangeJoint(int i_joint) { return i_joint == JNT_HEAD; }
     BOOL checkRemoveJoint(int i_joint) { return i_joint == JNT_MOUTH; }
 
-    static char* mCutNameList;
-    static cutFunc mCutList[1];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList;
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[1];
 
-private:
     /* 0xE40 */ NPC_ZELRO_HIO_CLASS* mpHIO;
     /* 0xE44 */ dCcD_Cyl mCyl;
     /* 0xF80 */ u8 mType;

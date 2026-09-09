@@ -53,8 +53,8 @@ public:
     void demoMessageGroupLocal();
     void endFlowGroupLocal();
     void changeGroupLocal(s16);
-    bool getStringLocal(u32, J2DTextBox*, J2DTextBox*, JUTFont*, COutFont_c*, char*,
-                                       char*, char*, s16*);
+    bool getStringLocal(u32, J2DTextBox*, J2DTextBox*, JUTFont*, COutFont_c*, TEXT_SPAN,
+                                       TEXT_SPAN, TEXT_SPAN, s16*);
     bool isGetItemMessage();
     bool isKanbanMessage();
     bool isHowlMessage();
@@ -121,7 +121,7 @@ public:
     static void endFlowGroup();
     static void changeGroup(s16);
     static bool getString(u32, J2DTextBox*, J2DTextBox*, JUTFont*, COutFont_c*,
-                                         char*, char*, char*, s16*);
+                                         TEXT_SPAN, TEXT_SPAN, TEXT_SPAN, s16*);
     static void* getMsgDtPtr();
     static void setProcessID(fpc_ProcID);
     static msg_class* getActor();
@@ -246,12 +246,12 @@ public:
 
     static void setWord(const char* i_word);
     void setWordLocal(const char* i_word) {
-        strcpy(mWord, i_word);
+        SAFE_STRCPY(mWord, i_word);
     }
 
     static void setSelectWord(int i_no, const char* i_word);
     void setSelectWordLocal(int i_no, const char* i_word) {
-        strcpy(mSelectWord[i_no], i_word);
+        SAFE_STRCPY(mSelectWord[i_no], i_word);
     }
 
     jmessage_tSequenceProcessor* getSequenceProcessor() { return mpSeqProc; }
@@ -280,13 +280,13 @@ public:
     /* 0x150 */ f32 field_0x150;
     /* 0x154 */ u32 mMessageID;
     /* 0x158 */ u32 field_0x158;
-    /* 0x15C */ u32 field_0x15c;
+    /* 0x15C */ u32 mSelectMessageID;  // message ID of the selection options message; 1000 = none
     /* 0x160 */ int mIdx;
     /* 0x164 */ u16 mNodeIdx;
     /* 0x166 */ u16 field_0x166;
     /* 0x168 */ u16 field_0x168;
     /* 0x16A */ s16 field_0x16a;
-    /* 0x16C */ s16 field_0x16c;
+    /* 0x16C */ s16 mCurrentGroupID;  // group whose BMG is parsed; -1 none, 0 common, 1-8 stage
     /* 0x16E */ s16 field_0x16e;
     /* 0x170 */ s16 mNowTalkFlowNo;
     /* 0x172 */ s16 field_0x172;
@@ -360,7 +360,12 @@ inline void dMsgObject_demoMessageGroup() {
 }
 
 inline bool dMsgObject_isTalkNowCheck() {
+#if TARGET_PC
+    dMsgObject_c* msgObject = dMsgObject_getMsgObjectClass();
+    return msgObject != NULL && msgObject->getStatus() != 1;
+#else
     return dMsgObject_getMsgObjectClass()->getStatus() == 1 ? false : true;
+#endif
 }
 
 inline bool dMsgObject_isKillMessageFlag() {
@@ -426,8 +431,8 @@ inline void dMsgObject_setTalkActor(fopAc_ac_c* actor) {
 }
 
 inline bool dMsgObject_getString(u32 i_msgId, J2DTextBox* i_tbox, J2DTextBox* i_rubyTbox,
-                                 JUTFont* i_font, COutFont_c* i_outFont, char* o_text,
-                                 char* o_ruby, char* o_textS, s16* param_8) {
+                                 JUTFont* i_font, COutFont_c* i_outFont, TEXT_SPAN o_text,
+                                 TEXT_SPAN o_ruby, TEXT_SPAN o_textS, s16* param_8) {
     return dMsgObject_getMsgObjectClass()->getString(i_msgId, i_tbox, i_rubyTbox, i_font, i_outFont, o_text, o_ruby,
                                    o_textS, param_8);
 }
@@ -497,7 +502,12 @@ inline void dMsgObject_onMsgSend() {
 }
 
 inline bool dMsgObject_isFukidashiCheck() {
+#if TARGET_PC
+    dMsgObject_c* msgObject = dMsgObject_getMsgObjectClass();
+    return msgObject != NULL && msgObject->getScrnDrawPtr() != NULL;
+#else
     return dMsgObject_getMsgObjectClass()->getScrnDrawPtr() == NULL ? false : true;
+#endif
 }
 
 inline void* dMsgObject_getTalkHeap() {
@@ -761,6 +771,6 @@ public:
     /* 0x35C */ dMsgObject_HowlHIO_c mHowlHIO;
 };
 
-extern dMsgObject_HIO_c g_MsgObject_HIO_c;
+DUSK_GAME_EXTERN dMsgObject_HIO_c g_MsgObject_HIO_c;
 
 #endif /* D_MSG_D_MSG_OBJECT_H */

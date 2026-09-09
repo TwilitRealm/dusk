@@ -11,14 +11,14 @@
 
 static daBubbPilar_HIO_c l_HIO;
 
-const dCcD_SrcGObjInf daBubbPilar_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daBubbPilar_c::mCcDObjInfo = {
     {0, {{0, 0, 0}, {0x20, 0x11}, {0}}},
     {dCcD_SE_NONE, 0, 1, 0, 0},
     {dCcD_SE_NONE, 0, 0, 0, 2},
     {0},
 };
 
-dCcD_SrcCyl daBubbPilar_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daBubbPilar_c::mCcDCyl = {
     daBubbPilar_c::mCcDObjInfo,
     {
         {{0.0f, 0.0f, 0.0f}, 0.0f, 0.0f}
@@ -218,7 +218,7 @@ static int daBubbPilar_Create(fopAc_ac_c* i_this) {
     return static_cast<daBubbPilar_c*>(i_this)->create();
 }
 
-static actor_method_class l_daBubbPilar_Method = {
+static DUSK_CONST actor_method_class l_daBubbPilar_Method = {
     (process_method_func)daBubbPilar_Create,
     (process_method_func)daBubbPilar_Delete,
     (process_method_func)daBubbPilar_Execute,
@@ -226,7 +226,7 @@ static actor_method_class l_daBubbPilar_Method = {
     (process_method_func)daBubbPilar_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_awaPlar = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_awaPlar = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

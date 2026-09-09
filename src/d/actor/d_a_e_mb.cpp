@@ -105,7 +105,7 @@ static int daE_MB_Draw(e_mb_class* i_this) {
     i_this->mRopeMat.update(16, l_color, &a_this->tevStr);
     dComIfGd_set3DlineMat(&i_this->mRopeMat);
 #if TARGET_PC
-    if (dusk::getSettings().game.enableFrameInterpolation) {
+    if (dusk::frame_interp::is_enabled()) {
         if (i_this->mRopeInterpCurrValid) {
             memcpy(i_this->mRopeInterpPrev, i_this->mRopeInterpCurr, sizeof(i_this->mRopeInterpCurr));
             i_this->mRopeInterpPrevValid = true;
@@ -763,7 +763,7 @@ static int daE_MB_Create(fopAc_ac_c* i_this) {
     return phase_state;
 }
 
-static actor_method_class l_daE_MB_Method = {
+static DUSK_CONST actor_method_class l_daE_MB_Method = {
     (process_method_func)daE_MB_Create,
     (process_method_func)daE_MB_Delete,
     (process_method_func)daE_MB_Execute,
@@ -771,7 +771,7 @@ static actor_method_class l_daE_MB_Method = {
     (process_method_func)daE_MB_Draw,
 };
 
-actor_process_profile_definition g_profile_E_MB = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_E_MB = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

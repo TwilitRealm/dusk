@@ -9,7 +9,7 @@
 #include "d/d_save.h"
 #include "f_op/f_op_actor_mng.h"
 
-FmtMngAttributes const daFmtMng_c::M_attr = {
+DUSK_GAME_DATA FmtMngAttributes const daFmtMng_c::M_attr = {
     0x14, 6.0f, 0.5f,
     120.0f, 150.0f, 10, 0x4000,
 };
@@ -62,7 +62,7 @@ void daFmtMng_c::initMemberPos() {
     }
 }
 
-daFmtMng_c::ActionFunc daFmtMng_c::ActionTable[10] = {
+DUSK_GAME_DATA daFmtMng_c::ActionFunc daFmtMng_c::ActionTable[10] = {
     &daFmtMng_c::initWait, &daFmtMng_c::executeWait,
     &daFmtMng_c::initWalk, &daFmtMng_c::executeWalk,
     &daFmtMng_c::initReverse, &daFmtMng_c::executeReverse,
@@ -386,7 +386,7 @@ void daFmtMng_c::create_init() {
     }
 }
 
-static actor_method_class l_daFmtMng_Method = {
+static DUSK_CONST actor_method_class l_daFmtMng_Method = {
     (process_method_func)daFmtMng_Create,
     (process_method_func)daFmtMng_Delete,
     (process_method_func)daFmtMng_Execute,
@@ -394,7 +394,7 @@ static actor_method_class l_daFmtMng_Method = {
     (process_method_func)daFmtMng_Draw,
 };
 
-actor_process_profile_definition g_profile_FORMATION_MNG = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_FORMATION_MNG = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

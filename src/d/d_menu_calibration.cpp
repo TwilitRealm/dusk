@@ -14,7 +14,12 @@
 #include "m_Do/m_Do_controller_pad.h"
 #include <cstring>
 
-// Need 0xC bytes of padding with no symbol between dMenu_Calibration_c::__vtable and the end of .data
+#if TARGET_PC
+#include "helpers/string.hpp"
+#endif
+
+// Need 0xC bytes of padding with no symbol between dMenu_Calibration_c::__vtable and the end of
+// .data
 // This is likely caused by the vtable of an abstract base class getting put there and then stripped out.
 // Not sure which abstract base class could go there though, so we simulate it with some dummy classes for now.
 class dummy_abstract_class {
@@ -22,7 +27,7 @@ public:
     virtual void virt_func_0() = 0;
 };
 class dummy_child_class : dummy_abstract_class {
-#ifdef TARGET_PC
+#if TARGET_PC
     virtual void virt_func_0() {}
 #else
     virtual void virt_func_0();
@@ -252,7 +257,7 @@ void dMenu_Calibration_c::setCalibrationValue() {
 void dMenu_Calibration_c::setAButtonString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 5; i++) {
-            strcpy(mpAButtonString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpAButtonString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 5; i++) {
@@ -264,7 +269,7 @@ void dMenu_Calibration_c::setAButtonString(u16 i_stringID) {
 void dMenu_Calibration_c::setBButtonString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 5; i++) {
-            strcpy(mpBButtonString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpBButtonString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 5; i++) {
@@ -276,7 +281,7 @@ void dMenu_Calibration_c::setBButtonString(u16 i_stringID) {
 void dMenu_Calibration_c::setStepString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 3; i++) {
-            strcpy(mpStepString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpStepString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 3; i++) {
@@ -288,7 +293,7 @@ void dMenu_Calibration_c::setStepString(u16 i_stringID) {
 void dMenu_Calibration_c::setExplainString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 3; i++) {
-            strcpy(mpExplainString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpExplainString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 3; i++) {

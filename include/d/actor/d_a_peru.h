@@ -59,7 +59,7 @@ class daPeru_Param_c {
 public:
     virtual ~daPeru_Param_c() {}
 
-    static daPeru_HIOParam const m;
+    static DUSK_GAME_DATA daPeru_HIOParam const m;
 };
 
 #if DEBUG
@@ -137,7 +137,7 @@ public:
                             daNpcT_motionAnmData_c const* param_2,
                             daNpcT_MotionSeqMngr_c::sequenceStepData_c const* param_3, int param_4,
                             daNpcT_MotionSeqMngr_c::sequenceStepData_c const* param_5, int param_6,
-                            daNpcT_evtData_c const* param_7, char** param_8)
+                            daNpcT_evtData_c const* param_7, char DUSK_CONST* DUSK_CONST* param_8)
         : daNpcT_c(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8) {
             OS_REPORT("|%06d:%x|daPeru_c -> コンストラクト\n", g_Counter.mCounter0, this);
         }
@@ -186,10 +186,9 @@ public:
     void setCnt(int cnt) { field_0xe6a = cnt; }
     int getCnt() { return field_0xe6a; }
 
-    static const char* mCutNameList[3];
-    static cutAppearFunc mCutList[3];
+    static DUSK_GAME_DATA const char* mCutNameList[3];
+    static DUSK_GAME_DATA cutAppearFunc mCutList[3];
 
-private:
     /* 0x0E40 */ daNpcT_ActorMngr_c mActors[3];
     /* 0x0E58 */ int field_0xe58;
     /* 0x0E5C */ actionFunc mActionFunc;

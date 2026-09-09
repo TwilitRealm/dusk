@@ -118,7 +118,7 @@ static int dKyeff_Create(kankyo_class* i_this) {
 
     if (strcmp(dComIfGp_getStartStageName(), "Name") == 0) {
         camera_process_class* camera = dComIfGp_getCamera(0);
-        OSTime time = OSGetTime();
+        OSTime time = DUSK_IF_ELSE(OSGetSystemTime(), OSGetTime());
         OSTicksToCalendarTime(time, &calendar);
 
         g_env_light.global_wind_influence.vec.x = 1.0f;
@@ -143,7 +143,7 @@ static leafdraw_method_class l_dKyeff_Method = {
     (process_method_func)dKyeff_Draw,
 };
 
-kankyo_process_profile_definition g_profile_KYEFF = {
+DUSK_PROFILE kankyo_process_profile_definition DUSK_CONST g_profile_KYEFF = {
     /* Layer ID      */ fpcLy_CURRENT_e,
     /* List ID       */ 12,
     /* List Prio     */ fpcPi_CURRENT_e,

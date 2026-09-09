@@ -74,6 +74,9 @@ public:
     void clacEllipsePlotAverage(int, f32, f32);
     bool dpdMove();
     u8 openExplain(u8);
+#if TARGET_PC
+    bool pointerMove();
+#endif
 
     virtual void draw() { _draw(); }
     virtual ~dMenu_Ring_c();
@@ -81,7 +84,6 @@ public:
     void drawFlag0() { mDrawFlag = 0; }
     void setStatus(u8 i_status) { mStatus = i_status; }
 
-private:
     /* 0x004 */ JKRExpHeap* mpHeap;
     /* 0x008 */ STControl* mpStick;
     /* 0x00C */ CSTControl* mpCStick;
@@ -215,6 +217,7 @@ private:
     bool mCursorInterpPrevAngular;
     bool mCursorInterpCurrAngular;
     bool mCursorInterpInit;
+    bool mPointerTouchPressHoveredCurrent;
 #endif
 };
 

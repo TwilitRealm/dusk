@@ -931,7 +931,9 @@ static void get_demo(e_th_ball_class* i_this) {
     case 0:
         break;
     case 1:
-        demo_id = fopAcM_createItemForTrBoxDemo(&i_this->current.pos, dItemNo_IRONBALL_e, -1, fopAcM_GetRoomNo(i_this), NULL, NULL);
+        demo_id = fopAcM_createItemForTrBoxDemo(&i_this->current.pos,
+            DUSK_ITEM_CHECK_EXPR("ball_and_chain:D_MN11", dItemNo_IRONBALL_e, i_this), -1,
+            fopAcM_GetRoomNo(i_this), NULL, NULL DUSK_GIVE_TAG("ball_and_chain:D_MN11"));
         JUT_ASSERT(1670, demo_id != fpcM_ERROR_PROCESS_ID_e);
         i_this->mDemoMode = 2;
         break;
@@ -1115,7 +1117,7 @@ static int daE_TH_BALL_Create(fopAc_ac_c* a_this) {
     return phase_state;
 }
 
-static actor_method_class l_daE_TH_BALL_Method = {
+static DUSK_CONST actor_method_class l_daE_TH_BALL_Method = {
     (process_method_func)daE_TH_BALL_Create,
     (process_method_func)daE_TH_BALL_Delete,
     (process_method_func)daE_TH_BALL_Execute,
@@ -1123,7 +1125,7 @@ static actor_method_class l_daE_TH_BALL_Method = {
     (process_method_func)daE_TH_BALL_Draw,
 };
 
-actor_process_profile_definition g_profile_E_TH_BALL = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_E_TH_BALL = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 8,
     /* List Prio    */ fpcPi_CURRENT_e,

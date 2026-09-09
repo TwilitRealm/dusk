@@ -22,6 +22,11 @@
 #include <cstdio>
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/menu_pointer.h"
+#include "dusk/version.hpp"
+#endif
+
 typedef void (dMenu_Insect_c::*initFunc)();
 static initFunc map_init_process[] = {
     &dMenu_Insect_c::wait_init,          &dMenu_Insect_c::explain_open_init,
@@ -280,6 +285,12 @@ void dMenu_Insect_c::wait_init() {
 
 void dMenu_Insect_c::wait_move() {
     if (mDoGph_gInf_c::getFader()->getStatus() == 1) {
+#if TARGET_PC
+        if (pointerWait()) {
+            return;
+        }
+#endif
+
         if (mDoCPd_c::getTrigB(PAD_1) || field_0xf7 == 0) {
             if (mDoCPd_c::getTrigB(PAD_1) && field_0xf6 == 1) {
                 dMeter2Info_setInsectSelectType(0);
@@ -300,6 +311,40 @@ void dMenu_Insect_c::wait_move() {
         }
     }
 }
+
+#if TARGET_PC
+bool dMenu_Insect_c::pointerWait() {
+    dusk::menu_pointer::begin_context(dusk::menu_pointer::Context::Collection);
+    for (u8 y = 0; y < 4; ++y) {
+        for (u8 x = 0; x < 6; ++x) {
+            const int index = x + y * 6;
+            if (!isGetInsect(x, y) || !dusk::menu_pointer::hit_pane(mpINSParent[index], 8.0f)) {
+                continue;
+            }
+            dusk::menu_pointer::set_hover_target(index);
+
+            if (field_0xf4 != x || field_0xf5 != y) {
+                field_0xf4 = x;
+                field_0xf5 = y;
+                setCursorPos();
+                setAButtonString(0x368);
+                Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_ITEM, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                         -1.0f, 0);
+            }
+            if (dusk::menu_pointer::consume_click()) {
+                field_0xf3 = 1;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_EXP_WIN_OPEN, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                         -1.0f, 0);
+                dMeter2Info_set2DVibration();
+                return true;
+            }
+            return false;
+        }
+    }
+
+    return false;
+}
+#endif
 
 void dMenu_Insect_c::explain_open_init() {
     char local_78[32];
@@ -352,12 +397,12 @@ void dMenu_Insect_c::explain_open_init() {
                      "\x1B"
                      "CR[%d]",
                      (int)(0.5f * (length - stringLength1)));
-            strcat(local_b8, local_78);
+            SAFE_STRCAT(local_b8, local_78);
             snprintf(cStack_d8, 32,
                      "\x1B"
                      "CR[%d]",
                      (int)(0.5f * (length - stringLength2)));
-            strcat(cStack_d8, local_98);
+            SAFE_STRCAT(cStack_d8, local_98);
             mpSelect_c->setString("", local_b8, cStack_d8);
             mpSelect_c->setRubyString("", "", "");
             mpSelect_c->selAnimeInit(2, field_0xf7 + 1, 0, length, 0);
@@ -491,7 +536,16 @@ void dMenu_Insect_c::screenSetBase() {
             }
         }
     }
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC
+    J2DTextBox* textBox;
+    if (dusk::version::isRegionJpn()) {
+        textBox = (J2DTextBox*)mpScreen->search(MULTI_CHAR('t_t00'));
+        mpScreen->search(MULTI_CHAR('f_t00'))->hide();
+    } else {
+        textBox = (J2DTextBox*)mpScreen->search(MULTI_CHAR('f_t00'));
+        mpScreen->search(MULTI_CHAR('t_t00'))->hide();
+    }
+#elif VERSION == VERSION_GCN_JPN
     J2DTextBox* textBox = (J2DTextBox*)mpScreen->search(MULTI_CHAR('t_t00'));
     mpScreen->search(MULTI_CHAR('f_t00'))->hide();
 #else
@@ -514,7 +568,19 @@ void dMenu_Insect_c::screenSetExplain() {
     if (field_0xf6 == 0) {
         mpExpSubWin[1]->hide();
     }
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC
+    if (dusk::version::isRegionJpn()) {
+        mpInfoText = JKR_NEW CPaneMgr(mpExpScreen, MULTI_CHAR('mg_3line'), 0, NULL);
+        mpExpScreen->search(MULTI_CHAR('n_e4line'))->hide();
+        field_0x5c = (J2DTextBox*)mpExpScreen->search(MULTI_CHAR('w_msg_jp'));
+        mpExpScreen->search(MULTI_CHAR('ms_for_2'))->hide();
+    } else {
+        mpInfoText = JKR_NEW CPaneMgr(mpExpScreen, MULTI_CHAR('mg_e4lin'), 0, NULL);
+        mpExpScreen->search(MULTI_CHAR('n_3line'))->hide();
+        field_0x5c = (J2DTextBox*)mpExpScreen->search(MULTI_CHAR('ms_for_2'));
+        mpExpScreen->search(MULTI_CHAR('w_msg_jp'))->hide();
+    }
+#elif VERSION == VERSION_GCN_JPN
     mpInfoText = JKR_NEW CPaneMgr(mpExpScreen, MULTI_CHAR('mg_3line'), 0, NULL);
     mpExpScreen->search(MULTI_CHAR('n_e4line'))->hide();
     field_0x5c = (J2DTextBox*)mpExpScreen->search(MULTI_CHAR('w_msg_jp'));
@@ -730,7 +796,7 @@ u8 dMenu_Insect_c::dpdMove() {
 void dMenu_Insect_c::setAButtonString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 5; i++) {
-            strcpy(mpAButtonString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpAButtonString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 5; i++) {
@@ -742,7 +808,7 @@ void dMenu_Insect_c::setAButtonString(u16 i_stringID) {
 void dMenu_Insect_c::setBButtonString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 5; i++) {
-            strcpy(mpBButtonString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpBButtonString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 5; i++) {

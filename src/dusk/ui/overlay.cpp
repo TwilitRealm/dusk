@@ -1,20 +1,25 @@
 #include "overlay.hpp"
 
-#include "aurora/lib/logging.hpp"
-#include "dusk/achievements.h"
-#include "dusk/action_bindings.h"
 #include "controller_config.hpp"
-#include "dusk/livesplit.h"
-#include "dusk/speedrun.h"
-#include "fmt/format.h"
-#include "magic_enum.hpp"
 #include "window.hpp"
 
+#include "dusk/achievements.h"
+#include "dusk/action_bindings.h"
+#include "dusk/livesplit.h"
+#include "dusk/settings.h"
+#include "dusk/speedrun.h"
+
+#include "m_Do/m_Do_main.h"
+
+#include <aurora/gfx.h>
+#include <borealis/log.hpp>
+#include <dolphin/pad.h>
+#include <fmt/format.h>
+#include <magic_enum.hpp>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_timer.h>
+
 #include <algorithm>
-#include <dolphin/pad.h>
-#include <m_Do/m_Do_main.h>
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
@@ -22,7 +27,7 @@
 
 namespace dusk::ui {
 namespace {
-aurora::Module Log{"dusk::ui::overlay"};
+constexpr borealis::Log Log{"dusk::ui::overlay"};
 
 const Rml::String kDocumentSource = R"RML(
 <rml>
@@ -31,6 +36,13 @@ const Rml::String kDocumentSource = R"RML(
 </head>
 <body>
     <fps id="fps" />
+    <pipeline-progress id="pipeline-progress">
+        <pipeline-status>
+            <icon class="pipeline-spinner">&#xe9d0;</icon>
+            <span id="pipeline-progress-label" />
+        </pipeline-status>
+        <progress id="pipeline-progress-bar" />
+    </pipeline-progress>
     <speedrun-timer id="speedrun-timer">
         <speedrun-rta id="speedrun-rta" />
         <speedrun-igt id="speedrun-igt" />
@@ -46,6 +58,7 @@ constexpr std::array<std::pair<const char*, const char*>, 3> kAutoSaveLayers{{
 }};
 
 constexpr auto kMenuNotificationDuration = std::chrono::milliseconds(2500);
+constexpr auto kPipelineProgressOpenDelay = std::chrono::milliseconds(250);
 
 constexpr std::array<const char*, 4> kFpsCorners = {"tl", "tr", "bl", "br"};
 
@@ -61,6 +74,9 @@ Rml::Element* create_toast(Rml::Element* parent, const Toast& toast) {
     }
 
     auto* elem = append(parent, "toast");
+    if (!toast.modId.empty()) {
+        elem->SetAttribute("mod-id", toast.modId);
+    }
     if (!toast.type.empty()) {
         elem->SetClass(toast.type, true);
     }
@@ -79,6 +95,9 @@ Rml::Element* create_toast(Rml::Element* parent, const Toast& toast) {
         } else if (toast.type == "controller") {
             auto* icon = append(heading, "icon");
             icon->SetClass("controller", true);
+        } else if (toast.type == "warning") {
+            auto* icon = append(heading, "icon");
+            icon->SetClass("warning", true);
         }
     }
     {
@@ -103,13 +122,13 @@ Rml::Element* create_controller_warning(Rml::Element* parent) {
 
     auto* heading = append(elem, "heading");
     auto* title = append(heading, "span");
-    title->SetInnerRML("No controller assigned");
+    title->SetInnerRML("No Device Assigned");
     auto* icon = append(heading, "icon");
     icon->SetClass("warning", true);
 
     auto* message = append(elem, "message");
     auto* content = append(message, "span");
-    content->SetInnerRML("Configure controller port 1 in Settings.");
+    content->SetInnerRML("Configure <b>Port 1</b> in Settings.");
 
     return elem;
 }
@@ -158,8 +177,8 @@ Rml::Element* create_menu_notification(Rml::Element* parent) {
     Rml::String padButton{};
     SDL_Gamepad* gamepad = gamepad_for_port(PAD_CHAN0);
     if (isActionBound(ActionBinds::OPEN_DUSKLIGHT_MENU, PAD_CHAN0) && gamepad != nullptr) {
-        padButton = native_button_name(gamepad,
-            getActionBindButton(ActionBinds::OPEN_DUSKLIGHT_MENU, PAD_CHAN0));
+        padButton = native_button_name(
+            gamepad, getActionBindButton(ActionBinds::OPEN_DUSKLIGHT_MENU, PAD_CHAN0));
     } else {
         padButton = back_button_name();
     }
@@ -187,51 +206,26 @@ void remove_element(Rml::Element*& elem) noexcept {
 
 }  // namespace
 
-// https://vplesko.com/posts/how_to_implement_an_fps_counter.html
-void Overlay::advance_fps_counter(float& outFps, Uint64 perfFreq) {
-    if (perfFreq == 0) {
-        outFps = 0.f;
-        return;
-    }
+static std::string FormatElapsedTime(OSTime ticksElapsed) {
+    using namespace std::chrono;
 
-    const Uint64 curr = SDL_GetPerformanceCounter();
-    if (!mFpsHavePrevCounter) {
-        mFpsPrevCounter = curr;
-        mFpsHavePrevCounter = true;
-        outFps = 0.f;
-        return;
-    }
+    milliseconds ms{OSTicksToMilliseconds(ticksElapsed)};
 
-    const Uint64 processingTicks = curr - mFpsPrevCounter;
-    mFpsPrevCounter = curr;
+    const hours hr = duration_cast<hours>(ms);
+    ms -= hr;
+    const minutes min = duration_cast<minutes>(ms);
+    ms -= min;
+    const seconds sec = duration_cast<seconds>(ms);
+    ms -= sec;
 
-    mFpsFrameEvents.push_back({curr, processingTicks});
-    mFpsSumTicks += processingTicks;
-
-    while (!mFpsFrameEvents.empty() && mFpsFrameEvents.front().endCounter + perfFreq < curr) {
-        mFpsSumTicks -= mFpsFrameEvents.front().processingTicks;
-        mFpsFrameEvents.pop_front();
-    }
-
-    const auto n = mFpsFrameEvents.size();
-    if (n == 0 || mFpsSumTicks == 0) {
-        outFps = 0.f;
-        return;
-    }
-
-    const double avgSeconds =
-        static_cast<double>(mFpsSumTicks) / static_cast<double>(n) / static_cast<double>(perfFreq);
-    outFps = static_cast<float>(1.0 / avgSeconds);
+    return fmt::format("{0:02}:{1:02}:{2:02}.{3:03}", hr.count(), min.count(), sec.count(), ms.count());
 }
 
-static std::string FormatTime(OSTime ticks) {
-    OSCalendarTime t;
-    OSTicksToCalendarTime(ticks, &t);
-    return fmt::format("{0:02}:{1:02}:{2:02}.{3:03}", t.hour, t.min, t.sec, t.msec);
-}
-
-Overlay::Overlay() : Document(kDocumentSource) {
+Overlay::Overlay() : Document(kDocumentSource, true, DocumentScope::Overlay) {
     mFpsCounter = mDocument->GetElementById("fps");
+    mPipelineProgress = mDocument->GetElementById("pipeline-progress");
+    mPipelineProgressLabel = mDocument->GetElementById("pipeline-progress-label");
+    mPipelineProgressBar = mDocument->GetElementById("pipeline-progress-bar");
     mSpeedrunTimer = mDocument->GetElementById("speedrun-timer");
     mSpeedrunRta = mDocument->GetElementById("speedrun-rta");
     mSpeedrunIgt = mDocument->GetElementById("speedrun-igt");
@@ -273,11 +267,24 @@ void Overlay::update() {
         if (getSettings().video.enableFpsOverlay.getValue()) {
             const int idx = getSettings().video.fpsOverlayCorner.getValue();
             mFpsCounter->SetAttribute("open", "");
+            mFpsCounter->RemoveProperty(Rml::PropertyId::Bottom);
             mFpsCounter->SetAttribute("corner", kFpsCorners[idx]);
 
+            if (idx == 2) {
+                if (mPipelineProgress && mPipelineProgress->GetAttribute("open")) {
+                    // 12 (height of pipeline box off bottom) + height of pipeline box + 3 (padding
+                    // space)
+                    mFpsCounter->SetProperty(Rml::PropertyId::Bottom,
+                        Rml::Property(15 + mPipelineProgress->GetOffsetHeight(), Rml::Unit::PX));
+                } else {
+                    // Return fps counter to default height off the bottom
+                    mFpsCounter->SetProperty(
+                        Rml::PropertyId::Bottom, Rml::Property(12, Rml::Unit::PX));
+                }
+            }
+
             const Uint64 perfFreq = SDL_GetPerformanceFrequency();
-            float fps = 0.f;
-            advance_fps_counter(fps, perfFreq);
+            float fps = aurora_get_fps();
 
             const Uint64 now = SDL_GetPerformanceCounter();
             // Limit updates to twice per second
@@ -290,15 +297,14 @@ void Overlay::update() {
             }
         } else {
             mFpsCounter->RemoveAttribute("open");
-            mFpsFrameEvents.clear();
-            mFpsSumTicks = 0;
-            mFpsHavePrevCounter = false;
             mFpsLastUpdate = 0;
         }
     }
 
+    update_pipeline_progress();
+
 #if !(defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IOS && !TARGET_OS_MACCATALYST))
-    if (getSettings().game.speedrunMode && getSettings().game.liveSplitEnabled) {
+    if (dusk::speedrun::isActive() && getSettings().game.liveSplitEnabled) {
         dusk::speedrun::updateLiveSplit();
         if (dusk::speedrun::consumeConnectedEvent()) {
             push_toast({.title = "LiveSplit connected", .duration = std::chrono::seconds(3)});
@@ -310,45 +316,46 @@ void Overlay::update() {
 #endif
 
     if (mSpeedrunTimer != nullptr && mSpeedrunRta != nullptr && mSpeedrunIgt != nullptr) {
-        if (getSettings().game.speedrunMode) {
+        if (dusk::speedrun::isActive()) {
             // L+R+A+Start to reset timer
             if (mDoCPd_c::getHoldL(PAD_1) && mDoCPd_c::getHoldR(PAD_1) &&
                 mDoCPd_c::getHoldA(PAD_1) && mDoCPd_c::getTrigZ(PAD_1))
             {
-                m_speedrunInfo.reset();
+                dusk::speedrun::g_speedrunInfo.reset();
             }
 
             // L+R+A+Y to manually stop timer
             if (mDoCPd_c::getHoldL(PAD_1) && mDoCPd_c::getHoldR(PAD_1) &&
                 mDoCPd_c::getHoldA(PAD_1) && mDoCPd_c::getTrigY(PAD_1))
             {
-                if (m_speedrunInfo.m_isRunStarted) {
-                    m_speedrunInfo.m_endTimestamp = OSGetTime() - m_speedrunInfo.m_startTimestamp;
-                    m_speedrunInfo.m_isRunStarted = false;
+                if (speedrun::g_speedrunInfo.m_isRunStarted) {
+                    speedrun::g_speedrunInfo.stopRun();
                 }
             }
 
-            OSTime elapsedTime = 0;
-            if (m_speedrunInfo.m_isRunStarted) {
-                elapsedTime = OSGetTime() - m_speedrunInfo.m_startTimestamp;
-            } else if (m_speedrunInfo.m_endTimestamp != 0) {
-                elapsedTime = m_speedrunInfo.m_endTimestamp;
+            OSTime rtaElapsedTime = 0;
+            if (speedrun::g_speedrunInfo.m_isRunStarted) {
+                rtaElapsedTime = OSGetNativeTime() - speedrun::g_speedrunInfo.m_rtaStartTimestamp;
+            } else if (speedrun::g_speedrunInfo.m_rtaTimer != 0) {
+                rtaElapsedTime = speedrun::g_speedrunInfo.m_rtaTimer;
             }
 
-            if (!m_speedrunInfo.m_isPauseIGT) {
-                m_speedrunInfo.m_igtTimer = elapsedTime - m_speedrunInfo.m_totalLoadTime;
+            if (speedrun::g_speedrunInfo.m_isRunStarted && !speedrun::g_speedrunInfo.m_isPauseIGT) {
+                speedrun::g_speedrunInfo.m_igtTimer = OSGetTime() - speedrun::g_speedrunInfo.m_igtStartTimestamp -
+                                            speedrun::g_speedrunInfo.m_totalLoadTime;
             }
 
             mSpeedrunTimer->SetAttribute("open", "");
 
             if (getSettings().game.showSpeedrunRTATimer) {
                 mSpeedrunRta->SetAttribute("open", "");
-                mSpeedrunRta->SetInnerRML(escape(fmt::format("RTA  {}", FormatTime(elapsedTime))));
+                mSpeedrunRta->SetInnerRML(escape(fmt::format("RTA  {}", FormatElapsedTime(rtaElapsedTime))));
             } else {
                 mSpeedrunRta->RemoveAttribute("open");
             }
 
-            mSpeedrunIgt->SetInnerRML(escape(fmt::format("IGT  {}", FormatTime(m_speedrunInfo.m_igtTimer))));
+            mSpeedrunIgt->SetInnerRML(
+                escape(fmt::format("IGT  {}", FormatElapsedTime(speedrun::g_speedrunInfo.m_igtTimer))));
         } else {
             mSpeedrunTimer->RemoveAttribute("open");
         }
@@ -357,6 +364,7 @@ void Overlay::update() {
     u32 count = 0;
     const bool showControllerWarning = PADGetIndexForPort(PAD_CHAN0) < 0 &&
                                        PADGetKeyButtonBindings(PAD_CHAN0, &count) == nullptr &&
+                                       !getSettings().game.enableTouchControls &&
                                        dynamic_cast<Window*>(top_document()) == nullptr &&
                                        dynamic_cast<WindowSmall*>(top_document()) == nullptr;
     if (showControllerWarning && mControllerWarning == nullptr) {
@@ -411,10 +419,8 @@ void Overlay::update() {
             std::chrono::duration<float>(clock::now() - mCurrentToastStartTime).count();
         const float ratio = duration > 0.0f ? std::clamp(elapsed / duration, 0.0f, 1.0f) : 1.0f;
         const auto remaining = 1.f - ratio;
-        Rml::ElementList list;
-        mDocument->GetElementsByTagName(list, "progress");
-        for (auto* elem : list) {
-            elem->SetAttribute("value", remaining);
+        if (auto* progress = mCurrentToast->QuerySelector("progress")) {
+            progress->SetAttribute("value", remaining);
         }
         if (remaining == 0.f) {
             if (mCurrentToast->IsPseudoClassSet("done") ||
@@ -430,6 +436,52 @@ void Overlay::update() {
             mCurrentToast->SetAttribute("open", "");
             mCurrentToast->SetPseudoClass("opened", true);
         }
+    }
+}
+
+void Overlay::update_pipeline_progress() {
+    if (mPipelineProgress == nullptr || mPipelineProgressLabel == nullptr ||
+        mPipelineProgressBar == nullptr)
+    {
+        return;
+    }
+
+    const auto* stats = aurora_get_stats();
+    const uint32_t queuedPipelines = stats != nullptr ? stats->queuedPipelines : 0;
+    if (queuedPipelines == 0) {
+        mPipelineProgress->RemoveAttribute("open");
+        mPipelineProgressActive = false;
+        mPipelineBatchCreatedBase = 0;
+        mLastQueuedPipelines = 0;
+        return;
+    }
+
+    const uint32_t createdPipelines = stats->createdPipelines;
+    if (!mPipelineProgressActive || createdPipelines < mPipelineBatchCreatedBase) {
+        mPipelineProgressActive = true;
+        mPipelineBatchCreatedBase = createdPipelines;
+        mPipelineProgressStartTime = clock::now();
+        mLastQueuedPipelines = 0;
+    }
+
+    const uint32_t builtPipelines = createdPipelines - mPipelineBatchCreatedBase;
+    const uint32_t totalPipelines = queuedPipelines + builtPipelines;
+    const float progress = totalPipelines > 0 ? static_cast<float>(builtPipelines) /
+                                                    static_cast<float>(totalPipelines) :
+                                                0.0f;
+
+    if (queuedPipelines != mLastQueuedPipelines) {
+        mLastQueuedPipelines = queuedPipelines;
+        const auto noun = queuedPipelines == 1 ? "pipeline" : "pipelines";
+        mPipelineProgressLabel->SetInnerRML(
+            escape(fmt::format("Building {} {}", queuedPipelines, noun)));
+    }
+    mPipelineProgressBar->SetAttribute("value", progress);
+
+    if (clock::now() >= mPipelineProgressStartTime + kPipelineProgressOpenDelay) {
+        mPipelineProgress->SetAttribute("open", "");
+    } else {
+        mPipelineProgress->RemoveAttribute("open");
     }
 }
 

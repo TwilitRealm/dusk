@@ -337,7 +337,7 @@ f32 renderingAmap_c::getIconSize(u8 i_typeGroup) const {
     return iconSize;
 }
 
-dMap_prm_res_s* dMap_HIO_prm_res_dst_s::m_res;
+DUSK_GAME_DATA dMap_prm_res_s* dMap_HIO_prm_res_dst_s::m_res;
 
 inline u8 twoValueLineInterpolation(u8 param_0, u8 param_1, f32 param_2) {
     return ((f32)param_0 + (param_2 * ((f32)param_1 - (f32)param_0)));
@@ -931,6 +931,13 @@ bool renderingAmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool para
         }
         break;
     case 5:
+#if TARGET_PC
+        if (dusk::getSettings().game.removeQuestMapMarkers &&
+            dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x190]))
+        {
+            break;
+        }
+#endif
         if (((i_data->mNo == 255 || (i_data->mNo != 255 && !dComIfGs_isTbox(i_data->mNo))) &&
              (i_data->mSwBit == 255 ||
               (i_data->mSwBit != 255 && dComIfGs_isSwitch(i_data->mSwBit, i_data->mRoomNo)))) &&
@@ -1206,6 +1213,10 @@ void dMap_c::changeTextureSize(int param_1, int param_2, int param_3) {
     JUT_ASSERT(2672, mImage_p != NULL);
     JUT_ASSERT(2673, mResTIMG != NULL);
 
+#if TARGET_PC
+    GXDestroyCopyTex(mImage_p);
+#endif
+
     mTexSizeX = param_1 >> param_3;
     mTexSizeY = param_2 >> param_3;
 
@@ -1216,6 +1227,24 @@ void dMap_c::changeTextureSize(int param_1, int param_2, int param_3) {
 
     init(mImage_p, mTexSizeX, mTexSizeY, param_1, param_2);
     makeResTIMG(mResTIMG, mTexSizeX, mTexSizeY, mImage_p, (u8*)m_res, 0x33);
+}
+#endif
+
+#if TARGET_PC
+bool dMap_c::refreshTextureSize() {
+    JUT_ASSERT(2688, mImage_p != NULL);
+    JUT_ASSERT(2689, mResTIMG != NULL);
+
+    const u16 oldWidth = mResTIMG->width;
+    const u16 oldHeight = mResTIMG->height;
+    makeResTIMG(mResTIMG, mTexSizeX, mTexSizeY, mImage_p, (u8*)m_res, 0x33);
+
+    if (mResTIMG->width == oldWidth && mResTIMG->height == oldHeight) {
+        return false;
+    }
+
+    GXDestroyCopyTex(mImage_p);
+    return true;
 }
 #endif
 
@@ -1611,7 +1640,7 @@ void dMap_c::_move(f32 i_centerX, f32 i_centerZ, int i_roomNo, f32 param_3) {
 
         mCenterX += IF_DUSK(dusk::getSettings().game.enableMirrorMode ? -mPackX :) mPackX;
         mCenterZ -= mPackZ;
-        mCenterX += field_0x64;
+        mCenterX += IF_DUSK(dusk::getSettings().game.enableMirrorMode ? -field_0x64 : ) field_0x64;
         mCenterZ += mPackPlusZ;
     }
 
@@ -1620,6 +1649,8 @@ void dMap_c::_move(f32 i_centerX, f32 i_centerZ, int i_roomNo, f32 param_3) {
     {
 #if DEBUG
         field_0x64 = 33830.0f;
+#elif TARGET_PC
+        field_0x64 = dusk::getSettings().game.enableMirrorMode ? 33830.0f : 0.0f;
 #else
         field_0x64 = 0.0f;
 #endif
@@ -1628,6 +1659,9 @@ void dMap_c::_move(f32 i_centerX, f32 i_centerZ, int i_roomNo, f32 param_3) {
         f32 temp = (field_0x58 * (f32)(field_0x74 + 4)) * 0.5f;
 #if DEBUG
         mRightEdgePlus = -(((dMpath_c::getMinZ() - (-127103.67f)) - temp) / field_0x58);
+
+#elif TARGET_PC
+        mRightEdgePlus = dusk::getSettings().game.enableMirrorMode ? -(((dMpath_c::getMinX() - (-127103.67f)) - temp) / field_0x58) : 0.0f;
 #else
         mRightEdgePlus = 0.0f;
 #endif

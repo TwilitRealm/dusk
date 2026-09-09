@@ -140,7 +140,6 @@ public:
     void setEatYm() { field_0x6d8 |= (u8) 4; }
     MtxP getMouthMtx() { return mAnm_p->getModel()->getAnmMtx(7); }
 
-private:
     /* 0x568 */ request_of_phase_process_class mPhase;
     /* 0x570 */ mDoExt_McaMorfSO* mAnm_p;
     /* 0x574 */ Z2CreatureEnemy mSound;
@@ -213,8 +212,8 @@ private:
     /* 0x750 */ int field_0x750;
     /* 0x754 */ int field_0x754;
     /* 0x758 */ int field_0x758;
-    /* 0x75C */ char* mArcName;
-    /* 0x760 */ char* mDemoName;
+    /* 0x75C */ DUSK_CONST char* mArcName;
+    /* 0x760 */ DUSK_CONST char* mDemoName;
     /* 0x764 */ u32 mShadowId;
     /* 0x768 */ dPath* mpPath1;
     /* 0x76C */ dPath* mpPath2;

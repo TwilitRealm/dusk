@@ -15,7 +15,6 @@ public:
     fopAc_ac_c* getActor();
     virtual ~daBaseNpc_acMngr_c() {}
 
-private:
     /* 0x04 */ fpc_ProcID mActorId;
 };
 
@@ -86,12 +85,12 @@ public:
 class daBaseNpc_c : public fopAc_ac_c {
 public:
     daBaseNpc_c();
-    J3DAnmTransform* getTrnsfrmKeyAnmP(char*, int);
+    J3DAnmTransform* getTrnsfrmKeyAnmP(char DUSK_CONST*, int);
     int setMcaMorfAnm(J3DAnmTransformKey*, f32, f32, int, int, int);
     int setBckAnm(J3DAnmTransform*, f32, int, int, int, bool);
-    J3DAnmTransform* getTexPtrnAnmP(char*, int);
+    J3DAnmTransform* getTexPtrnAnmP(char DUSK_CONST*, int);
     int setBtpAnm(J3DAnmTexPattern*, J3DModelData*, f32, int);
-    void orderEvent(int, char*);
+    void orderEvent(int, char DUSK_CONST*);
     void setEnvTevColor();
     void setRoomNo();
     int checkEndAnm(f32);
@@ -113,9 +112,9 @@ public:
     virtual void drawOtherMdls();
     virtual bool dbgDraw();
 
-    static dCcD_SrcGObjInf const mCcDObj;
-    static dCcD_SrcCyl mCcDCyl;
-    static dCcD_SrcSph mCcDSph;
+    static DUSK_GAME_DATA dCcD_SrcGObjInf const mCcDObj;
+    static DUSK_GAME_DATA dCcD_SrcCyl mCcDCyl;
+    static DUSK_GAME_DATA dCcD_SrcSph mCcDSph;
 
 public:
     /* 0x56C */ dBgS_ObjAcch mAcch;
@@ -128,7 +127,7 @@ public:
     /* 0x808 */ mDoExt_btpAnm mBtp;
     /* 0x820 */ mDoExt_btkAnm mBtk;
     /* 0x838 */ s16 field_0x838;
-    /* 0x83C */ u16* field_0x83c;
+    /* 0x83C */ u16 DUSK_CONST* field_0x83c;
     /* 0x840 */ u16 field_0x840;
     /* 0x842 */ u16 field_0x842;
     /* 0x844 */ u8 field_0x844;
@@ -173,9 +172,9 @@ public:
     virtual int ToFore() { return 1; }
     virtual int ToBack() { return 1; }
 
-    static const char* m_name;
-    static int m_dzb_id;
-    static MoveBGActor_SetFunc m_set_func;
+    static DUSK_GAME_DATA const char* m_name;
+    static DUSK_GAME_DATA int m_dzb_id;
+    static DUSK_GAME_DATA MoveBGActor_SetFunc m_set_func;
 
 public:
     /* 0xA14 */ dBgW* mpBgw;

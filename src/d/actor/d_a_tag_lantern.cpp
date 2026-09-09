@@ -14,7 +14,7 @@
 
 static TAG_LANTERN_HIO_CLASS l_HIO;
 
-daTag_Lantern_HIOParam const daTag_Lantern_Param_c::m = {0};
+DUSK_GAME_DATA daTag_Lantern_HIOParam const daTag_Lantern_Param_c::m = {0};
 
 #if DEBUG
 daTag_Lantern_HIO_c::daTag_Lantern_HIO_c() {
@@ -165,13 +165,13 @@ static int daTag_Lantern_IsDelete(void* i_this) {
     return 1;
 }
 
-static actor_method_class daTag_Lantern_MethodTable = {
+static DUSK_CONST actor_method_class daTag_Lantern_MethodTable = {
     (process_method_func)daTag_Lantern_Create,  (process_method_func)daTag_Lantern_Delete,
     (process_method_func)daTag_Lantern_Execute, (process_method_func)daTag_Lantern_IsDelete,
     (process_method_func)daTag_Lantern_Draw,
 };
 
-actor_process_profile_definition g_profile_TAG_LANTERN = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_TAG_LANTERN = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

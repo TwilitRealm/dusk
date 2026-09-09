@@ -3,6 +3,20 @@
 
 #include <gx.h>
 
+#if TARGET_PC
+#include <mtx.h>
+
+struct ParticleDrawCtx {
+    bool batch;     // off = immediate mode
+    bool useTexMtx; // UVs transformed by texMtx
+    bool useClr0;   // prm color in GX_VA_CLR0
+    bool useClr1;   // env color in GX_VA_CLR1
+    Mtx texMtx;
+    GXColor clr0;
+    GXColor clr1;
+};
+#endif
+
 struct JPAEmitterWorkData;
 class JPABaseParticle;
 class JKRHeap;
@@ -49,13 +63,13 @@ public:
     JPABaseShape(u8 const*, JKRHeap*);
     void setGX(JPAEmitterWorkData*) const;
 
-    static GXBlendMode st_bm[3];
-    static GXBlendFactor st_bf[10];
-    static GXLogicOp st_lo[16];
-    static GXCompare st_c[8];
-    static GXAlphaOp st_ao[4];
-    static GXTevColorArg st_ca[6][4];
-    static GXTevAlphaArg st_aa[2][4];
+    static DUSK_GAME_DATA GXBlendMode st_bm[3];
+    static DUSK_GAME_DATA GXBlendFactor st_bf[10];
+    static DUSK_GAME_DATA GXLogicOp st_lo[16];
+    static DUSK_GAME_DATA GXCompare st_c[8];
+    static DUSK_GAME_DATA GXAlphaOp st_ao[4];
+    static DUSK_GAME_DATA GXTevColorArg st_ca[6][4];
+    static DUSK_GAME_DATA GXTevAlphaArg st_aa[2][4];
 
     GXBlendMode getBlendMode() const { return st_bm[pBsd->mBlendModeCfg & 0x03]; }
     GXBlendFactor getBlendSrc() const { return st_bf[(pBsd->mBlendModeCfg >> 2) & 0x0F]; }
@@ -75,6 +89,9 @@ public:
 
     const GXTevColorArg* getTevColorArg() const { return st_ca[(pBsd->mFlags >> 0x0F) & 0x07]; }
     const GXTevAlphaArg* getTevAlphaArg() const { return st_aa[(pBsd->mFlags >> 0x12) & 0x01]; }
+#if TARGET_PC
+    u32 getTevColorArgSel() const { return (pBsd->mFlags >> 0x0F) & 0x07; }
+#endif
 
     u32 getType() const { return (pBsd->mFlags >> 0) & 0x0F; }
     u32 getDirType() const { return (pBsd->mFlags >> 4) & 0x07; }
@@ -186,26 +203,34 @@ void JPARegistPrm(JPAEmitterWorkData*);
 void JPARegistEnv(JPAEmitterWorkData*);
 void JPARegistPrmEnv(JPAEmitterWorkData*);
 
-void JPADrawPoint(JPAEmitterWorkData*, JPABaseParticle*);
-void JPADrawLine(JPAEmitterWorkData*, JPABaseParticle*);
-void JPADrawRotBillboard(JPAEmitterWorkData*, JPABaseParticle*);
-void JPADrawBillboard(JPAEmitterWorkData*, JPABaseParticle*);
-void JPADrawRotDirection(JPAEmitterWorkData*, JPABaseParticle*);
-void JPADrawDirection(JPAEmitterWorkData*, JPABaseParticle*);
-void JPADrawRotation(JPAEmitterWorkData*, JPABaseParticle*);
-void JPADrawDBillboard(JPAEmitterWorkData*, JPABaseParticle*);
-void JPADrawRotYBillboard(JPAEmitterWorkData*, JPABaseParticle*);
-void JPADrawYBillboard(JPAEmitterWorkData*, JPABaseParticle*);
-void JPADrawParticleCallBack(JPAEmitterWorkData*, JPABaseParticle*);
-void JPALoadTexAnm(JPAEmitterWorkData*, JPABaseParticle*);
-void JPASetPointSize(JPAEmitterWorkData*, JPABaseParticle*);
-void JPASetLineWidth(JPAEmitterWorkData*, JPABaseParticle*);
-void JPALoadCalcTexCrdMtxAnm(JPAEmitterWorkData*, JPABaseParticle*);
-void JPARegistAlpha(JPAEmitterWorkData*, JPABaseParticle*);
-void JPARegistEnv(JPAEmitterWorkData*, JPABaseParticle*);
-void JPARegistAlphaEnv(JPAEmitterWorkData*, JPABaseParticle*);
-void JPARegistPrmAlpha(JPAEmitterWorkData*, JPABaseParticle*);
-void JPARegistPrmAlphaEnv(JPAEmitterWorkData*, JPABaseParticle*);
+#if TARGET_PC
+#define JPA_DRAW_PARTICLE_ARGS JPAEmitterWorkData*, JPABaseParticle*, ParticleDrawCtx*
+#else
+#define JPA_DRAW_PARTICLE_ARGS JPAEmitterWorkData*, JPABaseParticle*
+#endif
+
+void JPADrawPoint(JPA_DRAW_PARTICLE_ARGS);
+void JPADrawLine(JPA_DRAW_PARTICLE_ARGS);
+void JPADrawRotBillboard(JPA_DRAW_PARTICLE_ARGS);
+void JPADrawBillboard(JPA_DRAW_PARTICLE_ARGS);
+void JPADrawRotDirection(JPA_DRAW_PARTICLE_ARGS);
+void JPADrawDirection(JPA_DRAW_PARTICLE_ARGS);
+void JPADrawRotation(JPA_DRAW_PARTICLE_ARGS);
+void JPADrawDBillboard(JPA_DRAW_PARTICLE_ARGS);
+void JPADrawRotYBillboard(JPA_DRAW_PARTICLE_ARGS);
+void JPADrawYBillboard(JPA_DRAW_PARTICLE_ARGS);
+void JPADrawParticleCallBack(JPA_DRAW_PARTICLE_ARGS);
+void JPALoadTexAnm(JPA_DRAW_PARTICLE_ARGS);
+void JPASetPointSize(JPA_DRAW_PARTICLE_ARGS);
+void JPASetLineWidth(JPA_DRAW_PARTICLE_ARGS);
+void JPALoadCalcTexCrdMtxAnm(JPA_DRAW_PARTICLE_ARGS);
+void JPARegistAlpha(JPA_DRAW_PARTICLE_ARGS);
+void JPARegistEnv(JPA_DRAW_PARTICLE_ARGS);
+void JPARegistAlphaEnv(JPA_DRAW_PARTICLE_ARGS);
+void JPARegistPrmAlpha(JPA_DRAW_PARTICLE_ARGS);
+void JPARegistPrmAlphaEnv(JPA_DRAW_PARTICLE_ARGS);
+
+#undef JPA_DRAW_PARTICLE_ARGS
 
 #if TARGET_PC
 void JPAInterpBillboard(JPAEmitterWorkData*, JPABaseParticle*);

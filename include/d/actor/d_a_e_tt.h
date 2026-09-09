@@ -47,7 +47,6 @@ public:
     int CreateHeap();
     int create();
 
-private:
     /* 0x5AC */ request_of_phase_process_class mPhaseReq;
     /* 0x5B4 */ request_of_phase_process_class mPhaseReq2;
     /* 0x5BC */ mDoExt_McaMorfSO* mpMorfSO;
@@ -63,7 +62,7 @@ private:
     /* 0x6D4 */ f32 field_0x6d4;
     /* 0x6D8 */ s16 mFootJoints[4];
     /* 0x6E0 */ s16 field_0x6e0;
-    /* 0x6E4 */ char* mpResName;
+    /* 0x6E4 */ char DUSK_CONST* mpResName;
     /* 0x6E8 */ u16 mDamageCooldownTimer;
     /* 0x6EA */ u8 mGenericTimer;
     /* 0x6EC */ int mAttackTimer;

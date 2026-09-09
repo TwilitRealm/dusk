@@ -23,10 +23,10 @@ public:
         /* 3 */ ACT_END,
     };
 
-    char* getArcName();
-    char* getBmd();
-    char* getDzb();
-    char* getBmd2();
+    DUSK_CONST char* getArcName();
+    DUSK_CONST char* getBmd();
+    DUSK_CONST char* getDzb();
+    DUSK_CONST char* getBmd2();
     J3DModelData* getDoorModelData();
     int CreateHeap();
     void calcMtx();
@@ -50,7 +50,6 @@ public:
 
     void setAction(u8 i_action) { mAction = i_action; }
 
-private:
     /* 0x568 */ request_of_phase_process_class mPhaseReq;
     /* 0x570 */ J3DModel* mpDoorModel;
     /* 0x574 */ J3DModel* mpLockModel;

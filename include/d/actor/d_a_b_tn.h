@@ -131,7 +131,6 @@ public:
     int CreateHeap();
     int create();
 
-private:
     /* 0x05AC */ request_of_phase_process_class mPhaseReq1;
     /* 0x05B4 */ request_of_phase_process_class mPhaseReq2;
     /* 0x05BC */ J3DModel* mpPartModels[16];
@@ -203,7 +202,7 @@ private:
     /* 0x0AAD */ bool mStayNo2Flag;
     /* 0x0AAE */ u8 mBlendStatus;
     /* 0x0AB0 */ f32 mBlend;
-    /* 0x0AB4 */ char* mArcName;
+    /* 0x0AB4 */ char DUSK_CONST* mArcName;
     /* 0x0AB8 */ dBgS_AcchCir mAcchCir;
     /* 0x0AF8 */ dBgS_ObjAcch mAcch;
     /* 0x0CD0 */ dBgS_AcchCir mAcchCirArr[16];

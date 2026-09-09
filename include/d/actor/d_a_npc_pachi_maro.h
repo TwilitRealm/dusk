@@ -21,7 +21,7 @@ class daNpc_Pachi_Maro_Param_c {
 public:
     virtual ~daNpc_Pachi_Maro_Param_c() {}
 
-    static daNpc_Pachi_Maro_HIOParam const m;
+    static DUSK_GAME_DATA daNpc_Pachi_Maro_HIOParam const m;
 };
 
 #if DEBUG
@@ -149,7 +149,7 @@ public:
                         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData,
                         int i_motionStepNum,
                         daNpcT_evtData_c const* i_evtData,
-                        char** i_arcNames)
+                        char DUSK_CONST* DUSK_CONST* i_arcNames)
                     : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
                     i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
                     i_arcNames) {
@@ -184,10 +184,9 @@ public:
     void setFMotion_Niramu_to_Besu() { mFMotion = 1; }
     void setFMotion_LookNone() { mFMotion = 2; }
 
-    static char* mCutNameList[11];
-    static cutFunc mCutList[11];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[11];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[11];
 
-private:
     /* 0xE40 */ NPC_PACHI_MARO_HIO_CLASS* mpHIO;
     /* 0xE44 */ dCcD_Cyl mCyl;
     /* 0xF80 */ u8 mType;

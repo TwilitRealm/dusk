@@ -71,9 +71,9 @@ int daObjSwpush2::Act_c::solidHeapCB(fopAc_ac_c* i_this) {
     return ((daObjSwpush2::Act_c*)i_this)->create_heap();
 }
 
-const char daObjSwpush2::Act_c::M_arcname[9] = "K_swmn00";
+DUSK_GAME_DATA const char daObjSwpush2::Act_c::M_arcname[9] = "K_swmn00";
 
-const daObjSwpush2::Attr_c daObjSwpush2::Act_c::M_attr[4] = {
+DUSK_GAME_DATA const daObjSwpush2::Attr_c daObjSwpush2::Act_c::M_attr[4] = {
     {
         0x2000,
         daObjSwpush2::AttrFlag_e(AttrFlag_UNK_0x1_e | AttrFlag_UNK_0x2_e),
@@ -714,7 +714,7 @@ actor_method_class Mthd_Table = {
 }
 }
 
-actor_process_profile_definition g_profile_Obj_Swpush2 = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Swpush2 = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 2,
     /* List Prio    */ fpcPi_CURRENT_e,

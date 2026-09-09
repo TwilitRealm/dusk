@@ -50,14 +50,14 @@ int daIceWall_c::CreateHeap() {
 
 static daIceWall_HIO_c l_HIO;
 
-const dCcD_SrcGObjInf daIceWall_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daIceWall_c::mCcDObjInfo = {
     {0, {{0x100, 1, 0}, {0x400000, 0x11}, {0}}},
     {dCcD_SE_SWORD, 0, 0, 2, 1},
     {dCcD_SE_STONE, 0, 0, 0, 0x2006},
     {0},
 };
 
-dCcD_SrcCyl daIceWall_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daIceWall_c::mCcDCyl = {
     daIceWall_c::mCcDObjInfo,
     {
         {
@@ -289,13 +289,13 @@ static int daIceWall_Create(fopAc_ac_c* i_this) {
     return ((daIceWall_c*)i_this)->create();
 }
 
-static actor_method_class l_daIceWall_Method = {
+static DUSK_CONST actor_method_class l_daIceWall_Method = {
     (process_method_func)daIceWall_Create,  (process_method_func)daIceWall_Delete,
     (process_method_func)daIceWall_Execute, (process_method_func)NULL,
     (process_method_func)daIceWall_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_IceWall = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_IceWall = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

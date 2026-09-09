@@ -34,7 +34,7 @@ public:
 
     /* 0x0000 */ fopAc_ac_c actor;
     /* 0x0568 */ request_of_phase_process_class phase;
-    /* 0x0570 */ char* arcname;
+    /* 0x0570 */ DUSK_CONST char* arcname;
     /* 0x0574 */ mDoExt_McaMorf* lock_modelMorf;
     /* 0x0578 */ J3DModel* lock_model;
     /* 0x057C */ int chain_num;
@@ -66,9 +66,18 @@ public:
     /* 0x2CA7 */ s8 hide_lock;
     /* 0x2CA8 */ cXyz field_0x2ca8;
     /* 0x2CB4 */ u8 field_0x2cb4;
+
+#if TARGET_PC
+    Mtx mChainInterpPrev[6][16];
+    Mtx mChainInterpCurr[6][16];
+    bool mChainInterpPrevValid;
+    bool mChainInterpCurrValid;
+#endif
 };
 
+#if !TARGET_PC
 STATIC_ASSERT(sizeof(obj_keyhole_class) == 0x2CB8);
+#endif
 
 class daObj_Keyhole_HIO_c : public JORReflexible {
 public:

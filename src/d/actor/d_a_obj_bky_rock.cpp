@@ -16,9 +16,9 @@ static int daBkyRock_c_createHeap(fopAc_ac_c* i_this) {
     return static_cast<daBkyRock_c*>(i_this)->createHeap();
 }
 
-static char* l_arcName = "BYRock";
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcName = "BYRock";
 
-daBkyRock_c::exeProc daBkyRock_c::s_exeProc[3] = {
+DUSK_GAME_DATA daBkyRock_c::exeProc daBkyRock_c::s_exeProc[3] = {
     &daBkyRock_c::exeModeNoDamage,
     &daBkyRock_c::exeModeDamage,
     &daBkyRock_c::exeModePiece,
@@ -124,7 +124,7 @@ static u16 const SECOND_PARTICLE_NAME[6] = {
     0x89C2, 0x89C3, 0x89C4, 0x89C5, 0x89C6, 0x89C7,
 };
 
-dCcD_SrcCyl const daBkyRock_c::s_CcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl const daBkyRock_c::s_CcDCyl = {
     {
         {0x0, {{0x0, 0x0, 0x0}, {0x20a0, 0x11}, 0x0}}, // mObj
         {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x0}, // mGObjAt
@@ -416,7 +416,7 @@ static int daBkyRock_draw(daBkyRock_c* i_this) {
     return i_this->draw();
 }
 
-static actor_method_class daBkyRock_METHODS = {
+static DUSK_CONST actor_method_class daBkyRock_METHODS = {
     (process_method_func)daBkyRock_create,
     (process_method_func)daBkyRock_Delete,
     (process_method_func)daBkyRock_execute,
@@ -424,7 +424,7 @@ static actor_method_class daBkyRock_METHODS = {
     (process_method_func)daBkyRock_draw,
 };
 
-actor_process_profile_definition g_profile_BkyRock = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_BkyRock = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

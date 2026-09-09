@@ -10,7 +10,7 @@
 
 static daLv1Cdl00_HIO_c l_HIO;
 
-dCcD_SrcGObjInf const daLv1Cdl00_c::mCcDObjInfo = {
+DUSK_GAME_DATA dCcD_SrcGObjInf const daLv1Cdl00_c::mCcDObjInfo = {
     {
         0, {
             {0x200, 0, 0x13},
@@ -23,7 +23,7 @@ dCcD_SrcGObjInf const daLv1Cdl00_c::mCcDObjInfo = {
     {0},
 };
 
-dCcD_SrcCyl daLv1Cdl00_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daLv1Cdl00_c::mCcDCyl = {
     daLv1Cdl00_c::mCcDObjInfo,
     {
         { {0.0f, 0.0f, 0.0f}, 0, 0}
@@ -267,7 +267,7 @@ static cPhs_Step daLv1Cdl00_Create(fopAc_ac_c* i_this) {
     return static_cast<daLv1Cdl00_c*>(i_this)->create();
 }
 
-static actor_method_class l_daLv1Cdl00_Method = {
+static DUSK_CONST actor_method_class l_daLv1Cdl00_Method = {
     (process_method_func)daLv1Cdl00_Create,
     (process_method_func)daLv1Cdl00_Delete,
     (process_method_func)daLv1Cdl00_Execute,
@@ -275,7 +275,7 @@ static actor_method_class l_daLv1Cdl00_Method = {
     (process_method_func)daLv1Cdl00_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_Lv1Cdl00 = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Lv1Cdl00 = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

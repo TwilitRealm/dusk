@@ -14,11 +14,14 @@ void applyPresetClassic() {
     auto& s = getSettings();
     s.video.lockAspectRatio.setValue(true);
     s.game.bloomMode.setValue(BloomMode::Classic);
+    s.game.depthOfFieldMode.setValue(DepthOfFieldMode::Classic);
     s.game.enableAchievementToasts.setValue(false);
     s.game.enableControllerToasts.setValue(false);
     s.game.internalResolutionScale.setValue(1);
     s.game.shadowResolutionMultiplier.setValue(1);
     s.game.hideTvSettingsScreen.setValue(false);
+    s.game.menuScalingMode.setValue(MenuScaling::GameCube);
+    s.game.enableMenuPointer.setValue(false);
     AuroraSetViewportPolicy(AURORA_VIEWPORT_FIT);
 }
 
@@ -35,18 +38,23 @@ void applyPresetDusk() {
     s.game.invertCameraXAxis.setValue(true);
     s.game.invertFirstPersonYAxis.setValue(true);
     s.game.no2ndFishForCat.setValue(true);
+    s.game.buttonFishing.setValue(true);
     s.game.enableAchievementToasts.setValue(true);
     s.game.enableControllerToasts.setValue(true);
     s.game.enableQuickTransform.setValue(true);
     s.game.instantSaves.setValue(true);
     s.game.midnasLamentNonStop.setValue(true);
-    s.game.enableFrameInterpolation.setValue(true);
+    s.game.enableFrameInterpolation.setValue(FrameInterpMode::Unlimited);
     s.game.sunsSong.setValue(true);
     s.game.bloomMode.setValue(BloomMode::Dusk);
+    s.game.depthOfFieldMode.setValue(DepthOfFieldMode::Dusk);
     s.game.internalResolutionScale.setValue(0);
     s.game.shadowResolutionMultiplier.setValue(4);
     s.game.enableGyroAim.setValue(true);
     s.game.autoSave.setValue(true);
+    s.game.menuScalingMode.setValue(MenuScaling::Dusklight);
+    s.game.enhancedMapMenus.setValue(true);
+    s.game.enableMenuPointer.setValue(true);
 }
 
 }  // namespace
@@ -98,8 +106,9 @@ PresetWindow::PresetWindow() : WindowSmall("modal", "modal-dialog") {
             if (cmd == NavCommand::Confirm) {
                 apply();
                 getSettings().backend.wasPresetChosen.setValue(true);
-                config::Save();
+                config::save();
                 hide(true);
+                mDoAud_seStartMenu(kSoundClick);
                 return true;
             }
             return false;

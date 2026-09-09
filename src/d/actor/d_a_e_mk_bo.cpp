@@ -5,12 +5,13 @@
 
 #include "d/dolzel_rel.h" // IWYU pragma: keep
 
-#include "d/actor/d_a_e_mk_bo.h"
+#include "Z2AudioLib/Z2Instances.h"
+#include "c/c_damagereaction.h"
 #include "d/actor/d_a_e_mk.h"
+#include "d/actor/d_a_e_mk_bo.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_s_play.h"
-#include "c/c_damagereaction.h"
-#include "Z2AudioLib/Z2Instances.h"
+#include "dusk/version.hpp"
 
 static int daE_MK_BO_Draw(e_mk_bo_class* i_this) {
     if (i_this->field_0x9b4 != 0) {
@@ -569,8 +570,10 @@ static int daE_MK_BO_Execute(e_mk_bo_class* i_this) {
 
     if (i_this->field_0x600 != 0) {
         fopAcM_delete(actor);
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC || VERSION == VERSION_GCN_JPN
+        IF_DUSK_BLOCK(dusk::version::isRegionJpn())
         return 1;
+        IF_DUSK_BLOCK_END
 #endif
     }
 
@@ -804,7 +807,7 @@ static int daE_MK_BO_Create(fopAc_ac_c* i_this) {
     return phase_state;
 }
 
-static actor_method_class l_daE_MK_BO_Method = {
+static DUSK_CONST actor_method_class l_daE_MK_BO_Method = {
     (process_method_func)daE_MK_BO_Create,
     (process_method_func)daE_MK_BO_Delete,
     (process_method_func)daE_MK_BO_Execute,
@@ -812,7 +815,7 @@ static actor_method_class l_daE_MK_BO_Method = {
     (process_method_func)daE_MK_BO_Draw,
 };
 
-actor_process_profile_definition g_profile_E_MK_BO = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_E_MK_BO = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 8,
     /* List Prio    */ fpcPi_CURRENT_e,

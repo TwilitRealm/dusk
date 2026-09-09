@@ -1,19 +1,17 @@
 #define PROCS_DUMP_NAMES 1
 
-#include <cstdio>
+#include "ImGuiConsole.hpp"
+#include "ImGuiMenuTools.hpp"
 
-#include "f_pc/f_pc_name.h"
 #include "f_pc/f_pc_create_iter.h"
 #include "f_pc/f_pc_create_req.h"
 #include "f_pc/f_pc_layer.h"
 #include "f_pc/f_pc_layer_iter.h"
 #include "f_pc/f_pc_leaf.h"
+#include "f_pc/f_pc_name.h"
 #include "f_pc/f_pc_node.h"
-#include "d/d_debug_viewer.h"
-#include "imgui.h"
-#include "ImGuiConsole.hpp"
-#include "ImGuiMenuTools.hpp"
-#include "imgui_internal.h"
+
+#include <imgui.h>
 
 namespace dusk {
     static bool BeginProcTable() {
@@ -46,7 +44,7 @@ namespace dusk {
         ImGui::TableNextColumn();
 
         char id_buf[32];
-        sprintf(id_buf, "%d", proc->id);
+        SAFE_SPRINTF(id_buf, "%d", proc->id);
 
         int flags = ImGuiTreeNodeFlags_SpanAllColumns;
         bool isLayer = fpcBs_Is_JustOfType(g_fpcNd_type, proc->subtype);

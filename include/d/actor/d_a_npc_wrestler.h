@@ -77,7 +77,7 @@ class daNpcWrestler_Param_c {
 public:
     virtual ~daNpcWrestler_Param_c() {}
 
-    static daNpcWrestler_HIOParam const m;
+    static DUSK_GAME_DATA daNpcWrestler_HIOParam const m;
 };
 
 class daNpcWrestler_HIO_Node_c: public JORReflexible {
@@ -110,10 +110,10 @@ public:
 #endif
 
 struct WrestlerParamList {
-    daNpc_GetParam1* bck_list;
-    daNpc_GetParam2* face_list;
-    daNpc_GetParam1* btp_list;
-    daNpc_GetParam1* btk_list;
+    DUSK_CONST daNpc_GetParam1* bck_list;
+    DUSK_CONST daNpc_GetParam2* face_list;
+    DUSK_CONST daNpc_GetParam1* btp_list;
+    DUSK_CONST daNpc_GetParam1* btk_list;
 };
 
 struct DemoCamera_c {
@@ -230,9 +230,8 @@ public:
     inline void initDemoCamera_ReadyWrestler();
     inline void playExpression();
 
-    static EventFn mEvtSeqList[7];
+    static DUSK_GAME_DATA EventFn DUSK_CONST mEvtSeqList[7];
 
-private:
     /* 0xB48 */ Z2Creature mSound;
     /* 0xBD8 */ daNpcWrestler_HIOParam* field_0xbd8;
     /* 0xBDC */ daNpcWrestler_HIOParamSub* field_0xbdc;
@@ -254,7 +253,7 @@ private:
         u8 chkFlag;
     } mArenaInfo;
     /* 0xE03 */ u8 field_0xe03;
-    /* 0xE04 */ WrestlerParamList* field_0xe04;
+    /* 0xE04 */ WrestlerParamList DUSK_CONST* field_0xe04;
     /* 0xE08 */ DemoCamera_c mDemoCam;
     /* 0xE50 */ f32 mDemoCamFovy;
     /* 0xE54 */ f32 field_0xe54;

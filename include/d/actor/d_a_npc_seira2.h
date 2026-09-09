@@ -12,7 +12,7 @@ class daNpc_Seira2_Param_c {
 public:
     virtual ~daNpc_Seira2_Param_c() {}
 
-    static const daNpc_Seira2_HIOParam m;
+    static DUSK_GAME_DATA const daNpc_Seira2_HIOParam m;
 };
 
 #if DEBUG
@@ -92,7 +92,7 @@ public:
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_faceMotionSequenceData,
         int i_faceMotionStepNum,
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData, int i_motionStepNum,
-        daNpcT_evtData_c const* i_evtData, char** i_arcNames)
+        daNpcT_evtData_c const* i_evtData, char DUSK_CONST* DUSK_CONST* i_arcNames)
         : dShopSystem_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
                    i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
                    i_arcNames) {
@@ -106,10 +106,9 @@ public:
     BOOL checkChangeJoint(int val) { return val == 4; }
     BOOL checkRemoveJoint(int val) { return val == 8; }
 
-    static char* mCutNameList[1];
-    static cutFunc mCutList[1];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[1];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[1];
 
-private:
     /* 0x0F7C */ mDoExt_McaMorfSO* mpSeiraMorf;
     /* 0x0F80 */ NPC_SEIRA2_HIO_CLASS* mpHIO;
     /* 0x0F84 */ dCcD_Cyl mCyl1;

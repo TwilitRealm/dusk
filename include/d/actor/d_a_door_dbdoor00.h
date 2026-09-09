@@ -14,11 +14,11 @@
  */
 class daDbDoor00_c : public fopAc_ac_c {
 public:
-    char* getAlwaysArcName();
-    char* getDzb();
-    char* getDummyBmdName();
-    char* getBmdArcName();
-    char* getBmdName();
+    DUSK_CONST char* getAlwaysArcName();
+    DUSK_CONST char* getDzb();
+    DUSK_CONST char* getDummyBmdName();
+    DUSK_CONST char* getBmdArcName();
+    DUSK_CONST char* getBmdName();
     J3DModelData* getDoorModelData();
     int CreateHeap();
     void calcMtx();
@@ -41,7 +41,6 @@ public:
 
     void setAction(u8 i_action) { mAction = i_action; }
 
-// private:
     /* 0x568 */ request_of_phase_process_class mPhaseReq;
     /* 0x570 */ request_of_phase_process_class mPhaseReq2;
     /* 0x578 */ J3DModel* mpModel;

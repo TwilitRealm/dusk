@@ -15,7 +15,6 @@ class dMenu_Fishing_c;
 class dMenu_Skill_c;
 class dMenu_Insect_c;
 class dSelect_cursor_c;
-
 class dMenu_Collect2D_c;
 class dMenu_Collect2DTop_c : public dDlst_base_c {
 public:
@@ -32,6 +31,8 @@ public:
 
     #if TARGET_PC
     void menuCollectWide();
+    bool pointerWait();
+    void pointerActivateCurrent();
     #endif
 
     void _create();
@@ -128,7 +129,6 @@ public:
     J2DPicture* getBlackTex() { return mpBlackTex; }
     u8 getSubWindowOpenCheck() { return mSubWindowOpenCheck; }
 
-private:
     /* 0x004 */ JKRExpHeap* mpHeap;
     /* 0x008 */ JKRExpHeap* mpSubHeap;
     /* 0x00C */ void* field_0xc;
@@ -222,9 +222,8 @@ public:
         mViewOffsetY = i_offset;
     }
 
-    static f32 mViewOffsetY;
+    static DUSK_GAME_DATA f32 mViewOffsetY;
 
-private:
     /* 0x004 */ JKRExpHeap* mpHeap;
     /* 0x008 */ JKRSolidHeap* mpSolidHeap;
     /* 0x00C */ dMenu_Collect2D_c* mpCollect2D;
@@ -259,7 +258,6 @@ public:
     bool isKeyCheck() { return mpCollect2D->isKeyCheck(); }
     bool isOutCheck() { return mpCollect2D->isOutCheck(); }
 
-private:
     /* 0x4 */ dMenu_Collect2D_c* mpCollect2D;
     /* 0x8 */ dMenu_Collect3D_c* mpCollect3D;
 };

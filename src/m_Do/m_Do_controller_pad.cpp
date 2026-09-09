@@ -10,12 +10,35 @@
 #include "f_ap/f_ap_game.h"
 #include "m_Do/m_Do_Reset.h"
 #include "m_Do/m_Do_main.h"
-#include "tracy/Tracy.hpp"
 
-JUTGamePad* mDoCPd_c::m_gamePad[4];
+#if TARGET_PC
+#include "dusk/menu_pointer.h"
+#include "dusk/settings.h"
+#include "dusk/ui/touch_controls.hpp"
 
-interface_of_controller_pad mDoCPd_c::m_cpadInfo[4];
-interface_of_controller_pad mDoCPd_c::m_debugCpadInfo[4];
+#include <tracy/Tracy.hpp>
+#endif
+
+DUSK_GAME_DATA JUTGamePad* mDoCPd_c::m_gamePad[4];
+
+DUSK_GAME_DATA interface_of_controller_pad mDoCPd_c::m_cpadInfo[4];
+DUSK_GAME_DATA interface_of_controller_pad mDoCPd_c::m_debugCpadInfo[4];
+
+#if TARGET_PC
+s16 mDoCPd_c::getStickAngle3D(u32 pad) {
+    if (dusk::getSettings().game.enableMirrorMode) {
+        return -getCpadInfo(pad).mMainStickAngle;
+    }
+    return getCpadInfo(pad).mMainStickAngle;
+}
+
+f32 mDoCPd_c::getSubStickX3D(u32 pad) {
+    if (dusk::getSettings().game.enableMirrorMode) {
+        return -getCpadInfo(pad).mCStickPosX;
+    }
+    return getCpadInfo(pad).mCStickPosX;
+}
+#endif
 
 void mDoCPd_c::create() {
     #if PLATFORM_GCN || PLATFORM_SHIELD
@@ -58,6 +81,9 @@ void mDoCPd_c::create() {
 
 void mDoCPd_c::read() {
     ZoneScoped;
+#if TARGET_PC
+    dusk::ui::sync_virtual_input();
+#endif
     JUTGamePad::read();
 
     if (!mDoRst::isReset() && mDoRst::is3ButtonReset()) {
@@ -88,6 +114,12 @@ void mDoCPd_c::read() {
             cLib_memSet(interface, 0, sizeof(interface_of_controller_pad));
         } else {
             convert(interface, *pad);
+#if TARGET_PC
+            const u32 suppressedButtons = dusk::menu_pointer::suppressed_pad_buttons(i);
+            interface->mButtonFlags &= ~suppressedButtons;
+            interface->mPressedButtonFlags &= ~suppressedButtons;
+            dusk::menu_pointer::finish_pad_suppression_read(i);
+#endif
             LRlockCheck(interface);
         }
 #if DEBUG

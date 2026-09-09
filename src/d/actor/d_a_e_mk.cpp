@@ -21,6 +21,8 @@
 #include "Z2AudioLib/Z2Instances.h"
 #include <cstring>
 
+#include "dusk/version.hpp"
+
 class daE_MK_HIO_c : public JORReflexible {
 public:
     virtual ~daE_MK_HIO_c() {}
@@ -612,8 +614,10 @@ static void e_mk_shoot(e_mk_class* i_this) {
                 i_this->sound.startCreatureVoice(Z2SE_EN_MK_V_CATCH_BOOM, -1);
                 i_this->sound.startCreatureSound(Z2SE_EN_MK_CATCH_BOOM, 0, -1);
 
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC || VERSION == VERSION_GCN_JPN
+                IF_DUSK_BLOCK(dusk::version::isRegionJpn())
                 return;
+                IF_DUSK_BLOCK_END
 #endif
             }
         }
@@ -2958,7 +2962,7 @@ static int daE_MK_Create(fopAc_ac_c* i_actor) {
 
 AUDIO_INSTANCES
 
-static actor_method_class l_daE_MK_Method = {
+static DUSK_CONST actor_method_class l_daE_MK_Method = {
     (process_method_func)daE_MK_Create,
     (process_method_func)daE_MK_Delete,
     (process_method_func)daE_MK_Execute,
@@ -2966,7 +2970,7 @@ static actor_method_class l_daE_MK_Method = {
     (process_method_func)daE_MK_Draw,
 };
 
-actor_process_profile_definition g_profile_E_MK = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_E_MK = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

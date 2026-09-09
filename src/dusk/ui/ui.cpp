@@ -1,34 +1,75 @@
 #include "ui.hpp"
 
-#include <RmlUi/Core.h>
-#include <SDL3/SDL_filesystem.h>
+#include "command_console.hpp"
+#include "icon_provider.hpp"
+#include "input.hpp"
+#include "mod_texture_provider.hpp"
+#include "prelaunch.hpp"
+#include "window.hpp"
+
+#include "dusk/config.hpp"
+
 #include <absl/container/flat_hash_set.h>
+#include <aurora/lib/window.hpp>
 #include <aurora/rmlui.hpp>
+#include <borealis/io.hpp>
 #include <fmt/format.h>
+#include <RmlUi/Core.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_joystick.h>
+#include <SDL3/SDL_power.h>
+#include <SDL3/SDL_video.h>
 
 #include <algorithm>
 #include <filesystem>
 #include <ranges>
 
-#include "aurora/lib/window.hpp"
-#include "dusk/io.hpp"
-#include "input.hpp"
-#include "prelaunch.hpp"
-#include "window.hpp"
-
 namespace dusk::ui {
 namespace {
 
 void load_font(const char* filename, bool fallback = false) {
-    Rml::LoadFontFace(io::fs_path_to_string(resource_path(filename)), fallback);
+    Rml::LoadFontFace(borealis::io::fs_path_to_string(resource_path(filename)), fallback);
 }
 
 bool sInitialized = false;
-std::vector<std::unique_ptr<Document> > sDocumentStack;
+std::vector<std::unique_ptr<Document>> sDocumentStack;
 // Documents that don't participate in the focus stack
-std::vector<std::unique_ptr<Document> > sPassiveDocuments;
+std::vector<std::unique_ptr<Document>> sPassiveDocuments;
+
+struct ScopedStyles {
+    DocumentScope scope;
+    std::string id;
+    Rml::SharedPtr<Rml::StyleSheetContainer> sheet;
+};
+std::vector<ScopedStyles> sScopedStyles;
+
+std::vector<const Rml::StyleSheetContainer*> scoped_sheets(DocumentScope scope) {
+    std::vector<const Rml::StyleSheetContainer*> sheets;
+    for (const auto& entry : sScopedStyles) {
+        if (entry.scope == scope) {
+            sheets.push_back(entry.sheet.get());
+        }
+    }
+    return sheets;
+}
+
+void restyle_scope(DocumentScope scope) {
+    const auto sheets = scoped_sheets(scope);
+    const auto restyle_documents = [&sheets, scope](auto& documents) {
+        for (auto& doc : documents) {
+            if (doc != nullptr && doc->scope() == scope && !doc->closed()) {
+                doc->restyle(sheets);
+            }
+        }
+    };
+    restyle_documents(sDocumentStack);
+    restyle_documents(sPassiveDocuments);
+}
+
 std::deque<Toast> sToasts;
 bool sMenuNotificationRequested = false;
+bool sConsoleShortcutHeld = false;
 
 // Sometimes gamepads can connect and disconnect quickly, especially during
 // connection negotiation. In this case, we'll receive an _ADDED event for a
@@ -55,14 +96,19 @@ bool initialize() noexcept {
     load_font("MaterialSymbolsRounded-Regular.ttf");
     load_font("NotoMono-Regular.ttf");
 
+    register_icon_texture_provider();
+    register_mod_texture_provider();
     sInitialized = true;
     return true;
 }
 
 void shutdown() noexcept {
+    unregister_mod_texture_provider();
+    unregister_icon_texture_provider();
     sDocumentStack.clear();
     sPassiveDocuments.clear();
     sConnectedGamepads.clear();
+    sConsoleShortcutHeld = false;
     input::reset_input_state();
     input::release_input_block();
     sInitialized = false;
@@ -130,11 +176,13 @@ void handle_event(const SDL_Event& event) noexcept {
             if (getSettings().game.enableControllerToasts) {
                 const char* name = SDL_GetGamepadName(gamepad);
                 Rml::String content = fmt::format("<span>{}</span>", name ? name : "[Unknown]");
-                Rml::String title = "Controller connected";
-                if (const char* icon = connection_state_icon(SDL_GetGamepadConnectionState(gamepad))) {
+                Rml::String title = "Device Connected";
+                if (const char* icon =
+                        connection_state_icon(SDL_GetGamepadConnectionState(gamepad)))
+                {
                     title = fmt::format(
-                        "<row><span>{}</span> <icon class=\"connection\">&#x{};</icon></row>", title,
-                        icon);
+                        "<row><span>{}</span> <icon class=\"connection\">&#x{};</icon></row>",
+                        title, icon);
                 }
                 int batteryLevel = -1;
                 const auto powerState = SDL_GetGamepadPowerInfo(gamepad, &batteryLevel);
@@ -163,14 +211,66 @@ void handle_event(const SDL_Event& event) noexcept {
             const char* name = SDL_GetGamepadNameForID(event.gdevice.which);
             push_toast({
                 .type = "controller",
-                .title = "Controller disconnected",
+                .title = "Device Disconnected",
                 .content = name ? name : "[Unknown]",
                 .duration = std::chrono::seconds(4),
             });
         }
         sConnectedGamepads.erase(event.gdevice.which);
+    } else if (event.type == SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED) {
+        apply_scale();
+    }
+    if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST) {
+        sConsoleShortcutHeld = false;
+    }
+    if (event.type == SDL_EVENT_KEY_UP && event.key.key == SDLK_SLASH && sConsoleShortcutHeld) {
+        sConsoleShortcutHeld = false;
+        return;
+    }
+    if (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_SLASH &&
+        getSettings().backend.enableAdvancedSettings)
+    {
+        auto* console = static_cast<CommandConsole*>(find_document(DocumentScope::CommandConsole));
+        if (sConsoleShortcutHeld) {
+            return;
+        }
+        if (console != nullptr && !console->input_active() && !event.key.repeat) {
+            sConsoleShortcutHeld = true;
+            bring_document_to_front(*console);
+            console->show();
+            input::sync_input_block();
+            return;
+        }
     }
     input::handle_event(event);
+}
+
+bool register_scoped_styles(DocumentScope scope, std::string id, const std::string& rcss) noexcept {
+    auto sheet = Rml::Factory::InstanceStyleSheetString(rcss);
+    if (sheet == nullptr) {
+        return false;
+    }
+    const auto it = std::ranges::find_if(sScopedStyles,
+        [scope, &id](const ScopedStyles& entry) { return entry.scope == scope && entry.id == id; });
+    if (it != sScopedStyles.end()) {
+        it->sheet = std::move(sheet);
+    } else {
+        sScopedStyles.push_back({scope, std::move(id), std::move(sheet)});
+    }
+    restyle_scope(scope);
+    return true;
+}
+
+void unregister_scoped_styles(DocumentScope scope, std::string_view id) noexcept {
+    const auto erased = std::erase_if(sScopedStyles,
+        [scope, id](const ScopedStyles& entry) { return entry.scope == scope && entry.id == id; });
+    if (erased != 0) {
+        restyle_scope(scope);
+    }
+}
+
+void apply_scoped_styles(Document& doc) noexcept {
+    doc.restyle(scoped_sheets(doc.scope()));
 }
 
 Document& push_document(std::unique_ptr<Document> doc, bool show, bool passive) noexcept {
@@ -187,28 +287,69 @@ Document& push_document(std::unique_ptr<Document> doc, bool show, bool passive) 
     return ret;
 }
 
-void show_top_document() noexcept {
+void bring_document_to_front(Document& doc) noexcept {
+    const auto it = std::ranges::find_if(
+        sDocumentStack, [&doc](const auto& entry) { return entry.get() == &doc; });
+    if (it == sDocumentStack.end() || std::next(it) == sDocumentStack.end()) {
+        return;
+    }
+    auto entry = std::move(*it);
+    sDocumentStack.erase(it);
+    sDocumentStack.push_back(std::move(entry));
+}
+
+void uncover_top_document() noexcept {
     if (auto* doc = top_document()) {
-        doc->show();
+        doc->uncover();
+    }
+    input::sync_input_block();
+}
+
+Document* find_document(DocumentScope scope) noexcept {
+    for (auto& doc : std::views::reverse(sDocumentStack)) {
+        if (!doc->closed() && doc->scope() == scope) {
+            return doc.get();
+        }
+    }
+    return nullptr;
+}
+
+void close_all_documents() noexcept {
+    for (auto& doc : sDocumentStack) {
+        if (!doc->closed()) {
+            doc->force_hide(!doc->permanent());
+        }
     }
     input::sync_input_block();
 }
 
 bool any_document_visible() noexcept {
     return std::any_of(sDocumentStack.begin(), sDocumentStack.end(),
-        [](const auto& doc) { return doc && doc->visible(); });
+        [](const auto& doc) { return doc && doc->visible() && !doc->pending_close(); });
 }
 
 bool is_prelaunch_open() noexcept {
     return std::any_of(sDocumentStack.begin(), sDocumentStack.end(), [](const auto& doc) {
         const auto* prelaunch = dynamic_cast<const Prelaunch*>(doc.get());
-        return prelaunch != nullptr && !prelaunch->pending_close() && !prelaunch->closed();
+        return prelaunch != nullptr && prelaunch->active();
     });
+}
+
+bool game_obscured_below(const Document& doc) noexcept {
+    for (const auto& entry : sDocumentStack) {
+        if (entry.get() == &doc) {
+            break;
+        }
+        if (entry->active() && entry->obscures_game()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 Document* top_document() noexcept {
     for (auto& doc : std::views::reverse(sDocumentStack)) {
-        if (!doc->closed() && !doc->pending_close()) {
+        if (doc->active()) {
             return doc.get();
         }
     }
@@ -245,13 +386,10 @@ void update() noexcept {
         sPassiveDocuments.erase(first, last);
     }
 
-    // If no documents have focus, explicitly focus the top one
-    if (auto* context = aurora::rmlui::get_context();
-        context != nullptr && (context->GetFocusElement() == nullptr ||
-                                  context->GetFocusElement() == context->GetRootElement()))
-    {
+    // Keep focus on the highest active document.
+    if (aurora::rmlui::get_context() != nullptr) {
         for (auto& doc : std::views::reverse(sDocumentStack)) {
-            if (!doc->closed() && !doc->pending_close() && doc->focus()) {
+            if (doc->active() && (doc->has_focus() || doc->focus())) {
                 break;
             }
         }
@@ -300,6 +438,17 @@ Rml::Element* append(Rml::Element* parent, const Rml::String& tag) noexcept {
     return parent->AppendChild(doc->CreateElement(tag));
 }
 
+Rml::Element* append_text(Rml::Element* parent, const Rml::String& text) noexcept {
+    if (parent == nullptr) {
+        return nullptr;
+    }
+    auto* doc = parent->GetOwnerDocument();
+    if (doc == nullptr) {
+        return nullptr;
+    }
+    return parent->AppendChild(doc->CreateTextNode(text));
+}
+
 NavCommand map_nav_event(const Rml::Event& event) noexcept {
     const auto key = static_cast<Rml::Input::KeyIdentifier>(
         event.GetParameter<int>("key_identifier", Rml::Input::KI_UNKNOWN));
@@ -315,6 +464,7 @@ NavCommand map_nav_event(const Rml::Event& event) noexcept {
     case Rml::Input::KeyIdentifier::KI_ESCAPE:
         return NavCommand::Cancel;
     case Rml::Input::KeyIdentifier::KI_RETURN:
+    case Rml::Input::KeyIdentifier::KI_NUMPADENTER:
         return NavCommand::Confirm;
     case Rml::Input::KeyIdentifier::KI_F1:
         return event.GetParameter<int>("shift_key", 0) ? NavCommand::None : NavCommand::Menu;
@@ -365,10 +515,6 @@ void push_toast(Toast toast) noexcept {
     sToasts.push_back(std::move(toast));
 }
 
-std::vector<std::unique_ptr<Document> >& get_document_stack() noexcept {
-    return sDocumentStack;
-}
-
 std::deque<Toast>& get_toasts() noexcept {
     return sToasts;
 }
@@ -381,6 +527,16 @@ bool consume_menu_notification_request() noexcept {
     const bool requested = sMenuNotificationRequested;
     sMenuNotificationRequested = false;
     return requested;
+}
+
+void apply_scale() noexcept {
+    const auto userScale = getSettings().video.uiScale.getValue();
+    auto scale = 0.0f;
+    if (userScale != 0) {
+        const auto displayScale = aurora::window::get_window_size().scale;
+        scale = static_cast<float>(userScale) / 100.0f * (displayScale > 0.0f ? displayScale : 1.0f);
+    }
+    aurora::rmlui::set_ui_scale(scale);
 }
 
 }  // namespace dusk::ui

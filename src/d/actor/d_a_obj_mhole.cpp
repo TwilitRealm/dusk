@@ -25,7 +25,7 @@ static f32 const l_size[2] = {150.0f, 370.0f};
 
 static char const* l_arcName[2] = {"ef_MgnF_L", "ef_MgnF_S"};
 
-dCcD_SrcCps l_cps_src = {
+DUSK_GAME_DATA dCcD_SrcCps l_cps_src = {
     {
         {0x0, {{AT_TYPE_40000, 0x0, 0x1d}, {0x0, 0x0}, 0x0}},  // mObj
         {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x6},                    // mGObjAt
@@ -375,7 +375,7 @@ static int daObjMHole_Create(fopAc_ac_c* i_this) {
     return a_this->create();
 }
 
-static actor_method_class l_daObjMHole_Method = {
+static DUSK_CONST actor_method_class l_daObjMHole_Method = {
     (process_method_func)daObjMHole_Create,  
     (process_method_func)daObjMHole_Delete,
     (process_method_func)daObjMHole_Execute, 
@@ -383,7 +383,7 @@ static actor_method_class l_daObjMHole_Method = {
     (process_method_func)daObjMHole_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_MHole = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_MHole = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

@@ -4,9 +4,11 @@
 #include "JSystem/JAHostIO/JAHioMessage.h"
 #include "JSystem/JAHostIO/JAHioMgr.h"
 #include "JSystem/JAHostIO/JAHioNode.h"
-#include "JSystem/JHostIO/JORServer.h"
 
-JAHioNode* JAHioNode::smCurrentNode;
+#include "JSystem/JHostIO/JORServer.h"
+#include "helpers/string.hpp"
+
+DUSK_GAME_DATA JAHioNode* JAHioNode::smCurrentNode;
 
 JAHioNode::JAHioNode(const char* name) : mTree(this) {
     mLastChild = NULL;
@@ -32,7 +34,7 @@ void JAHioNode::updateNode() {
 void JAHioNode::setNodeName(const char* name) {
     int size = strlen(name) + 1;
     JUT_ASSERT(51, size < 32);
-    strcpy(mName, name);
+    SAFE_STRCPY(mName, name);
 }
 
 void JAHioNode::genMessage(JORMContext* mctx) {

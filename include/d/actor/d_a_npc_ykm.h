@@ -38,7 +38,7 @@ class daNpc_ykM_Param_c {
 public:
     virtual ~daNpc_ykM_Param_c() {}
 
-    static daNpc_ykM_HIOParam const m;
+    static DUSK_GAME_DATA daNpc_ykM_HIOParam const m;
 };
 
 #if DEBUG
@@ -258,7 +258,7 @@ public:
             daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData,
             int i_motionStepNum,
             daNpcT_evtData_c const* i_evtData,
-            char** i_arcNames)
+            char DUSK_CONST* DUSK_CONST* i_arcNames)
         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
         i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
         i_arcNames) {
@@ -285,9 +285,8 @@ public:
     int getBitTRB() { return (u8)((fopAcM_GetParam(this) & 0x3F0000) >> 16); }
     u8 getPathID() { return (fopAcM_GetParam(this) & 0xFF00) >> 8; }
 
-    static char* mCutNameList[10];
-    static cutFunc mCutList[10];
-private:
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[10];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[10];
     /* 0x0E40 */ mDoExt_McaMorfSO* mFishModelMorf;
     /* 0x0E44 */ mDoExt_McaMorfSO* mLeafModelMorf;
     /* 0x0E48 */ NPC_YKM_HIO_CLASS* mpHIO;

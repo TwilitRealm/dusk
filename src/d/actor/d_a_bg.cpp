@@ -624,14 +624,12 @@ int daBg_c::create() {
     dComIfGp_roomControl_onStatusFlag(roomNo, 0x10);
     OS_REPORT("<BG> room%d\n", roomNo);
 
-#if TARGET_PC
-    draw_interp_frame = true;
-#endif
+    IF_DUSK(draw_interp_frame = true);
 
     return cPhs_COMPLEATE_e;
 }
 
-static actor_method_class l_daBg_Method = {
+static DUSK_CONST actor_method_class l_daBg_Method = {
     (process_method_func)daBg_Create,
     (process_method_func)daBg_Delete,
     (process_method_func)daBg_Execute,
@@ -639,7 +637,7 @@ static actor_method_class l_daBg_Method = {
     (process_method_func)daBg_Draw,
 };
 
-actor_process_profile_definition2 g_profile_BG = {
+DUSK_PROFILE actor_process_profile_definition2 DUSK_CONST g_profile_BG = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

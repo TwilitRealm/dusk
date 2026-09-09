@@ -59,7 +59,7 @@ int daGpTaru_c::CreateHeap() {
     return 1;
 }
 
-dCcD_SrcCyl daGpTaru_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daGpTaru_c::mCcDCyl = {
     daGpTaru_c::mCcDObjInfo,
     {
         {
@@ -70,7 +70,7 @@ dCcD_SrcCyl daGpTaru_c::mCcDCyl = {
     }  // mCylAttr
 };
 
-const dCcD_SrcGObjInf daGpTaru_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daGpTaru_c::mCcDObjInfo = {
     {0, {{0, 0, 0x1F}, {0xD8FAFDBF, 0x11}, {0x79}}},
     {dCcD_SE_NONE, 0, 1, 0, 0},
     {dCcD_SE_NONE, 0, 0, 0, 2},
@@ -581,7 +581,7 @@ static int daGpTaru_Create(fopAc_ac_c* i_this) {
     return ((daGpTaru_c*)i_this)->create();
 }
 
-static actor_method_class l_daGpTaru_Method = {
+static DUSK_CONST actor_method_class l_daGpTaru_Method = {
     (process_method_func)daGpTaru_Create,
     (process_method_func)daGpTaru_Delete,
     (process_method_func)daGpTaru_Execute,
@@ -589,7 +589,7 @@ static actor_method_class l_daGpTaru_Method = {
     (process_method_func)daGpTaru_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_GpTaru = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_GpTaru = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

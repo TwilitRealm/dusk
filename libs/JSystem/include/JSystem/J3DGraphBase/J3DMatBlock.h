@@ -1437,7 +1437,7 @@ inline u16 calcZModeID(u8 param_0, u8 param_1, u8 param_2) {
     return param_1 * 2 + param_0 * 0x10 + param_2;
 }
 
-extern u8 j3dZModeTable[96];
+DUSK_GAME_EXTERN u8 j3dZModeTable[96];
 
 /**
  * @ingroup jsystem-j3d
@@ -1575,6 +1575,12 @@ struct J3DAlphaComp {
     u8 getRef1() const { return mRef1; }
 
     void load() const {
+#ifdef AVOID_UB
+    if (mID > 255) {
+            J3DGDSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+            return;
+        }
+#endif
         J3DGDSetAlphaCompare((GXCompare)getComp0(), mRef0, (GXAlphaOp)getOp(), (GXCompare)getComp1(), mRef1);
     }
 

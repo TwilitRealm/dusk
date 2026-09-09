@@ -1,27 +1,30 @@
 #include "menu_bar.hpp"
 
-#include <RmlUi/Core.h>
-
-#include "Z2AudioLib/Z2SeMgr.h"
-#include "m_Do/m_Do_audio.h"
-
 #include "achievements.hpp"
-#include "aurora/rmlui.hpp"
-#include "dusk/speedrun.h"
-#include "dusk/livesplit.h"
-#include "dusk/main.h"
-#include "dusk/settings.h"
 #include "editor.hpp"
-#include "f_pc/f_pc_manager.h"
-#include "f_pc/f_pc_name.h"
-#include "imgui.h"
 #include "modal.hpp"
+#include "mods_window.hpp"
+#include "prelaunch.hpp"
 #include "settings.hpp"
 #include "ui.hpp"
 #include "warp.hpp"
 #include "window.hpp"
 
-#include <chrono>
+#include "dusk/game_mode.hpp"
+#include "dusk/livesplit.h"
+#include "dusk/main.h"
+#include "dusk/mods/svc/ui.hpp"
+#include "dusk/settings.h"
+#include "dusk/speedrun.h"
+
+#include "f_pc/f_pc_manager.h"
+#include "f_pc/f_pc_name.h"
+#include "m_Do/m_Do_audio.h"
+
+#include <aurora/rmlui.hpp>
+#include <imgui.h>
+#include <RmlUi/Core.h>
+
 #include <cmath>
 
 namespace dusk::ui {
@@ -41,16 +44,31 @@ const Rml::String kDocumentSource = R"RML(
 
 }
 
-MenuBar::MenuBar() : Document(kDocumentSource), mRoot(mDocument->GetElementById("popup")) {
+MenuBar::MenuBar()
+    : Document(kDocumentSource, false, DocumentScope::MenuBar),
+      mRoot(mDocument->GetElementById("popup")) {
     mTabBar = std::make_unique<TabBar>(mRoot, TabBar::Props{
                                                   .onClose =
                                                       [this] {
-                                                          toggle_cursor_if_gyro(false);
                                                           mDoAud_seStartMenu(kSoundMenuClose);
                                                           hide(false);
                                                       },
                                                   .autoSelect = false,
                                               });
+
+    // Hide document after transition completion
+    listen(mRoot, Rml::EventId::Transitionend, [this](Rml::Event& event) {
+        if (event.GetTargetElement() == mRoot && !mRoot->HasAttribute("open") &&
+            Document::visible())
+        {
+            Document::hide(mPendingClose);
+        }
+    });
+
+    build_tabs();
+}
+
+void MenuBar::build_tabs() {
     mTabBar->add_tab("Settings", [this] { push(std::make_unique<SettingsWindow>()); });
 
     if (getSettings().backend.enableAdvancedSettings) {
@@ -58,8 +76,15 @@ MenuBar::MenuBar() : Document(kDocumentSource), mRoot(mDocument->GetElementById(
         mTabBar->add_tab("Editor", [this] { push(std::make_unique<EditorWindow>()); });
     }
 
-    mTabBar->add_tab("Achievements", [this] { push(std::make_unique<AchievementsWindow>()); });
-
+    // Only allow us to access achievements if we are playing on a game mode that uses them
+    if (dusk::gamemode::getGameModeManager().isCurrentGameMode(dusk::gamemode::kVanillaGameModeId)
+        || dusk::gamemode::getGameModeManager().isCurrentGameMode(dusk::speedrun::kSpeedrunGameModeId)) {
+        mTabBar->add_tab("Achievements", [this] { push(std::make_unique<AchievementsWindow>()); });
+    }
+    mTabBar->add_tab("Mods", [this] { push(std::make_unique<ModsWindow>()); });
+    for (auto& tab : mods::svc::ui_mod_menu_tabs()) {
+        mTabBar->add_tab(tab.label, std::move(tab.onSelected));
+    }
 
     mTabBar->add_tab("Reset", [this] {
         mTabBar->set_active_tab(-1);
@@ -87,9 +112,13 @@ MenuBar::MenuBar() : Document(kDocumentSource), mRoot(mDocument->GetElementById(
                                     dismiss(modal);
                                     return;
                                 }
-                                JUTGamePad::C3ButtonReset::sResetSwitchPushing = true;
                                 dismiss(modal);
+                                if (gamemode::getGameModeManager().getRegisteredGameModes().size() > 1) {
+                                    // If game modes are registered, return to prelaunch on reset.
+                                    prelaunch_state().returnToPrelaunchOnReset = true;
+                                }
                                 hide(false);
+                                JUTGamePad::C3ButtonReset::sResetSwitchPushing = true;
                             },
                     },
                 },
@@ -128,39 +157,29 @@ MenuBar::MenuBar() : Document(kDocumentSource), mRoot(mDocument->GetElementById(
         }));
     });
 
-    if (getSettings().game.speedrunMode) {
-        mTabBar->add_tab("Reset Timer", [this] {
+    if (dusk::speedrun::isActive()) {
+        mTabBar->add_tab("Reset Run", [this] {
             mTabBar->set_active_tab(-1);
             mDoAud_seStartMenu(kSoundClick);
-            m_speedrunInfo.reset();
-            if (getSettings().game.liveSplitEnabled) {
-                dusk::speedrun::reset();
-            }
+            dusk::speedrun::g_speedrunInfo.reset();
+            dusk::speedrun::reset();
+            JUTGamePad::C3ButtonReset::sResetSwitchPushing = true;
             hide(false);
         });
     }
-
-    // Hide document after transition completion
-    listen(mRoot, Rml::EventId::Transitionend, [this](Rml::Event& event) {
-        if (event.GetTargetElement() == mRoot && !mRoot->HasAttribute("open") &&
-            Document::visible())
-        {
-            Document::hide(mPendingClose);
-        }
-    });
 }
 
 void MenuBar::show() {
     Document::show();
     mRoot->SetAttribute("open", "");
     mTabBar->set_active_tab(-1);
-    if (!mTabBar->focus_tab(mFocusedTabIndex)) {
+    if (!mTabBar->focus_tab(mFocusedTabTitle)) {
         mTabBar->focus();
     }
 }
 
 void MenuBar::hide(bool close) {
-    mFocusedTabIndex = mTabBar->focused_tab_index();
+    mFocusedTabTitle = mTabBar->focused_tab_title();
     mRoot->RemoveAttribute("open");
     if (close) {
         mPendingClose = true;
@@ -219,7 +238,6 @@ bool MenuBar::handle_nav_command(Rml::Event& event, NavCommand cmd) {
         return true;
     }
     if (cmd == NavCommand::Cancel && visible()) {
-        toggle_cursor_if_gyro(false);
         mDoAud_seStartMenu(kSoundMenuClose);
         hide(false);
         return true;
@@ -229,6 +247,22 @@ bool MenuBar::handle_nav_command(Rml::Event& event, NavCommand cmd) {
 
 bool MenuBar::focus() {
     return mTabBar->focus();
+}
+
+void MenuBar::refresh_tabs() {
+    auto* menuBar = static_cast<MenuBar*>(find_document(DocumentScope::MenuBar));
+    if (menuBar == nullptr) {
+        return;
+    }
+    const auto focusedTitle = menuBar->mTabBar->focused_tab_title();
+    if (!focusedTitle.empty()) {
+        menuBar->mFocusedTabTitle = focusedTitle;
+    }
+    menuBar->mTabBar->clear_tabs();
+    menuBar->build_tabs();
+    if (menuBar->visible() && !menuBar->mTabBar->focus_tab(menuBar->mFocusedTabTitle)) {
+        menuBar->mTabBar->focus();
+    }
 }
 
 }  // namespace dusk::ui

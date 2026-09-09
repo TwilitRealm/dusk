@@ -11,7 +11,7 @@ class daNpc_Kyury_Param_c {
 public:
     virtual ~daNpc_Kyury_Param_c() {}
 
-    static const daNpc_Kyury_HIOParam m;
+    static DUSK_GAME_DATA const daNpc_Kyury_HIOParam m;
 };
 
 #if DEBUG
@@ -106,7 +106,7 @@ public:
                                  daNpcT_MotionSeqMngr_c::sequenceStepData_c const* param_3,
                                  int param_4,
                                  daNpcT_MotionSeqMngr_c::sequenceStepData_c const* param_5,
-                                 int param_6, daNpcT_evtData_c const* param_7, char** param_8)
+                                 int param_6, daNpcT_evtData_c const* param_7, char DUSK_CONST* DUSK_CONST* param_8)
         : daNpcT_c(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8) {}
     u16 getEyeballMaterialNo() { return 2; }
     s32 getHeadJointNo() { return 4; }
@@ -123,10 +123,9 @@ public:
         return nodeNo;
     }
 
-    static char* mCutNameList[2];
-    static cutFunc mCutList[2];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[2];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[2];
 
-private:
     /* 0xE40 */ NPC_KYURY_HIO_CLASS* mpHIO;
     /* 0xE44 */ J3DModel* mpModel[2];
     /* 0xE4C */ dCcD_Cyl mCyl;

@@ -16,7 +16,7 @@ struct daNpc_Bou_HIOParam {
 public:
     virtual ~daNpc_Bou_Param_c() {}
 
-    static const daNpc_Bou_HIOParam m;
+    static DUSK_GAME_DATA const daNpc_Bou_HIOParam m;
  };
 
 #if DEBUG
@@ -89,7 +89,7 @@ public:
     daNpc_Bou_c(daNpcT_faceMotionAnmData_c const* param_1, daNpcT_motionAnmData_c const* param_2,
                 daNpcT_MotionSeqMngr_c::sequenceStepData_c const* param_3, int param_4,
                 daNpcT_MotionSeqMngr_c::sequenceStepData_c const* param_5, int param_6,
-                daNpcT_evtData_c const* param_7, char** param_8)
+                daNpcT_evtData_c const* param_7, char DUSK_CONST* DUSK_CONST* param_8)
         :
                                daNpcT_c(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8)
                                 {}
@@ -114,8 +114,8 @@ public:
     virtual int drawDbgInfo();
     virtual void changeAnm(int*, int*);
 
-    static char* mCutNameList[9];
-    static cutFunc mCutList[9];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[9];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[9];
 
     int getFlowNodeNo() {
         u16 nodeNo = home.angle.x;
@@ -168,7 +168,6 @@ public:
         return 0;
     }
 
-private:
     /* 0xE40 */ NPC_BOU_HIO_CLASS* mpHIO;
     /* 0xE44 */ dCcD_Cyl mCyl1;
     /* 0xF80 */ u8 mType;

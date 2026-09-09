@@ -707,7 +707,7 @@ void daNpcF_c::tgHitCallBack(fopAc_ac_c* i_this, dCcD_GObjInf* param_1, fopAc_ac
     }
 }
 
-dCcD_SrcCyl daNpcF_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daNpcF_c::mCcDCyl = {
     daNpcF_c::mCcDObjInfo,
     {
         {
@@ -718,18 +718,18 @@ dCcD_SrcCyl daNpcF_c::mCcDCyl = {
     }
 };
 
-dCcD_SrcSph daNpcF_c::mCcDSph = {
+DUSK_GAME_DATA dCcD_SrcSph daNpcF_c::mCcDSph = {
     daNpcF_c::mCcDObjInfo,
     {
                 {{0.0f, 0.0f, 0.0f}, 0.0f}  // mSph
     }  // mSphAttr
 };
 
-char daNpcF_c::mFileNameBuf[0x15];
+DUSK_GAME_DATA char daNpcF_c::mFileNameBuf[0x15];
 
-fopAc_ac_c* daNpcF_c::mFindActorPList[100];
+DUSK_GAME_DATA fopAc_ac_c* daNpcF_c::mFindActorPList[100];
 
-s32 daNpcF_c::mFindCount;
+DUSK_GAME_DATA s32 daNpcF_c::mFindCount;
 
 void* daNpcF_c::srchAttnActor1(void* i_proc, void* param_1) {
     void* param_1_copy = param_1;
@@ -746,7 +746,7 @@ void* daNpcF_c::srchAttnActor1(void* i_proc, void* param_1) {
     return NULL;
 }
 
-s16 daNpcF_c::mSrchActorName;
+DUSK_GAME_DATA s16 daNpcF_c::mSrchActorName;
 
 void* daNpcF_c::srchActor(void* i_proc, void* i_this) {
     void* i_this_copy = i_this;
@@ -891,22 +891,22 @@ void daNpcF_c::initialize() {
     field_0x9d2 = cM_rndF(0x10000);
 }
 
-J3DAnmTransformKey* daNpcF_c::getTrnsfrmKeyAnmP(char* i_arcName, int i_resIdx) {
+J3DAnmTransformKey* daNpcF_c::getTrnsfrmKeyAnmP(char DUSK_CONST* i_arcName, int i_resIdx) {
     J3DAnmTransformKey* key = (J3DAnmTransformKey*)dComIfG_getObjectRes(i_arcName, i_resIdx);
     return key;
 }
 
-J3DAnmTexPattern* daNpcF_c::getTexPtrnAnmP(char* i_arcName, int i_resIdx) {
+J3DAnmTexPattern* daNpcF_c::getTexPtrnAnmP(char DUSK_CONST* i_arcName, int i_resIdx) {
     J3DAnmTexPattern* pattern = (J3DAnmTexPattern*)dComIfG_getObjectRes(i_arcName, i_resIdx);
     return pattern;
 }
 
-J3DAnmTextureSRTKey* daNpcF_c::getTexSRTKeyAnmP(char* i_arcName, int i_resIdx) {
+J3DAnmTextureSRTKey* daNpcF_c::getTexSRTKeyAnmP(char DUSK_CONST* i_arcName, int i_resIdx) {
     J3DAnmTextureSRTKey* key = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(i_arcName, i_resIdx);
     return key;
 }
 
-J3DAnmTevRegKey* daNpcF_c::getTevRegKeyAnmP(char* i_arcName, int i_resIdx) {
+J3DAnmTevRegKey* daNpcF_c::getTevRegKeyAnmP(char DUSK_CONST* i_arcName, int i_resIdx) {
     J3DAnmTevRegKey* key = (J3DAnmTevRegKey*)dComIfG_getObjectRes(i_arcName, i_resIdx);
     return key;
 }
@@ -1280,7 +1280,7 @@ int daNpcF_c::ctrlMsgAnm(int& o_expression, int& o_motion, fopAc_ac_c* param_2, 
     return mMsgTimer;
 }
 
-void daNpcF_c::orderEvent(int i_speak, char* i_evtName, u16 param_2, u16 i_priority,
+void daNpcF_c::orderEvent(int i_speak, DUSK_CONST char* i_evtName, u16 param_2, u16 i_priority,
                           u8 i_mapToolID,
                           u16 i_flag) {
     if (i_evtName != NULL) {
@@ -1302,7 +1302,7 @@ void daNpcF_c::orderEvent(int i_speak, char* i_evtName, u16 param_2, u16 i_prior
     }
 }
 
-void daNpcF_c::changeEvent(char* i_arcName, char* i_evtName, u16 param_2, u16 param_3) {
+void daNpcF_c::changeEvent(DUSK_CONST char* i_arcName, DUSK_CONST char* i_evtName, u16 param_2, u16 param_3) {
     if (i_arcName != NULL) {
         eventInfo.setArchiveName(i_arcName);
         dComIfGp_getEventManager().setObjectArchive(eventInfo.getArchiveName());
@@ -2159,14 +2159,14 @@ int daNpcF_MoveBgActor_c::MoveBGDraw() {
     return Draw();
 }
 
-dCcD_SrcGObjInf const daBaseNpc_c::mCcDObj = {
+DUSK_GAME_DATA dCcD_SrcGObjInf const daBaseNpc_c::mCcDObj = {
     {0, {{0, 0, 0}, {0x0, 0x0}, {0x79}}},
     {dCcD_SE_NONE, 0, 0, 0, 0},
     {dCcD_SE_NONE, 0, 0, 0, 0},
     {0}
 };
 
-dCcD_SrcGObjInf const daNpcF_c::mCcDObjInfo = {
+DUSK_GAME_DATA dCcD_SrcGObjInf const daNpcF_c::mCcDObjInfo = {
     {0, {{0, 0, 0}, {0x0, 0x0}, {0x79}}},
     {dCcD_SE_NONE, 0, 0, 0, 0},
     {dCcD_SE_NONE, 0, 0, 0, 0},

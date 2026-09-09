@@ -76,14 +76,14 @@ int daFlorBoad_c::Execute(Mtx** param_0) {
 
 static daFlorBoad_HIO_c l_HIO;
 
-const dCcD_SrcGObjInf daFlorBoad_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daFlorBoad_c::mCcDObjInfo = {
     {0, {{0, 1, 0}, {0x400020, 0x11}, {0}}},
     {dCcD_SE_SWORD, 0, 0, 2, 1},
     {dCcD_SE_STONE, 0, 0, 0, 6},
     {0},
 };
 
-dCcD_SrcCyl daFlorBoad_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daFlorBoad_c::mCcDCyl = {
     daFlorBoad_c::mCcDObjInfo,
     {
         {
@@ -183,13 +183,13 @@ static int daFlorBoad_Create(fopAc_ac_c* i_this) {
     return ((daFlorBoad_c*)i_this)->create();
 }
 
-static actor_method_class l_daFlorBoad_Method = {
+static DUSK_CONST actor_method_class l_daFlorBoad_Method = {
     (process_method_func)daFlorBoad_Create,  (process_method_func)daFlorBoad_Delete,
     (process_method_func)daFlorBoad_Execute, (process_method_func)NULL,
     (process_method_func)daFlorBoad_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_Lv5FBoard = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Lv5FBoard = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

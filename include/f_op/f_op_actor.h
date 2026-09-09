@@ -15,7 +15,7 @@ struct actor_method_class {
 };
 struct actor_process_profile_definition {
     /* 0x00 */ leaf_process_profile_definition base;
-    /* 0x24 */ actor_method_class* sub_method;
+    /* 0x24 */ DUSK_CONST actor_method_class* sub_method;
     /* 0x28 */ u32 status;
     /* 0x2C */ u8 group;
     /* 0x2D */ u8 cullType;
@@ -202,7 +202,7 @@ class dEvt_info_c {
 public:
     dEvt_info_c();
     virtual ~dEvt_info_c() {}
-    void setEventName(char*);
+    void setEventName(DUSK_CONST char*);
     char* getEventName();
     void beforeProc();
     void onCondition(u16 cond) { mCondition |= cond; }
@@ -218,12 +218,12 @@ public:
     void setEventId(s16 id) { mEventId = id; }
     void setCondition(u16 condition) { mCondition = condition; }
     u16 getCondition() { return mCondition; }
-    void setArchiveName(char* name) { mArchiveName = name; }
+    void setArchiveName(DUSK_CONST char* name) { mArchiveName = name; }
     u8 getMapToolId() { return mMapToolId; }
     s16 getEventId() { return mEventId; }
     s16 getIdx() { return (s8)mIndex; }
     void setIdx(u8 i_idx) { mIndex = i_idx; }
-    char* getArchiveName() { return mArchiveName; }
+    DUSK_CONST char* getArchiveName() { return mArchiveName; }
     BOOL chkCondition(u16 condition) { return (mCondition & condition) == condition; }
 
     void suspendProc(void* actor) {
@@ -237,7 +237,7 @@ public:
     /* 0x08 */ s16 mEventId;
     /* 0x0A */ u8 mMapToolId;
     /* 0x0B */ u8 mIndex;
-    /* 0x0C */ char* mArchiveName;
+    /* 0x0C */ DUSK_CONST char* mArchiveName;
     /* 0x10 */ u8 field_0x10;
     /* 0x14 */ void (*field_0x14)(void*);
 };  // Size = 0x18
@@ -279,7 +279,7 @@ public:
     /* 0x0C0 */ int actor_type;
     /* 0x0C4 */ create_tag_class actor_tag;
     /* 0x0D8 */ create_tag_class draw_tag;
-    /* 0x0EC */ profile_method_class* sub_method;
+    /* 0x0EC */ profile_method_class DUSK_CONST* sub_method;
     /* 0x0F0 */ JKRSolidHeap* heap;
     /* 0x0F4 */ dEvt_info_c eventInfo;
     /* 0x10C */ dKy_tevstr_c tevStr;
@@ -318,6 +318,11 @@ public:
     /* 0x566 */ s8 field_0x566;
     /* 0x567 */ s8 field_0x567;
 
+#if TARGET_PC
+    u32 mItemGiveTag;
+    u8 mItemGiveOriginalNo;
+#endif
+
 #if !__MWERKS__
     s8 actor_last_base_field;
 #endif
@@ -332,7 +337,7 @@ public:
     static u32 getStopStatus() { return stopStatus; }
     static void setStopStatus(u32 status) { stopStatus = status; }
 
-    static u32 stopStatus;
+    static DUSK_GAME_DATA u32 stopStatus;
 };  // Size: 0x568
 
 STATIC_ASSERT(sizeof(fopAc_ac_c) == 0x568);
@@ -431,6 +436,6 @@ public:
 
 BOOL fopAc_IsActor(void* i_actor);
 
-extern actor_method_class g_fopAc_Method;
+DUSK_GAME_EXTERN actor_method_class g_fopAc_Method;
 
 #endif

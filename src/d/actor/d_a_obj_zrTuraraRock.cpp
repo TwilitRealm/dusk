@@ -23,7 +23,7 @@ daZrTuraRc_HIO_c::daZrTuraRc_HIO_c() {
     field_0x1c = 5.0f;
 }
 
-dCcD_SrcGObjInf const daZrTuraRc_c::mCcDObjInfo = {
+DUSK_GAME_DATA dCcD_SrcGObjInf const daZrTuraRc_c::mCcDObjInfo = {
     {0, {
         {0x20, 1, 0x1F},
         {0, 0},
@@ -34,7 +34,7 @@ dCcD_SrcGObjInf const daZrTuraRc_c::mCcDObjInfo = {
     {0}
 };
 
-dCcD_SrcSph daZrTuraRc_c::mCcDSph = {
+DUSK_GAME_DATA dCcD_SrcSph daZrTuraRc_c::mCcDSph = {
     mCcDObjInfo,
     {{{0.0f, 0.0f, 0.0f}, 0.0f}}
 };
@@ -169,7 +169,7 @@ static cPhs_Step daZrTuraRc_Create(fopAc_ac_c* i_this) {
     return static_cast<daZrTuraRc_c*>(i_this)->create();
 }
 
-static actor_method_class l_daZrTuraRc_Method = {
+static DUSK_CONST actor_method_class l_daZrTuraRc_Method = {
     (process_method_func)daZrTuraRc_Create,
     (process_method_func)daZrTuraRc_Delete,
     (process_method_func)daZrTuraRc_Execute,
@@ -177,7 +177,7 @@ static actor_method_class l_daZrTuraRc_Method = {
     (process_method_func)daZrTuraRc_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_zrTuraraRc = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_zrTuraraRc = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

@@ -31,11 +31,11 @@ void daLv6SwGate_HIO_c::genMessage(JORMContext* context)
 
 static daLv6SwGate_HIO_c l_HIO;
 
-const dCcD_SrcGObjInf daLv6SwGate_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daLv6SwGate_c::mCcDObjInfo = {
     {0, {{0, 0, 0}, {0x400, 0x11}, {0x79}}}, {1, 0, 0, 0, 0}, {0xA, 0, 0, 0, 0}, {0}
 };
 
-dCcD_SrcCyl daLv6SwGate_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daLv6SwGate_c::mCcDCyl = {
     mCcDObjInfo,
     {
         {
@@ -46,7 +46,7 @@ dCcD_SrcCyl daLv6SwGate_c::mCcDCyl = {
     }  // mCylAttr
 };
 
-static cull_box l_cull_box = {-1200.0f, -300.0f, -100.0f, 1200.0f, 300.0f, 100.0f};
+static DUSK_CONSTEXPR cull_box l_cull_box = {-1200.0f, -300.0f, -100.0f, 1200.0f, 300.0f, 100.0f};
 
 void daLv6SwGate_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
@@ -314,7 +314,7 @@ static int daLv6SwGate_Create(fopAc_ac_c* i_this) {
     return gate->create();
 }
 
-static actor_method_class l_daLv6SwGate_Method = {
+static DUSK_CONST actor_method_class l_daLv6SwGate_Method = {
     (process_method_func)daLv6SwGate_Create,  
     (process_method_func)daLv6SwGate_Delete,
     (process_method_func)daLv6SwGate_Execute, 
@@ -322,7 +322,7 @@ static actor_method_class l_daLv6SwGate_Method = {
     (process_method_func)daLv6SwGate_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_Lv6SwGate = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Lv6SwGate = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

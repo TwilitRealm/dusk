@@ -10,6 +10,10 @@
 #include "Z2AudioLib/Z2Instances.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "mods/items.h"
+#endif
+
 enum grC_RES_File_ID {
     /* BCK */
     /* 0x05 */ BCK_GRC_F_CHEERFUL = 0x5,
@@ -156,12 +160,12 @@ enum Event_Cut_Nums {
 
 static NPC_GRC_HIO_CLASS l_HIO;
 
-static daNpc_GetParam1 l_bmdGetParamList[2] = {
+static DUSK_CONSTEXPR daNpc_GetParam1 l_bmdGetParamList[2] = {
     {BMDR_GRC_A, GRC_MDL},
     {BMDR_GRC_TW, GRC_TW},
 };
 
-static daNpc_GetParam1 l_bckGetParamList[19] = {
+static DUSK_CONSTEXPR daNpc_GetParam1 l_bckGetParamList[19] = {
     {-1, GRC},
     {BCK_GRC_F_WAIT_A, 0},
     {BCK_GRC_GRUMPY, GRC},
@@ -183,7 +187,7 @@ static daNpc_GetParam1 l_bckGetParamList[19] = {
     {BCK_GRC_STEP, GRC},
 };
 
-static daNpc_GetParam1 l_btpGetParamList[6] = {
+static DUSK_CONSTEXPR daNpc_GetParam1 l_btpGetParamList[6] = {
     {BTP_GRC_A, GRC}, 
     {BTP_GRC_F_CHEERFUL_T, GRC},
     {BTP_GRC_F_GRUMPY_T, GRC},
@@ -192,49 +196,49 @@ static daNpc_GetParam1 l_btpGetParamList[6] = {
     {BTP_GRC_FH_CLOSEEYE, GRC},
 };
 
-static daNpc_GetParam1 l_btkGetParamList[1] = {
+static DUSK_CONSTEXPR daNpc_GetParam1 l_btkGetParamList[1] = {
     {-1, GRC},
 };
 
-static daNpc_GetParam1 l_evtGetParamList[1] = {
+static DUSK_CONSTEXPR daNpc_GetParam1 l_evtGetParamList[1] = {
     {0, GRC},
 };
 
-static int l_loadRes_GRCa[3] = {
+static DUSK_CONSTEXPR int l_loadRes_GRCa[3] = {
     GRC, GRC_MDL, -1,
 };
 
-static int l_loadRes_GRCa_TW[3] = {
+static DUSK_CONSTEXPR int l_loadRes_GRCa_TW[3] = {
     GRC, GRC_TW, -1,
 };
 
-static int l_loadRes_GRC0[3] = {
+static DUSK_CONSTEXPR int l_loadRes_GRC0[3] = {
     GRC, GRC_MDL, -1,
 };
 
-static int* l_loadRes_list[7] = {
+static DUSK_CONSTEXPR int DUSK_CONST* l_loadRes_list[7] = {
     l_loadRes_GRCa, l_loadRes_GRCa_TW, l_loadRes_GRCa,
     l_loadRes_GRCa, l_loadRes_GRCa,    l_loadRes_GRCa,
     l_loadRes_GRC0,
 };
 
-static char* l_resNames[3] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_resNames[3] = {
     "grC",
     "grC_Mdl",
     "grC_TW",
 };
 
-static char* l_evtNames[1] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_evtNames[1] = {
     NULL
 };
 
-static char* l_myName = "grC";
+static DUSK_CONSTEXPR char DUSK_CONST* l_myName = "grC";
 
-char* daNpc_grC_c::mEvtCutNameList = "";
+DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST daNpc_grC_c::mEvtCutNameList = "";
 
-daNpc_grC_c::EventFn daNpc_grC_c::mEvtCutList[1] = {NULL};
+DUSK_GAME_DATA daNpc_grC_c::EventFn DUSK_CONST daNpc_grC_c::mEvtCutList[1] = {NULL};
 
-daNpc_grC_HIOParam const daNpc_grC_Param_c::m = {
+DUSK_GAME_DATA daNpc_grC_HIOParam const daNpc_grC_Param_c::m = {
     40.0f,
     -3.0f,
     1.0f,
@@ -1476,8 +1480,27 @@ BOOL daNpc_grC_c::talk(void* param_1) {
                 rv = TRUE;
 
                 if (mFlow.getEventId(&i_itemNo) == 1) {
-                    mItemID = fopAcM_createItemForPresentDemo(&current.pos, i_itemNo, 0, -1, -1, NULL, NULL);
+#if TARGET_PC
+                    const bool isCastleTownShop =
+                        strcmp(dComIfGp_getStartStageName(), "R_SP160") == 0 &&
+                        (i_itemNo == dItemNo_RED_BOTTLE_e || i_itemNo == dItemNo_OIL_BOTTLE_e);
+                    u32 itemGiveTag = 0;
+                    if (isCastleTownShop) {
+                        const auto itemCheck = dusk::mods::item_check_commit(
+                            dusk::mods::item_give_tag_shop(i_itemNo), i_itemNo, this);
+                        i_itemNo = itemCheck.itemNo;
+                        itemGiveTag = itemCheck.tag;
+                    }
 
+                    if (isCastleTownShop && i_itemNo == dItemNo_NONE_e) {
+                        dusk::mods::item_check_complete({itemGiveTag, dItemNo_NONE_e}, this);
+                    } else {
+                        mItemID = fopAcM_createItemForPresentDemo(
+                            &current.pos, i_itemNo, 0, -1, -1, NULL, NULL, itemGiveTag);
+                    }
+#else
+                    mItemID = fopAcM_createItemForPresentDemo(&current.pos, i_itemNo, 0, -1, -1, NULL, NULL);
+#endif
                     if (mItemID != fpcM_ERROR_PROCESS_ID_e) {
                         s16 i_eventID = dComIfGp_getEventManager().getEventIdx(this, "DEFAULT_GETITEM", 0xFF);
                         dComIfGp_getEvent()->reset(this);
@@ -1568,7 +1591,7 @@ static int daNpc_grC_IsDelete(void* a_this) {
 
 AUDIO_INSTANCES;
 
-static actor_method_class daNpc_grC_MethodTable = {
+static DUSK_CONST actor_method_class daNpc_grC_MethodTable = {
     (process_method_func)daNpc_grC_Create,
     (process_method_func)daNpc_grC_Delete,
     (process_method_func)daNpc_grC_Execute,
@@ -1576,7 +1599,7 @@ static actor_method_class daNpc_grC_MethodTable = {
     (process_method_func)daNpc_grC_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_GRC = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_GRC = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

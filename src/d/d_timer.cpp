@@ -24,6 +24,7 @@
 #include <cstring>
 
 #include "dusk/frame_interpolation.h"
+#include "dusk/version.hpp"
 
 static int dTimer_createStart2D(s32 param_0, u16 param_1);
 
@@ -1224,8 +1225,8 @@ BOOL dDlst_TimerScrnDraw_c::closeAnime() {
 int dDlst_TimerScrnDraw_c::createGetIn(cXyz i_pos) {
     char string[104];
     dMeter2Info_getString(0x3E4, string, NULL);  // "GOAT IN!"
-    strcpy(static_cast<J2DTextBox*>(mpGetInScreen->search(MULTI_CHAR('get_in_s')))->getStringPtr(), string);
-    strcpy(static_cast<J2DTextBox*>(mpGetInScreen->search(MULTI_CHAR('get_in')))->getStringPtr(), string);
+    SAFE_STRCPY(static_cast<J2DTextBox*>(mpGetInScreen->search(MULTI_CHAR('get_in_s')))->getStringPtr(), string);
+    SAFE_STRCPY(static_cast<J2DTextBox*>(mpGetInScreen->search(MULTI_CHAR('get_in')))->getStringPtr(), string);
 
     if (mCowID < 50) {
         m_getin_info[mCowID].bck_frame = 40.0f;
@@ -1313,8 +1314,8 @@ int dDlst_TimerScrnDraw_c::createGetIn(cXyz i_pos) {
 s32 dDlst_TimerScrnDraw_c::createStart(u16 i_messageID) {
     char string[112];
     dMeter2Info_getString(i_messageID, string, NULL);
-    strcpy(static_cast<J2DTextBox*>(mpGetInScreen->search(MULTI_CHAR('get_in_s')))->getStringPtr(), string);
-    strcpy(static_cast<J2DTextBox*>(mpGetInScreen->search(MULTI_CHAR('get_in')))->getStringPtr(), string);
+    SAFE_STRCPY(static_cast<J2DTextBox*>(mpGetInScreen->search(MULTI_CHAR('get_in_s')))->getStringPtr(), string);
+    SAFE_STRCPY(static_cast<J2DTextBox*>(mpGetInScreen->search(MULTI_CHAR('get_in')))->getStringPtr(), string);
 
     if (mCowID == 0) {
         m_getin_info[mCowID].bck_frame = 40.0f;
@@ -1430,7 +1431,7 @@ void dDlst_TimerScrnDraw_c::playBckAnimation(f32 i_frame) {
     mpGetInParent->getPanePtr()->setAnimation((J2DAnmTransform*)NULL);
 }
 
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC || VERSION == VERSION_GCN_JPN
 bool dDlst_TimerScrnDraw_c::isLeadByte(int i_char) {
     return (i_char >= 0x81 && i_char <= 0x9f) || (i_char >= 0xe0 && i_char <= 0xfc);
 }
@@ -1466,7 +1467,18 @@ void dDlst_TimerScrnDraw_c::drawPikari(int i_no) {
                 var_f25 * static_cast<J2DTextBox*>(mpGetInText->getPanePtr())->getCharSpace();
         }
 
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC
+        if (dusk::version::isRegionJpn()) {
+            if (isLeadByte(c)) {
+                c = ((string[str_idx] & 0xFF) << 8) | (string[str_idx + 1] & 0xFF);
+                str_idx++;
+            } else {
+                c = string[str_idx] & 0xFF;
+            }
+        } else {
+            c = string[str_idx] & 0xFF;
+        }
+#elif VERSION == VERSION_GCN_JPN
         if (isLeadByte(c)) {
             c = ((string[str_idx] & 0xFF) << 8) | (string[str_idx + 1] & 0xFF);
             str_idx++;
@@ -1492,7 +1504,18 @@ void dDlst_TimerScrnDraw_c::drawPikari(int i_no) {
                 var_f25 * static_cast<J2DTextBox*>(mpGetInText->getPanePtr())->getCharSpace();
         }
 
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC
+        if (dusk::version::isRegionJpn()) {
+            if (isLeadByte(c)) {
+                c = ((string[str_idx] & 0xFF) << 8) | (string[str_idx + 1] & 0xFF);
+                str_idx++;
+            } else {
+                c = string[str_idx] & 0xFF;
+            }
+        } else {
+            c = string[str_idx] & 0xFF;
+        }
+#elif VERSION == VERSION_GCN_JPN
         if (isLeadByte(c)) {
             c = ((string[str_idx] & 0xFF) << 8) | (string[str_idx + 1] & 0xFF);
             str_idx++;
@@ -1650,7 +1673,7 @@ static leafdraw_method_class l_dTimer_Method = {
     (process_method_func)dTimer_Draw,
 };
 
-msg_process_profile_definition g_profile_TIMER = {
+DUSK_PROFILE msg_process_profile_definition DUSK_CONST g_profile_TIMER = {
     /* Layer ID    */ fpcLy_CURRENT_e,
     /* List ID     */ 12,
     /* List Prio   */ fpcPi_CURRENT_e,

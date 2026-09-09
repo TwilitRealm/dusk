@@ -5472,6 +5472,15 @@ int daB_ZANT_c::create() {
     fopAcM_ct(this, daB_ZANT_c);
     OS_REPORT("B_ZANT PARAM %x\n", fopAcM_GetParam(this));
 
+#if TARGET_PC
+        // Due to our loads being so much faster, Zant can initialize *before* the player
+        // This breaks respawning in the final phase of the fight when it tries
+        // to load the player's position
+        if (daPy_getPlayerActorClass() == NULL) {
+            return cPhs_INIT_e;
+        }
+#endif
+
     mSwbit = fopAcM_GetParam(this);
     if (mSwbit != 0xFF) {
         if (dComIfGs_isSwitch(mSwbit, fopAcM_GetRoomNo(this))) {
@@ -5591,7 +5600,7 @@ static int daB_ZANT_Create(daB_ZANT_c* i_this) {
     return i_this->create();
 }
 
-static actor_method_class l_daB_ZANT_Method = {
+static DUSK_CONST actor_method_class l_daB_ZANT_Method = {
     (process_method_func)daB_ZANT_Create,
     (process_method_func)daB_ZANT_Delete,
     (process_method_func)daB_ZANT_Execute,
@@ -5599,7 +5608,7 @@ static actor_method_class l_daB_ZANT_Method = {
     (process_method_func)daB_ZANT_Draw,
 };
 
-actor_process_profile_definition g_profile_B_ZANT = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_B_ZANT = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 4,
     /* List Prio    */ fpcPi_CURRENT_e,

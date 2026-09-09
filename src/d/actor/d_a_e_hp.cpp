@@ -726,13 +726,27 @@ void daE_HP_c::executeDead() {
             fopAcM_onSwitch(this, bitSw);
         }
 
+#if TARGET_PC
+        const auto itemCheck = dusk::mods::item_check_commit(
+            dusk::mods::item_give_tag_poe(bitSw), dItemNo_POU_SPIRIT_e, this);
+        mItemCheckHandled = true;
+        if (itemCheck.itemNo == dItemNo_NONE_e) {
+            dusk::mods::item_check_complete(itemCheck, this);
+        } else {
+            daAlink_getAlinkActorClass()->procWolfAtnActorMoveInit();
+            dusk::mods::item_check_enqueue(itemCheck, dusk::mods::ItemGiveMode::ForcedDemo);
+        }
+#else
         dComIfGs_addPohSpiritNum();
+#endif
 
         field_0x784 = -1;
 
+#if !TARGET_PC
         if (dComIfGs_getPohSpiritNum() == 20) {
             dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x1c9]);
         }
+#endif
 
         movemode++;
     }
@@ -752,13 +766,13 @@ void daE_HP_c::executeDead() {
                     field_0x788 = 1;
                 }
             }
-        } else if (field_0x788 != 0) {
+        } else if (field_0x788 != 0 IF_DUSK(|| mItemCheckHandled)) {
             fopAcM_createDisappear(this, &current.pos, 8, 3, 0xff);
             fopAcM_delete(this);
         } else {
             if (field_0x784 == -1) {
-                field_0x784 = fopAcM_createItemForPresentDemo(&current.pos, dItemNo_POU_SPIRIT_e, 0, -1,
-                                                              -1, 0, 0);
+                field_0x784 = fopAcM_createItemForPresentDemo(&current.pos, dItemNo_POU_SPIRIT_e, 0,
+                    -1, -1, 0, 0 IF_DUSK_ARG(dusk::mods::item_give_tag_poe(bitSw)));
             }
 
             if (fopAcM_IsExecuting(field_0x784) != FALSE) {
@@ -1313,13 +1327,13 @@ static int daE_HP_Create(daE_HP_c* i_this) {
     return i_this->create();
 }
 
-static actor_method_class l_daE_HP_Method = {
+static DUSK_CONST actor_method_class l_daE_HP_Method = {
     (process_method_func)daE_HP_Create,  (process_method_func)daE_HP_Delete,
     (process_method_func)daE_HP_Execute, (process_method_func)daE_HP_IsDelete,
     (process_method_func)daE_HP_Draw,
 };
 
-actor_process_profile_definition g_profile_E_HP = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_E_HP = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

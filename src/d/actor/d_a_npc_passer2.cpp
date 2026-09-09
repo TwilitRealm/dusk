@@ -31,7 +31,7 @@ static int createHeapCallBack(fopAc_ac_c* i_this) {
     return actor->createHeap();
 }
 
-daNpcPasser2_c::actionFunc daNpcPasser2_c::ActionTable[1][2] = {
+DUSK_GAME_DATA daNpcPasser2_c::actionFunc daNpcPasser2_c::ActionTable[1][2] = {
     {&daNpcPasser2_c::initPath, &daNpcPasser2_c::executePath},
 };
 
@@ -370,7 +370,7 @@ static int daNpcPasser2_IsDelete(void* i_this) {
     return 1;
 }
 
-static actor_method_class daNpcPasser2_METHODS = {
+static DUSK_CONST actor_method_class daNpcPasser2_METHODS = {
     (process_method_func)daNpcPasser2_Create,
     (process_method_func)daNpcPasser2_Delete,
     (process_method_func)daNpcPasser2_Execute,
@@ -378,7 +378,7 @@ static actor_method_class daNpcPasser2_METHODS = {
     (process_method_func)daNpcPasser2_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_PASSER2 = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_PASSER2 = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

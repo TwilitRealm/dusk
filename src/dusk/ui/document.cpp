@@ -1,11 +1,12 @@
 #include "document.hpp"
 
-#include "aurora/rmlui.hpp"
 #include "ui.hpp"
 
-#include "Z2AudioLib/Z2SeMgr.h"
 #include "m_Do/m_Do_audio.h"
-#include <imgui.h>
+
+#include <aurora/rmlui.hpp>
+
+#include <algorithm>
 
 namespace dusk::ui {
 namespace {
@@ -20,32 +21,47 @@ Rml::ElementDocument* load_document(const Rml::String& source) {
 
 }  // namespace
 
-Document::Document(const Rml::String& source) : mDocument(load_document(source)) {
+Document::Document(const Rml::String& source, bool passive, DocumentScope scope)
+    : mDocument(load_document(source)), mScope(scope), mPassive(passive) {
+    if (mDocument != nullptr) {
+        if (const auto* base = mDocument->GetStyleSheetContainer()) {
+            // Clone a pristine snapshot to rebuild from on every restyle
+            mBaseStyleSheets = base->CombineStyleSheetContainer(Rml::StyleSheetContainer{});
+        }
+        apply_scoped_styles(*this);
+    }
+
     // Block events while hidden (except for Menu command); play nav sounds when visible
     listen(
         Rml::EventId::Keydown,
         [this](Rml::Event& event) {
+            if (mPassive) {
+                return;
+            }
             const auto cmd = map_nav_event(event);
-            if (cmd != NavCommand::Menu && !visible()) {
+            if (cmd != NavCommand::Menu && (!visible() || !active())) {
                 event.StopImmediatePropagation();
             }
         },
         true);
-    const auto blockUnlessVisible = [this](Rml::Event& event) {
-        if (!visible()) {
+    const auto blockUnlessActive = [this](Rml::Event& event) {
+        if (!visible() || !active()) {
             event.StopImmediatePropagation();
         }
     };
-    listen(Rml::EventId::Mouseover, blockUnlessVisible, true);
-    listen(Rml::EventId::Click, blockUnlessVisible, true);
-    listen(Rml::EventId::Scroll, blockUnlessVisible, true);
+    listen(Rml::EventId::Mouseover, blockUnlessActive, true);
+    listen(Rml::EventId::Click, blockUnlessActive, true);
+    listen(Rml::EventId::Scroll, blockUnlessActive, true);
 
     listen(Rml::EventId::Keydown, [this](Rml::Event& event) {
-        const auto cmd = map_nav_event(event);
-        if (cmd == NavCommand::None) {
+        if (mPassive) {
+            auto* doc = top_document();
+            if (doc != nullptr && doc->handle_nav_event(event)) {
+                event.StopPropagation();
+            }
             return;
         }
-        if (handle_nav_command(event, cmd)) {
+        if (handle_nav_event(event)) {
             event.StopPropagation();
         }
     });
@@ -69,6 +85,7 @@ void Document::show() {
             focus();
         }
     }
+    mPendingClose = false;
 }
 
 void Document::hide(bool close) {
@@ -86,12 +103,78 @@ bool Document::focus() {
     return false;
 }
 
+bool Document::has_focus() const {
+    if (mDocument == nullptr) {
+        return false;
+    }
+    auto* context = mDocument->GetContext();
+    const auto* focused = context != nullptr ? context->GetFocusElement() : nullptr;
+    return focused != nullptr && focused->GetOwnerDocument() == mDocument;
+}
+
+bool Document::set_document_styles(const Rml::String& rcss) {
+    if (rcss.empty()) {
+        mDocumentStyleSheets = nullptr;
+    } else {
+        auto sheet = Rml::Factory::InstanceStyleSheetString(rcss);
+        if (sheet == nullptr) {
+            return false;
+        }
+        mDocumentStyleSheets = std::move(sheet);
+    }
+    apply_scoped_styles(*this);
+    return true;
+}
+
+void Document::restyle(std::span<const Rml::StyleSheetContainer* const> sheets) {
+    if (mDocument == nullptr) {
+        return;
+    }
+    const bool wantsExtra =
+        mDocumentStyleSheets != nullptr ||
+        std::ranges::any_of(sheets, [](const auto* sheet) { return sheet != nullptr; });
+    // Nothing to add
+    if (!wantsExtra && !mRestyled) {
+        return;
+    }
+    auto combined = mBaseStyleSheets;
+    const auto combine = [&combined](const Rml::StyleSheetContainer& sheet) {
+        if (combined != nullptr) {
+            combined = combined->CombineStyleSheetContainer(sheet);
+        } else {
+            combined = sheet.CombineStyleSheetContainer(Rml::StyleSheetContainer{});
+        }
+    };
+    for (const auto* sheet : sheets) {
+        if (sheet != nullptr) {
+            combine(*sheet);
+        }
+    }
+    if (mDocumentStyleSheets != nullptr) {
+        combine(*mDocumentStyleSheets);
+    }
+    mDocument->SetStyleSheetContainer(std::move(combined));
+    mRestyled = wantsExtra;
+}
+
 void Document::listen(Rml::Element* element, Rml::EventId event,
     ScopedEventListener::Callback callback, bool capture) {
     if (element == nullptr) {
         element = mDocument;
     }
     if (element == nullptr || !callback) {
+        return;
+    }
+    mListeners.emplace_back(
+        std::make_unique<ScopedEventListener>(element, event, std::move(callback), capture));
+}
+
+void Document::listen(Rml::Element* element, const Rml::String& event,
+    ScopedEventListener::Callback callback, bool capture) {
+    if (element == nullptr) {
+        element = mDocument;
+    }
+    if (element == nullptr || event.empty() || !callback) {
         return;
     }
     mListeners.emplace_back(
@@ -105,27 +188,31 @@ bool Document::visible() const {
     return *mDocument->GetProperty(Rml::PropertyId::Visibility) == Rml::Style::Visibility::Visible;
 }
 
+bool Document::active() const {
+    return !mClosed && !mPendingClose;
+}
+
+bool Document::handle_nav_event(Rml::Event& event) {
+    if (!active()) {
+        return false;
+    }
+    const auto cmd = map_nav_event(event);
+    if (cmd == NavCommand::None || (cmd != NavCommand::Menu && !visible())) {
+        return false;
+    }
+    return handle_nav_command(event, cmd);
+}
+
 bool Document::handle_nav_command(Rml::Event& event, NavCommand cmd) {
     if (cmd == NavCommand::Menu) {
-        toggle_cursor_if_gyro(!visible());
+        if (game_obscured_below(*this)) {
+            return true;
+        }
         mDoAud_seStartMenu(visible() ? kSoundMenuClose : kSoundMenuOpen);
         toggle();
         return true;
     }
     return false;
-}
-
-void Document::toggle_cursor_if_gyro(bool cursor_enabled) {
-    if (dusk::getSettings().game.gyroMode.getValue() == GyroMode::Mouse)
-    {
-        if (cursor_enabled) {
-            ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
-            SDL_ShowCursor();
-        } else {
-            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-            SDL_HideCursor();
-        }
-    }
 }
 
 }  // namespace dusk::ui

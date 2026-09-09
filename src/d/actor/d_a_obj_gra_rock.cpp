@@ -16,7 +16,7 @@ static void dummy() {
     cLib_calcTimer<s16>(0);
 }
 
-dCcD_SrcCyl const daObjGraRock_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl const daObjGraRock_c::mCcDCyl = {
     {
         {0x0, {{0x0, 0x0, 0x0}, {0x2020, 0x11}, 0x0}}, // mObj
         {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x0}, // mGObjAt
@@ -171,7 +171,7 @@ int daObjGraRock_c::Create() {
     return 1;
 }
 
-static char* l_arcName[5] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcName[5] = {
     "M_VBom",
     "grA_base",
     "grA_mdl",
@@ -298,7 +298,7 @@ static int daObjGraRock_create(fopAc_ac_c* i_this) {
     return static_cast<daObjGraRock_c*>(i_this)->create();
 }
 
-static actor_method_class l_daObjGraRock_Method = {
+static DUSK_CONST actor_method_class l_daObjGraRock_Method = {
     (process_method_func)daObjGraRock_create,
     (process_method_func)daObjGraRock_Delete,
     (process_method_func)daObjGraRock_Execute,
@@ -306,7 +306,7 @@ static actor_method_class l_daObjGraRock_Method = {
     (process_method_func)daObjGraRock_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_GraRock = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_GraRock = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

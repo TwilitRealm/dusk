@@ -53,7 +53,7 @@ enum CStatueAnimIndex {
     CStatueAnimIndex_N,
 };
 
-u16 const daCstatue_c::m_bckIdxTable[daCstatueType_N][CStatueAnimIndex_N] = {
+DUSK_GAME_DATA u16 const daCstatue_c::m_bckIdxTable[daCstatueType_N][CStatueAnimIndex_N] = {
     // daCstatueType_NORMAL
     {CStatueAnimSwing, CStatueAnimWalk, CStatueAnimSwing, CStatueAnimFall, CStatueAnimStop,
      CStatueAnimStart, CStatueAnimSwingre},
@@ -1206,7 +1206,7 @@ static int daCstatue_Draw(daCstatue_c* actor) {
     return static_cast<daCstatue_c*>(actor)->draw();
 }
 
-static actor_method_class l_daCstatue_Method = {
+static DUSK_CONST actor_method_class l_daCstatue_Method = {
     (process_method_func)daCstatue_Create,
     (process_method_func)daCstatue_Delete,
     (process_method_func)daCstatue_Execute,
@@ -1214,7 +1214,7 @@ static actor_method_class l_daCstatue_Method = {
     (process_method_func)daCstatue_Draw,
 };
 
-actor_process_profile_definition g_profile_CSTATUE = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_CSTATUE = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

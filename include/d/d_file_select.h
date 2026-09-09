@@ -9,6 +9,10 @@
 #include "JSystem/J3DGraphLoader/J3DModelLoader.h"
 #include "JSystem/J3DGraphLoader/J3DAnmLoader.h"
 
+#if TARGET_PC
+#include "mods/svc/game_mode.h"
+#endif
+
 class dFile_info_c;
 class J2DPicture;
 
@@ -254,6 +258,11 @@ public:
         MEMCARDCHECKPROC_ERR_YESNO_CURSOR_MOVE_ANM,
         MEMCARDCHECKPROC_SAVEDATA_CLEAR,
 
+#if TARGET_PC
+        MEMCARDCHECKPROC_AUTO_MAKE_GAMEFILE,
+        MEMCARDCHECKPROC_AUTO_MAKE_GAMEFILE_ERR_WAIT,
+#endif
+
         #if PLATFORM_WII || PLATFORM_SHIELD
         MEMCARDCHECKPROC_NAND_STAT_CHECK,
         MEMCARDCHECKPROC_GAMEFILE_INIT_SEL,
@@ -378,6 +387,17 @@ public:
     bool yesnoWakuAlpahAnm(u8);
     #if TARGET_PC
     void fileSelectWide();
+    bool pointerDataSelect();
+    bool pointerMenuSelect();
+    bool pointerCopyDataToSelect();
+    bool pointerYesNoSelect(bool errorSelect);
+    void backToDataSelectMove() {
+        headerTxtSet(0x43, 1, 0);
+        fileRecScaleAnmInitSet2(0.0f, 1.0f);
+        nameMoveAnmInitSet(0xd29, 0xd1f);
+        modoruTxtDispAnmInit(0);
+        mDataSelProc = DATASELPROC_NAME_TO_DATA_SELECT_MOVE;
+    }
     #endif
     void _draw();
     void errorMoveAnmInitSet(int, int);
@@ -412,6 +432,10 @@ public:
     void MemCardMakeGameFile();
     void MemCardMakeGameFileWait();
     void MemCardMakeGameFileCheck();
+#if TARGET_PC
+    void MemCardAutoMakeGameFile();
+    void MemCardAutoMakeGameFileErrWait();
+#endif
     void MemCardMsgWindowInitOpen();
     void MemCardMsgWindowOpen();
     void MemCardMsgWindowClose();
@@ -530,7 +554,7 @@ public:
     /* 0x0130 */ int field_0x0130;
     /* 0x0134 */ int field_0x0134;
     /* 0x0138 */ CPaneMgrAlpha* mErrorMsgTxtPane[2];
-    /* 0x0140 */ char* mErrorMsgStringPtr[2];
+    /* 0x0140 */ TEXT_SPAN mErrorMsgStringPtr[2];
     /* 0x0148 */ u8 mErrorTxtDispIdx;
     /* 0x0149 */ u8 field_0x0149;
     /* 0x014A */ bool field_0x014a;
@@ -574,7 +598,7 @@ public:
     /* 0x020A */ u8 mFadeTimer;
     /* 0x020B */ u8 field_0x020b;
     /* 0x020C */ CPaneMgrAlpha* mHeaderTxtPane[2];
-    /* 0x0214 */ char* mHeaderStringPtr[2];
+    /* 0x0214 */ TEXT_SPAN mHeaderStringPtr[2];
     /* 0x021C */ u8 mHeaderTxtDispIdx;
     /* 0x021D */ u8 field_0x021d;
     /* 0x021E */ u8 field_0x021e;
@@ -591,7 +615,7 @@ public:
     /* 0x024B */ u8 field_0x024b;
     /* 0x024C */ u8 field_0x024c;
     /* 0x024B */ u8 field_0x024d[3];
-    /* 0x0250 */ char* mModoruStringPtr;
+    /* 0x0250 */ TEXT_SPAN mModoruStringPtr;
     /* 0x0254 */ STControl* stick;
     /* 0x0258 */ u8 mIsDataNew[3];
     /* 0x025B */ u8 mIsNoData[3];
@@ -682,24 +706,23 @@ public:
     /* 0x2374 */ u8 mFadeFlag;
     /* 0x2375 */ bool mHasDrawn;
 
-    #if PLATFORM_GCN
+#if PLATFORM_GCN
     /* 0x2378 */ J2DPicture* mpFadePict;
-    #endif
-#ifdef TARGET_PC
-    dDlst_FileSelFade_c mFadeDlst;
 #endif
 
-    #if PLATFORM_WII || PLATFORM_SHIELD
+#if PLATFORM_WII || PLATFORM_SHIELD
     /* 0x2376 */ u8 field_0x2376[SAVEFILE_SIZE];
     /* 0x4332 */ u8 field_0x4332;
     /* 0x4333 */ u8 field_0x4333;
-    #endif
+#endif
+
+#if TARGET_PC
+    dDlst_FileSelFade_c mFadeDlst;
+    bool mGameModeSaveStartBuildUi = true;
+    GameModeNewSaveState mGameModeNewSaveState = GAME_MODE_STATE_PENDING;
+#endif
 };
 
-#ifdef TARGET_PC
-STATIC_ASSERT(sizeof(dFile_select_c) == 0x237C + sizeof(dDlst_FileSelFade_c));
-#else
 STATIC_ASSERT(sizeof(dFile_select_c) == 0x237C);
-#endif
 
 #endif /* D_FILE_D_FILE_SELECT_H */

@@ -15,6 +15,10 @@
 #include "SSystem/SComponent/c_counter.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "helpers/string.hpp"
+#endif
+
 #if DEBUG
 static dEvM_HIO_c l_HIO;
 #endif
@@ -328,11 +332,22 @@ int dEvent_manager_c::create() {
     return 1;
 }
 
-bool dEvent_manager_c::setObjectArchive(char* arcname) {
+bool dEvent_manager_c::setObjectArchive(DUSK_CONST char* arcname) {
     void* rt = NULL;
 
     if (arcname != NULL) {
         rt = dComIfG_getObjectRes(arcname, DataFileName);
+#if TARGET_PC
+        if (rt != nullptr && strcmp(arcname, "Prayer") == 0) {
+            // pointer to Prayer event `011get_item` prm0 in its event_list.dat
+            u8* itemNo = static_cast<u8*>(rt) + 0x927;
+            *itemNo =
+                dusk::mods::item_check("prayer_reward", dItemNo_KAKERA_HEART_e, NULL);
+            // set the proper item give tag
+            u32* prm1 = reinterpret_cast<u32*>(static_cast<u8*>(rt) + 0x928);
+            *prm1 = dusk::mods::item_give_tag("prayer_reward");
+        }
+#endif
         int base_status = mEventList[BASE_ACTOR].init((char*)rt, -1);
 
         #if DEBUG
@@ -388,7 +403,7 @@ void dEvent_manager_c::roomInit(int roomNo) {
     }
 
     char arcname[8];
-    strcpy(arcname, dComIfG_getRoomArcName(roomNo));
+    SAFE_STRCPY(arcname, dComIfG_getRoomArcName(roomNo));
     char* res = (char*)dComIfG_getStageRes(arcname, DataFileName);
 
     int i;
@@ -836,7 +851,7 @@ s16 dEvent_manager_c::getEventIdx(const char* eventName, u8 mapToolID, s32 roomN
             case dStage_MapEvent_dt_TYPE_STB:
                 return getEventIdx(mapdata->data.event_name, 0xFF, roomNo);
             case dStage_MapEvent_dt_TYPE_MAPTOOLCAMERA:
-                sprintf(map_tool_name, "MapToolCamera%d", mapToolID);
+                SAFE_SPRINTF(map_tool_name, "MapToolCamera%d", mapToolID);
                 return getEventIdx(map_tool_name, 0xFF, roomNo);
             default:
                 JUT_ASSERT(1278, FALSE);
@@ -876,7 +891,7 @@ s16 dEvent_manager_c::getEventIdx(fopAc_ac_c* actor, u8 mapToolID) {
         case dStage_MapEvent_dt_TYPE_STB:
             return getEventIdx(actor, mapdata->data.event_name, 0xFF);
         case dStage_MapEvent_dt_TYPE_MAPTOOLCAMERA:
-            sprintf(map_tool_name, "MapToolCamera%d", mapToolID);
+            SAFE_SPRINTF(map_tool_name, "MapToolCamera%d", mapToolID);
             return getEventIdx(actor, map_tool_name, 0xFF);
         default:
             JUT_ASSERT(1341, FALSE);
@@ -901,7 +916,7 @@ s16 dEvent_manager_c::getEventIdx(fopAc_ac_c* actor, const char* eventName, u8 m
             case dStage_MapEvent_dt_TYPE_STB:
                 return getEventIdx(actor, mapdata->data.event_name, 0xFF);
             case dStage_MapEvent_dt_TYPE_MAPTOOLCAMERA:
-                sprintf(map_tool_name, "MapToolCamera%d", mapToolID);
+                SAFE_SPRINTF(map_tool_name, "MapToolCamera%d", mapToolID);
                 return getEventIdx(actor, map_tool_name, 0xFF);
             default:
                 JUT_ASSERT(1376, FALSE);
@@ -918,7 +933,7 @@ s16 dEvent_manager_c::getEventIdx(fopAc_ac_c* actor, const char* eventName, u8 m
         dEvDtBase_c actor_event;
         if (type < BASE_ROOM0 || BASE_ROOM5 < type || actorRoomNo == mEventList[type].roomNo()) {
             if (actor != NULL && type == BASE_ACTOR) {
-                char* arcname = actor->eventInfo.getArchiveName();
+                DUSK_CONST char* arcname = actor->eventInfo.getArchiveName();
                 if (arcname != NULL) {
                     char* data = (char*)dComIfG_getObjectRes(arcname, DataFileName);
                     actor_event.init(data, -1);
@@ -1040,7 +1055,7 @@ int dEvent_manager_c::getMyStaffId(const char* staffName, fopAc_ac_c* actor, int
             dEvDtStaff_c* staff = getBase().getStaffP(staff_id);
             if (staff->getType() != dEvDtStaff_c::TYPE_ALL) {
                 char buf[20];
-                strcpy(buf, staff->getName());
+                SAFE_STRCPY(buf, staff->getName());
 
                 char* ptr = NULL;
                 if (!hasDp) {
@@ -1286,7 +1301,7 @@ int dEvent_manager_c::getEventPrio(fopAc_ac_c* actor, s16 evCompositId) {
     dEvDtBase_c eventBase;
 
     if (getTypeCompositId(evCompositId) == 2 && actor != NULL) {
-        char* arcname = actor->eventInfo.getArchiveName();
+        DUSK_CONST char* arcname = actor->eventInfo.getArchiveName();
         if (arcname != NULL) {
             char* data = (char*)dComIfG_getObjectRes(arcname, DataFileName);
             eventBase.init(data, -1);
@@ -1310,7 +1325,7 @@ void dEvent_manager_c::issueStaff(const char* staffname) {
         fopAcM_Search((fopAcIt_JudgeFunc)extraOnObjectCallBack, NULL);
     } else {
         char nameBuf[32];
-        strcpy(nameBuf, staffname);
+        SAFE_STRCPY(nameBuf, staffname);
         fopAc_ac_c* actor = fopAcM_searchFromName4Event(nameBuf, -1);
         fopAcM_OnStatus(actor, fopAcStts_STAFF_EXTRA_e);
     }
@@ -1321,7 +1336,7 @@ void dEvent_manager_c::cancelStaff(const char* staffname) {
         fopAcM_Search((fopAcIt_JudgeFunc)extraOffObjectCallBack, NULL);
     } else {
         char nameBuf[32];
-        strcpy(nameBuf, staffname);
+        SAFE_STRCPY(nameBuf, staffname);
         fopAc_ac_c* actor = fopAcM_searchFromName4Event(nameBuf, -1);
         fopAcM_OffStatus(actor, fopAcStts_STAFF_EXTRA_e);
     }

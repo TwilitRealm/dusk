@@ -51,12 +51,15 @@ public:
     void setBButtonString(u16);
     void setHIO(bool);
 
+#if TARGET_PC
+    bool pointerWait();
+#endif
+
     virtual void draw() { _draw(); }
     virtual ~dMenu_Insect_c();
 
     u8 getStatus() { return mStatus; }
 
-private:
     /* 0x04 */ JKRExpHeap* mpHeap;
     /* 0x08 */ JKRArchive* mpArchive;
     /* 0x0C */ STControl* mpStick;

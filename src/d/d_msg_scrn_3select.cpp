@@ -16,8 +16,20 @@
 #include "d/d_msg_object.h"
 #include "d/d_pane_class.h"
 
+#if TARGET_PC
+#include "dusk/menu_pointer.h"
+#include "dusk/version.hpp"
+
+namespace {
+bool hit_choice_pane(CPaneMgr* pane, f32 padding) {
+    return pane != NULL && pane->getPanePtr() != NULL && pane->getPanePtr()->isVisible() &&
+           dusk::menu_pointer::hit_pane(pane, padding);
+}
+}  // namespace
+#endif
+
 typedef void (dMsgScrn3Select_c::*processFn)();
-processFn process[] = {
+DUSK_GAME_DATA processFn process[] = {
     &dMsgScrn3Select_c::open1Proc,  &dMsgScrn3Select_c::open2Proc,  &dMsgScrn3Select_c::waitProc,
     &dMsgScrn3Select_c::selectProc, &dMsgScrn3Select_c::changeProc, &dMsgScrn3Select_c::closeProc,
 };
@@ -107,7 +119,97 @@ dMsgScrn3Select_c::dMsgScrn3Select_c() {
         mCursorPos[i] = mpCursor_c[i]->getGlobalVtxCenter(true, 0);
     }
 
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC
+    if (dusk::version::isRegionJpn()) {
+        if (dComIfGs_getOptRuby() == 0) {
+            mpTmSel_c[0] = JKR_NEW CPaneMgr(mpScreen, 'a_tf', 0, NULL);
+
+            mpTmSel_c[1] = JKR_NEW CPaneMgr(mpScreen, 'b_tf', 0, NULL);
+
+            mpTmSel_c[2] = JKR_NEW CPaneMgr(mpScreen, 'c_tf', 0, NULL);
+
+            mpTmrSel_c[0] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('a_tf_f'), 0, NULL);
+
+            mpTmrSel_c[1] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('b_tf_f'), 0, NULL);
+
+            mpTmrSel_c[2] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('c_tf_f'), 0, NULL);
+
+            for (int i = 0; i < 3; i++) {
+                ((J2DTextBox*)(mpTmSel_c[i]->getPanePtr()))->setString(64, "");
+                ((J2DTextBox*)(mpTmSel_c[i]->getPanePtr()))->setFont(mDoExt_getMesgFont());
+
+                ((J2DTextBox*)(mpTmrSel_c[i]->getPanePtr()))->setString(64, "");
+                ((J2DTextBox*)(mpTmrSel_c[i]->getPanePtr()))->setFont(mDoExt_getMesgFont());
+            }
+
+            mpScreen->search(MULTI_CHAR('a_t_e'))->hide();
+            mpScreen->search(MULTI_CHAR('b_t_e'))->hide();
+            mpScreen->search(MULTI_CHAR('c_t_e'))->hide();
+            mpScreen->search('a_tf')->show();
+            mpScreen->search('b_tf')->show();
+            mpScreen->search('c_tf')->show();
+            mpScreen->search(MULTI_CHAR('a_tf_f'))->show();
+            mpScreen->search(MULTI_CHAR('b_tf_f'))->show();
+            mpScreen->search(MULTI_CHAR('c_tf_f'))->show();
+            mpScreen->search('a_t')->hide();
+            mpScreen->search('b_t')->hide();
+            mpScreen->search('c_t')->hide();
+        } else {
+            mpTmSel_c[0] = JKR_NEW CPaneMgr(mpScreen, 'a_t', 0, NULL);
+
+            mpTmSel_c[1] = JKR_NEW CPaneMgr(mpScreen, 'b_t', 0, NULL);
+
+            mpTmSel_c[2] = JKR_NEW CPaneMgr(mpScreen, 'c_t', 0, NULL);
+
+            for (int i = 0; i < 3; i++) {
+                ((J2DTextBox*)(mpTmSel_c[i]->getPanePtr()))->setString(64, "");
+                ((J2DTextBox*)(mpTmSel_c[i]->getPanePtr()))->setFont(mDoExt_getMesgFont());
+                mpTmrSel_c[i] = NULL;
+            }
+
+            mpScreen->search(MULTI_CHAR('a_t_e'))->hide();
+            mpScreen->search(MULTI_CHAR('b_t_e'))->hide();
+            mpScreen->search(MULTI_CHAR('c_t_e'))->hide();
+            mpScreen->search('a_tf')->hide();
+            mpScreen->search('b_tf')->hide();
+            mpScreen->search('c_tf')->hide();
+            mpScreen->search(MULTI_CHAR('a_tf_f'))->hide();
+            mpScreen->search(MULTI_CHAR('b_tf_f'))->hide();
+            mpScreen->search(MULTI_CHAR('c_tf_f'))->hide();
+            mpScreen->search('a_t')->show();
+            mpScreen->search('b_t')->show();
+            mpScreen->search('c_t')->show();
+        }
+    } else {
+        mpTmSel_c[0] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('a_t_e'), 0, NULL);
+        JUT_ASSERT(0, mpTmSel_c[0] != NULL);
+
+        mpTmSel_c[1] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('b_t_e'), 0, NULL);
+        JUT_ASSERT(0, mpTmSel_c[1] != NULL);
+
+        mpTmSel_c[2] = JKR_NEW CPaneMgr(mpScreen, MULTI_CHAR('c_t_e'), 0, NULL);
+        JUT_ASSERT(0, mpTmSel_c[2] != NULL);
+
+        for (int i = 0; i < 3; i++) {
+            ((J2DTextBox*)(mpTmSel_c[i]->getPanePtr()))->setString(64, "");
+            ((J2DTextBox*)(mpTmSel_c[i]->getPanePtr()))->setFont(mDoExt_getMesgFont());
+            mpTmrSel_c[i] = NULL;
+        }
+
+        mpScreen->search(MULTI_CHAR('a_t_e'))->show();
+        mpScreen->search(MULTI_CHAR('b_t_e'))->show();
+        mpScreen->search(MULTI_CHAR('c_t_e'))->show();
+        mpScreen->search('a_tf')->hide();
+        mpScreen->search('b_tf')->hide();
+        mpScreen->search('c_tf')->hide();
+        mpScreen->search(MULTI_CHAR('a_tf_f'))->hide();
+        mpScreen->search(MULTI_CHAR('b_tf_f'))->hide();
+        mpScreen->search(MULTI_CHAR('c_tf_f'))->hide();
+        mpScreen->search('a_t')->hide();
+        mpScreen->search('b_t')->hide();
+        mpScreen->search('c_t')->hide();
+    }
+#elif VERSION == VERSION_GCN_JPN
     if (dComIfGs_getOptRuby() == 0) {
         mpTmSel_c[0] = JKR_NEW CPaneMgr(mpScreen, 'a_tf', 0, NULL);
 
@@ -277,7 +379,7 @@ bool dMsgScrn3Select_c::isSelect() {
     return mProcess == PROC_SELECT_e ? TRUE : FALSE;
 }
 
-void dMsgScrn3Select_c::setString(char* mpText0, char* mpText1, char* mpText2) {
+void dMsgScrn3Select_c::setString(DUSK_CONST char* mpText0, DUSK_CONST char* mpText1, DUSK_CONST char* mpText2) {
     if (mpTmSel_c[0] != NULL) {
         JUT_ASSERT(0, ((J2DTextBox*)(mpTmSel_c[0]->getPanePtr()))->getStringAllocByte() >
                    strlen(mpText0));
@@ -294,19 +396,19 @@ void dMsgScrn3Select_c::setString(char* mpText0, char* mpText1, char* mpText2) {
     }
 
     if (mpTmSel_c[0] != NULL) {
-        strcpy(((J2DTextBox*)(mpTmSel_c[0]->getPanePtr()))->getStringPtr(), mpText0);
+        SAFE_STRCPY(((J2DTextBox*)(mpTmSel_c[0]->getPanePtr()))->getStringPtr(), mpText0);
     }
 
     if (mpTmSel_c[1] != NULL) {
-        strcpy(((J2DTextBox*)(mpTmSel_c[1]->getPanePtr()))->getStringPtr(), mpText1);
+        SAFE_STRCPY(((J2DTextBox*)(mpTmSel_c[1]->getPanePtr()))->getStringPtr(), mpText1);
     }
 
     if (mpTmSel_c[2] != NULL) {
-        strcpy(((J2DTextBox*)(mpTmSel_c[2]->getPanePtr()))->getStringPtr(), mpText2);
+        SAFE_STRCPY(((J2DTextBox*)(mpTmSel_c[2]->getPanePtr()))->getStringPtr(), mpText2);
     }
 }
 
-void dMsgScrn3Select_c::setRubyString(char* pText0, char* pText1, char* pText2) {
+void dMsgScrn3Select_c::setRubyString(DUSK_CONST char* pText0, DUSK_CONST char* pText1, DUSK_CONST char* pText2) {
     if (mpTmrSel_c[0] != NULL) {
         JUT_ASSERT(0, ((J2DTextBox*)(mpTmrSel_c[0]->getPanePtr()))->getStringAllocByte() >
                    strlen(pText0));
@@ -323,15 +425,15 @@ void dMsgScrn3Select_c::setRubyString(char* pText0, char* pText1, char* pText2) 
     }
 
     if (mpTmrSel_c[0] != NULL) {
-        strcpy(((J2DTextBox*)(mpTmrSel_c[0]->getPanePtr()))->getStringPtr(), pText0);
+        SAFE_STRCPY(((J2DTextBox*)(mpTmrSel_c[0]->getPanePtr()))->getStringPtr(), pText0);
     }
 
     if (mpTmrSel_c[1] != NULL) {
-        strcpy(((J2DTextBox*)(mpTmrSel_c[1]->getPanePtr()))->getStringPtr(), pText1);
+        SAFE_STRCPY(((J2DTextBox*)(mpTmrSel_c[1]->getPanePtr()))->getStringPtr(), pText1);
     }
 
     if (mpTmrSel_c[2] != NULL) {
-        strcpy(((J2DTextBox*)(mpTmrSel_c[2]->getPanePtr()))->getStringPtr(), pText2);
+        SAFE_STRCPY(((J2DTextBox*)(mpTmrSel_c[2]->getPanePtr()))->getStringPtr(), pText2);
     }
 }
 
@@ -470,6 +572,9 @@ bool dMsgScrn3Select_c::selAnimeMove(u8 i_selNum, u8 param_1, bool param_2) {
     mSelNum = i_selNum;
     field_0x114 = 0;
     field_0x108 = param_2;
+#if TARGET_PC
+    pointerMove();
+#endif
 
     (this->*process[mProcess])();
 
@@ -517,6 +622,48 @@ bool dMsgScrn3Select_c::selAnimeMove(u8 i_selNum, u8 param_1, bool param_2) {
 
     return mProcess == PROC_SELECT_e ? TRUE : FALSE;
 }
+
+#if TARGET_PC
+bool dMsgScrn3Select_c::pointerMove() {
+    dusk::menu_pointer::begin_context(dusk::menu_pointer::Context::Dialog);
+    mDPDPoint = 0xFF;
+
+    const u8 firstPane = mSelNum == 2 ? 1 : 0;
+    for (u8 choice = 0; choice < mSelNum; ++choice) {
+        const u8 paneIndex = firstPane + choice;
+        if (paneIndex >= 3) {
+            continue;
+        }
+
+        // TODO: this sucks and should be replaced with Wii mpTouchArea
+        bool hit = hit_choice_pane(mpSel_c[paneIndex], 8.0f) ||
+                   hit_choice_pane(mpTmSel_c[paneIndex], 24.0f) ||
+                   hit_choice_pane(mpTmrSel_c[paneIndex], 24.0f) ||
+                   hit_choice_pane(mpKahen_c[paneIndex], 8.0f) ||
+                   hit_choice_pane(mpCursor_c[paneIndex], 8.0f);
+        for (int i = 0; i < 5 && !hit; ++i) {
+            hit = hit_choice_pane(mpSelCldw_c[i][paneIndex], 8.0f);
+        }
+
+        if (!hit) {
+            continue;
+        }
+
+        mDPDPoint = choice;
+        field_0x110 = paneIndex;
+        dusk::menu_pointer::set_hover_target(choice);
+        dusk::menu_pointer::set_dialog_choice(choice, dusk::menu_pointer::peek_click());
+        return true;
+    }
+
+    return false;
+}
+
+bool dMsgScrn3Select_c::consumePointerClick() {
+    u8 choice = 0xFF;
+    return dusk::menu_pointer::consume_dialog_click(choice);
+}
+#endif
 
 bool dMsgScrn3Select_c::selAnimeEnd() {
     if (mProcess == PROC_MAX_e) {
@@ -910,7 +1057,18 @@ void dMsgScrn3Select_c::selectTrans() {
 
     f32 sp68[3];
     for (int i = 0; i < 3; i++) {
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC
+        if (dusk::version::isRegionJpn()) {
+            if (dComIfGs_getOptRuby() == 0 && (field_0x112 & (u8)(1 << i)) != 0) {
+                sp68[i] = 0.0f;
+            } else {
+                f32 temp = mpTmSel_c[i]->getInitPosY();
+                sp68[i] = mpScreen->search(tag_n[i])->getBounds().i.y - temp;
+            }
+        } else {
+            sp68[i] = 0.0f;
+        }
+#elif VERSION == VERSION_GCN_JPN
         if (dComIfGs_getOptRuby() == 0 && (field_0x112 & (u8)(1 << i)) != 0) {
             sp68[i] = 0.0f;
         } else {

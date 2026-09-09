@@ -137,17 +137,17 @@ static const u8 lbl_46_rodata_24[6] = {
     0x1E,
 };
 
-const u16 daBoomerang_HIO_c0::m_lockWaitTime = 10;
+DUSK_GAME_DATA const u16 daBoomerang_HIO_c0::m_lockWaitTime = 10;
 
-const f32 daBoomerang_HIO_c0::m_minCircleR = 28.0f;
+DUSK_GAME_DATA const f32 daBoomerang_HIO_c0::m_minCircleR = 28.0f;
 
-const f32 daBoomerang_HIO_c0::m_middleCircleR = 35.0f;
+DUSK_GAME_DATA const f32 daBoomerang_HIO_c0::m_middleCircleR = 35.0f;
 
-const f32 daBoomerang_HIO_c0::m_maxCircleR = 80.0f;
+DUSK_GAME_DATA const f32 daBoomerang_HIO_c0::m_maxCircleR = 80.0f;
 
-const f32 daBoomerang_HIO_c0::m_scale = 3.0f / 5.0f;
+DUSK_GAME_DATA const f32 daBoomerang_HIO_c0::m_scale = 3.0f / 5.0f;
 
-const f32 daBoomerang_HIO_c0::m_lockWindScale = 2.0f;
+DUSK_GAME_DATA const f32 daBoomerang_HIO_c0::m_lockWindScale = 2.0f;
 
 static const u32 l_lockSeFlg[BOOMERANG_LOCK_MAX] = {
     Z2SE_SY_BOOM_LOCK_ON_1,
@@ -1489,7 +1489,7 @@ static int daBoomerang_Create(fopAc_ac_c* i_this) {
     return ((daBoomerang_c*)i_this)->create();
 }
 
-static actor_method_class l_daBoomerang_Method = {
+static DUSK_CONST actor_method_class l_daBoomerang_Method = {
     (process_method_func)daBoomerang_Create,
     (process_method_func)daBoomerang_Delete,
     (process_method_func)daBoomerang_Execute,
@@ -1497,7 +1497,7 @@ static actor_method_class l_daBoomerang_Method = {
     (process_method_func)daBoomerang_Draw,
 };
 
-actor_process_profile_definition g_profile_BOOMERANG = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_BOOMERANG = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 6,
     /* List Prio    */ fpcPi_CURRENT_e,

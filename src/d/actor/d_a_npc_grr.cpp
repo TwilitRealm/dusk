@@ -124,11 +124,11 @@ enum Event_Cut_Nums {
 
 static NPC_GRR_HIO_CLASS l_HIO;
 
-static int l_bmdGetParamList[1][2] = {
+static DUSK_CONSTEXPR int l_bmdGetParamList[1][2] = {
     {BMDR_GRR, GRR},
 };
 
-static daNpc_GetParam1 l_bckGetParamList[19] = {
+static DUSK_CONSTEXPR daNpc_GetParam1 l_bckGetParamList[19] = {
     {-1, GRR},
     {BCK_GRR_F_TALK_A, GRR},
     {BCK_GRR_F_LAUGH, GRR},
@@ -150,7 +150,7 @@ static daNpc_GetParam1 l_bckGetParamList[19] = {
     {BCK_GRR_SWING, GRR1},
 };
 
-static daNpc_GetParam1 l_btpGetParamList[6] = {
+static DUSK_CONSTEXPR daNpc_GetParam1 l_btpGetParamList[6] = {
     {BTP_GRR, GRR},
     {BTP_GRR_F_LAUGH, GRR},
     {BTP_GRR_F_KEEE, GRR},
@@ -159,53 +159,53 @@ static daNpc_GetParam1 l_btpGetParamList[6] = {
     {BTP_GRR_FH_LAUGH, GRR},
 };
 
-static daNpc_GetParam1 l_btkGetParamList[1] = {
+static DUSK_CONSTEXPR daNpc_GetParam1 l_btkGetParamList[1] = {
     {BTK_GRR, GRR},
 };
 
-static daNpc_GetParam1 l_evtGetParamList[1] = {
+static DUSK_CONSTEXPR daNpc_GetParam1 l_evtGetParamList[1] = {
     {0, GRR},
 };
 
-static int l_loadRes_GRRa[3] = {
+static DUSK_CONSTEXPR int l_loadRes_GRRa[3] = {
     GRR, -1, -1,
 };
 
-static int l_loadRes_GRR_SPAWATER[3] = {
+static DUSK_CONSTEXPR int l_loadRes_GRR_SPAWATER[3] = {
     GRR, GRR1, -1,
 };
 
-static int l_loadRes_GRR_MARO[3] = {
+static DUSK_CONSTEXPR int l_loadRes_GRR_MARO[3] = {
     GRR, GRR1, -1,
 };
 
-static int l_loadRes_GRR0[3] = {
+static DUSK_CONSTEXPR int l_loadRes_GRR0[3] = {
     GRR, -1, -1,
 };
 
-static int* l_loadRes_list[4] = {
+static DUSK_CONSTEXPR int DUSK_CONST* l_loadRes_list[4] = {
     l_loadRes_GRRa,
     l_loadRes_GRR_SPAWATER,
     l_loadRes_GRR_MARO,
     l_loadRes_GRR0,
 };
 
-static char* l_resNames[2] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_resNames[2] = {
     "grR",
     "grR1",
 };
 
-static char* l_evtNames[1] = {NULL};
+static DUSK_CONSTEXPR char DUSK_CONST* l_evtNames[1] = {NULL};
 
-static char* l_myName = "grR";
+static DUSK_CONSTEXPR char DUSK_CONST* l_myName = "grR";
 
-char* daNpc_grR_c::mEvtCutNameList = "";
+DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST daNpc_grR_c::mEvtCutNameList = "";
 
-daNpc_grR_c::cutFunc daNpc_grR_c::mEvtCutList[1] = {
+DUSK_GAME_DATA daNpc_grR_c::cutFunc DUSK_CONST daNpc_grR_c::mEvtCutList[1] = {
     NULL,
 };
 
-daNpc_grR_HIOParam const daNpc_grR_Param_c::m = {
+DUSK_GAME_DATA daNpc_grR_HIOParam const daNpc_grR_Param_c::m = {
     60.0f,
     -3.0f,
     1.0f,
@@ -1338,7 +1338,9 @@ int daNpc_grR_c::talk(void* param_1) {
             if (bVar1 && talkProc(NULL, TRUE, NULL)) {
                 if (mType == TYPE_0) {
                     if (mFlow.getEventId(&i_itemNo) == 1) {
-                        mItemID = fopAcM_createItemForPresentDemo(&current.pos, i_itemNo, 0, -1, -1, NULL, NULL);
+                        DUSK_ITEM_CHECK("key_shard_3:D_MN04", i_itemNo, this);
+                        mItemID = fopAcM_createItemForPresentDemo(&current.pos, i_itemNo, 0, -1, -1,
+                            NULL, NULL DUSK_GIVE_TAG("key_shard_3:D_MN04"));
 
                         if (mItemID != fpcM_ERROR_PROCESS_ID_e) {
                             s16 i_eventID = dComIfGp_getEventManager().getEventIdx(this, "DEFAULT_GETITEM", 0xFF);
@@ -1434,7 +1436,7 @@ static int daNpc_grR_IsDelete(void* a_this) {
 
 AUDIO_INSTANCES;
 
-static actor_method_class daNpc_grR_MethodTable = {
+static DUSK_CONST actor_method_class daNpc_grR_MethodTable = {
     (process_method_func)daNpc_grR_Create,
     (process_method_func)daNpc_grR_Delete,
     (process_method_func)daNpc_grR_Execute,
@@ -1442,7 +1444,7 @@ static actor_method_class daNpc_grR_MethodTable = {
     (process_method_func)daNpc_grR_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_GRR = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_GRR = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

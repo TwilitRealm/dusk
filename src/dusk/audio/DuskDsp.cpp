@@ -1,21 +1,21 @@
+#include "DuskDsp.hpp"
+
+#include "Adpcm.hpp"
+#include "DuskAudioSystem.h"
+#include "global.h"
+
+#include "dusk/logging.h"
+#include "helpers/endian.h"
+
 #include <ar.h>
 #include <dolphin/os.h>
-
-#include "DuskDsp.hpp"
+#include <freeverb/revmodel.hpp>
+#include <tracy/Tracy.hpp>
 
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <cstdio>
 #include <span>
-
-#include "Adpcm.hpp"
-#include "freeverb/revmodel.hpp"
-#include "dusk/audio/DuskAudioSystem.h"
-#include "dusk/endian.h"
-#include "dusk/logging.h"
-#include "global.h"
-#include "tracy/Tracy.hpp"
 
 using namespace dusk::audio;
 
@@ -85,10 +85,9 @@ static bool ValidateChannelWaveFormat(const JASDsp::TChannel& channel) {
  */
 static void ValidateChannel(const JASDsp::TChannel& channel) {
     if (!ValidateChannelWaveFormat(channel)) {
-        CRASH(
-            "Unable to handle channel format: %02x, %02x\n",
-            channel.mSamplesPerBlock,
-            channel.mBytesPerBlock);
+        const auto msg = fmt::format("Unable to handle channel format: {:02x}, {:02x}\n",
+            channel.mSamplesPerBlock, channel.mBytesPerBlock);
+        CRASH(msg.c_str());
     }
 }
 
@@ -458,10 +457,7 @@ static int ReadChannelSamplesChunk(
 
     auto aramBase = static_cast<u8*>(ARGetStorageAddress()) + channel.mWaveAramAddress;
 
-    // Streaming logic directly modifies mSamplesLeft.
-    // So we use that as our tracking of where we are.
-    auto curSamplePosition = channel.mEndSample - channel.mSamplesLeft;
-
+    auto curSamplePosition = channel.mSamplePosition;
     u32 skipSamples = curSamplePosition % channel.mSamplesPerBlock;
     if (skipSamples != 0) {
         // We need to start reading in the middle of a block. This can happen thanks to loops.

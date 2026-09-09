@@ -8,7 +8,10 @@
 #include "d/d_item_data.h"
 #include "JSystem/JUtility/JUTAssert.h"
 #include "JSystem/JHostIO/JORReflexible.h"
-#include "dusk/endian.h"
+
+#if TARGET_PC
+#include "helpers/endian.h"
+#endif
 
 static const int DEFAULT_SELECT_ITEM_INDEX = 0;
 static const int MAX_SELECT_ITEM = 4;
@@ -488,21 +491,25 @@ public:
     }
 #if TARGET_PC
     u16 getDeathCount() const { return mDeathCount; }
-#endif
+    TEXT_SPAN getPlayerName() const { return const_cast<char(&)[17]>(mPlayerName); }
+#else
     char* getPlayerName() const { return const_cast<char*>(mPlayerName); }
+#endif
     void setPlayerName(const char* i_name) {
 #if AVOID_UB
-        strncpy(mPlayerName, i_name, sizeof(mPlayerName) - 1);
-        mPlayerName[sizeof(mPlayerName) - 1] = '\0';
+        SafeStringCopyTruncate(mPlayerName, i_name);
 #else
         strcpy(mPlayerName, i_name);
 #endif
     }
+#if TARGET_PC
+    TEXT_SPAN getHorseName() const { return const_cast<char(&)[17]>(mHorseName); }
+#else
     char* getHorseName() const { return const_cast<char*>(mHorseName); }
+#endif
     void setHorseName(const char* i_name) {
 #if AVOID_UB
-        strncpy(mHorseName, i_name, sizeof(mHorseName) - 1);
-        mHorseName[sizeof(mHorseName) - 1] = '\0';
+        SafeStringCopyTruncate(mHorseName, i_name);
 #else
         strcpy(mHorseName, i_name);
 #endif
@@ -590,7 +597,6 @@ public:
     dSv_player_info_c& getPlayerInfo() { return mPlayerInfo; }
     dSv_player_config_c& getConfig() { return mConfig; }
 
-private:
     /* 0x000 */ dSv_player_status_a_c mPlayerStatusA;
     /* 0x028 */ dSv_player_status_b_c mPlayerStatusB;
     /* 0x040 */ dSv_horse_place_c mHorsePlace;
@@ -888,7 +894,6 @@ public:
 
 class dSv_reserve_c {
 public:
-private:
     u8 unk[80];
 };
 
@@ -1004,7 +1009,7 @@ public:
 
     static const int ZONE_MAX = 0x20;
 
-#if DEBUG
+#if PARTIAL_DEBUG || DEBUG
     /* 0x000 */ u8 unk_0x0;
     /* 0x001 */ char unk_0x1;
     /* 0x000 */ u8 unk_0x2[0x48 - 0x2];
@@ -1025,6 +1030,9 @@ public:
     /* 0xF30 */ s64 mSaveTotalTime;
 #if DEBUG
     /* 0xF80 */ flagFile_c mFlagFile;
+#elif PARTIAL_DEBUG
+    // flagFile_c's ctor/virtuals are only defined under #if DEBUG (d_save.cpp)
+    alignas(flagFile_c) u8 mFlagFile[sizeof(flagFile_c)];
 #endif
 };  // Size: 0xF38
 
@@ -1042,7 +1050,7 @@ public:
 #else
     u16
 #endif
-    static saveBitLabels[822];
+    static DUSK_GAME_DATA saveBitLabels[822];
 };
 
 class dSv_event_tmp_flag_c {
@@ -1051,7 +1059,7 @@ public:
         #include "d/d_save_temp_bit_labels.inc"
     };
 
-    static u16 const tempBitLabels[185];
+    static DUSK_GAME_DATA u16 const tempBitLabels[185];
 };
 
 #endif /* D_SAVE_D_SAVE_H */

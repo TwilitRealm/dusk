@@ -14,10 +14,13 @@
 #include "d/actor/d_a_obj_automata.h"
 #include "d/d_msg_object.h"
 #include "d/actor/d_a_obj_scannon.h"
-#include "dusk/frame_interpolation.h"
 #include <cstring>
 
-const daNpc_Toby_HIOParam daNpc_Toby_Param_c::m = {
+#if TARGET_PC
+#include "dusk/frame_interpolation.h"
+#endif
+
+DUSK_GAME_DATA const daNpc_Toby_HIOParam daNpc_Toby_Param_c::m = {
     160.0f,
     -3.0f,
     1.0f,
@@ -121,13 +124,13 @@ void daNpc_Toby_HIO_c::genMessage(JORMContext* ctext) {
 }
 #endif
 
-static int l_bmdData[3][2] = {
+static DUSK_CONSTEXPR int l_bmdData[3][2] = {
     {3, 1},
     {3, 2},
     {9, 6},
 };
 
-static daNpcT_evtData_c l_evtList[7] = {
+static DUSK_CONSTEXPR daNpcT_evtData_c l_evtList[7] = {
     {"", 0},
     {"NO_RESPONSE", 0},
     {"TALKTO_ONESELF", 5},
@@ -137,7 +140,7 @@ static daNpcT_evtData_c l_evtList[7] = {
     {"CONVERSATION_ABOUT_ZRA", 4},
 };
 
-static char* l_resNameList[9] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_resNameList[9] = {
     "",
     "Toby",
     "Toby_TW",
@@ -149,20 +152,20 @@ static char* l_resNameList[9] = {
     "Toby5",
 };
 
-static s8 l_loadResPtrn0[6] = {1, 3, 4, 7, 8, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn0[6] = {1, 3, 4, 7, 8, -1};
 
-static s8 l_loadResPtrn1[6] = {2, 3, 5, 7, 8, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn1[6] = {2, 3, 5, 7, 8, -1};
 
-static s8 l_loadResPtrn2[5] = {1, 3, 6, 7, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn2[5] = {1, 3, 6, 7, -1};
 
-static s8 l_loadResPtrn3[8] = {1, 2, 3, 4, 5, 7, 8, -1};
+static DUSK_CONSTEXPR s8 l_loadResPtrn3[8] = {1, 2, 3, 4, 5, 7, 8, -1};
 
-static s8* l_loadResPtrnList[7] = {
+static DUSK_CONSTEXPR s8 DUSK_CONST* l_loadResPtrnList[7] = {
     l_loadResPtrn0, l_loadResPtrn1, l_loadResPtrn1, l_loadResPtrn2,
     l_loadResPtrn2, l_loadResPtrn0, l_loadResPtrn3,
 };
 
-static daNpcT_faceMotionAnmData_c l_faceMotionAnmData[16] = {
+static DUSK_CONSTEXPR daNpcT_faceMotionAnmData_c l_faceMotionAnmData[16] = {
     {-1, 0, 0, 13, 2, 3, 1},
     {5, 0, 3, 14, 0, 3, 0},
     {12, 0, 4, 29, 0, 4, 0},
@@ -181,7 +184,7 @@ static daNpcT_faceMotionAnmData_c l_faceMotionAnmData[16] = {
     {8, 2, 5, 22, 2, 5, 0},
 };
 
-static daNpcT_motionAnmData_c l_motionAnmData[25] = {
+static DUSK_CONSTEXPR daNpcT_motionAnmData_c l_motionAnmData[25] = {
     {7, 2, 3, 10, 0, 3, 1, 0},
     {15, 2, 4, 10, 0, 3, 1, 0},
     {20, 2, 4, 10, 0, 3, 1, 0},
@@ -209,7 +212,7 @@ static daNpcT_motionAnmData_c l_motionAnmData[25] = {
     {10, 0, 8, 10, 0, 3, 0, 0},
 };
 
-static daNpcT_MotionSeqMngr_c::sequenceStepData_c l_faceMotionSequenceData[68] = {
+static DUSK_CONSTEXPR daNpcT_MotionSeqMngr_c::sequenceStepData_c l_faceMotionSequenceData[68] = {
     {1, -1, 1}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0}, {8, -1, 1}, {15, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
     {9, -1, 1}, {13, 0, 0}, {-1, 0, 0}, {-1, 0, 0}, {10, -1, 1}, {12, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
     {11, -1, 1}, {14, 0, 0}, {-1, 0, 0}, {-1, 0, 0}, {2, -1, 1}, {3, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
@@ -221,7 +224,7 @@ static daNpcT_MotionSeqMngr_c::sequenceStepData_c l_faceMotionSequenceData[68] =
     {0, -1, 0}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
 };
 
-static daNpcT_MotionSeqMngr_c::sequenceStepData_c l_motionSequenceData[100] = {
+static DUSK_CONSTEXPR daNpcT_MotionSeqMngr_c::sequenceStepData_c l_motionSequenceData[100] = {
     {0, -1, 0}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0}, {1, -1, 1}, {0, -1, 0}, {-1, 0, 0}, {-1, 0, 0},
     {10, -1, 1}, {0, 0, 0}, {-1, 0, 0}, {-1, 0, 0}, {11, -1, 0}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
     {12, -1, 0}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0}, {13, -1, 0}, {-1, 0, 0}, {-1, 0, 0}, {-1, 0, 0},
@@ -247,7 +250,7 @@ enum NPC_TOBY_CUTS {
     CUT_CONVERSATION_ABOUT_ZRA = 6,
 };
 
-char* daNpc_Toby_c::mCutNameList[7] = {
+DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST daNpc_Toby_c::mCutNameList[7] = {
     "",
     "TOBY_HOUSE_FIRE",
     "TALKTO_ONESELF",
@@ -257,7 +260,7 @@ char* daNpc_Toby_c::mCutNameList[7] = {
     "CONVERSATION_ABOUT_ZRA",
 };
 
-daNpc_Toby_c::cutFunc daNpc_Toby_c::mCutList[7] = {
+DUSK_GAME_DATA daNpc_Toby_c::cutFunc DUSK_CONST daNpc_Toby_c::mCutList[7] = {
     NULL,
     &daNpc_Toby_c::cutTobyHouseFire,
     &daNpc_Toby_c::cutTalkToOneself,
@@ -1399,7 +1402,7 @@ int daNpc_Toby_c::cutRepairSCannon(int arg0) {
                 old.pos = current.pos;
                 setAngle(cM_deg2s(5.0f * f32(mPath.getArg0())));
                 mEventTimer = mPath.getArg2();
-                dusk::frame_interp::request_presentation_sync();
+                IF_DUSK(dusk::frame_interp::request_presentation_sync());
             }
         } else if (!mHide) {
             mHide = 1;
@@ -2199,7 +2202,7 @@ static int daNpc_Toby_IsDelete(void*) {
     return true;
 }
 
-static actor_method_class daNpc_Toby_MethodTable = {
+static DUSK_CONST actor_method_class daNpc_Toby_MethodTable = {
     (process_method_func)daNpc_Toby_Create,
     (process_method_func)daNpc_Toby_Delete,
     (process_method_func)daNpc_Toby_Execute,
@@ -2207,7 +2210,7 @@ static actor_method_class daNpc_Toby_MethodTable = {
     (process_method_func)daNpc_Toby_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_TOBY = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_TOBY = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

@@ -11,7 +11,6 @@
 #include "d/d_pane_class_alpha.h"
 #include "d/d_s_logo.h"
 #include "d/d_s_play.h"
-#include "dusk/version.hpp"
 #include "f_op/f_op_msg_mng.h"
 #include "f_op/f_op_overlap_mng.h"
 #include "f_op/f_op_scene_mng.h"
@@ -19,9 +18,9 @@
 #include "m_Do/m_Do_controller_pad.h"
 #include "m_Do/m_Do_graphic.h"
 
-#ifdef TARGET_PC
+#if TARGET_PC
 #include "dusk/frame_interpolation.h"
-#include "dusk/settings.h"
+#include "dusk/version.hpp"
 #endif
 
 class daTit_HIO_c : public JORReflexible {
@@ -52,7 +51,7 @@ static u8 const lit_3772[12] = {
 
 #if TARGET_PC
 using namespace dusk::version;
-#define l_arcName versionSelect<const char*>({{GameVersion::GcnPal, "TitlePal"}}, "Title")
+#define l_arcName regionSelect<const char*>("Title", "TitlePal", "Title")
 #elif VERSION == VERSION_GCN_PAL
 static char const l_arcName[] = "TitlePal";
 #else
@@ -170,7 +169,7 @@ int daTitle_c::Execute() {
     }
 
 #ifdef TARGET_PC
-    if (!dusk::getSettings().game.enableFrameInterpolation) {
+    if (!dusk::frame_interp::is_enabled()) {
 #endif
         dMenu_Collect3D_c::setViewPortOffsetY(0.0f);
 #ifdef TARGET_PC
@@ -250,7 +249,7 @@ void daTitle_c::loadWait_proc() {
             text[i]->setFont(mpFont);
             text[i]->setString(0x80, "");
 
-            char* msg = text[i]->getStringPtr();
+            TEXT_SPAN msg = text[i]->getStringPtr();
             fopMsgM_messageGet(msg, 100);
         }
 
@@ -353,11 +352,7 @@ void daTitle_c::fastLogoDispInit() {
     mWaitTimer = 30;
     mProcID = 5;
 
-#ifdef TARGET_PC
-    if (dusk::getSettings().game.enableFrameInterpolation) {
-        dusk::frame_interp::request_presentation_sync();
-    }
-#endif
+    IF_DUSK(dusk::frame_interp::request_presentation_sync());
 }
 
 void daTitle_c::fastLogoDisp() {
@@ -447,7 +442,7 @@ void dDlst_daTitle_c::draw() {
     Scr->draw(0.0f, 0.0f, ctx);
 }
 
-static actor_method_class l_daTitle_Method = {
+static DUSK_CONST actor_method_class l_daTitle_Method = {
     (process_method_func)daTitle_Create,
     (process_method_func)daTitle_Delete,
     (process_method_func)daTitle_Execute,
@@ -455,7 +450,7 @@ static actor_method_class l_daTitle_Method = {
     (process_method_func)daTitle_Draw,
 };
 
-actor_process_profile_definition g_profile_TITLE = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_TITLE = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

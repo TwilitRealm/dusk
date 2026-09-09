@@ -11,55 +11,55 @@
 #include "SSystem/SComponent/c_counter.h"
 #include <cstring>
 
-static int l_bmdData[2] = {
+static DUSK_CONSTEXPR int l_bmdData[2] = {
     7, 1
 };
 
-static daNpcT_evtData_c l_evtList[2] = {
+static DUSK_CONSTEXPR daNpcT_evtData_c l_evtList[2] = {
     {"", 0},
     {"NO_RESPONSE", 0}
 };
 
-static char* l_resNameList[2] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_resNameList[2] = {
     "",
     "Zant",
 };
 
-static s8 l_loadResPtrn0[2] = {
+static DUSK_CONSTEXPR s8 l_loadResPtrn0[2] = {
     1, -1
 };
 
-static s8* l_loadResPtrnList[2] = {
+static DUSK_CONSTEXPR s8 DUSK_CONST* l_loadResPtrnList[2] = {
     l_loadResPtrn0, l_loadResPtrn0,
 };
 
-static daNpcT_faceMotionAnmData_c l_faceMotionAnmData = {
+static DUSK_CONSTEXPR daNpcT_faceMotionAnmData_c l_faceMotionAnmData = {
     -1, 0, 0, -1, 0, 0, 0
 };
 
-static daNpcT_motionAnmData_c l_motionAnmData = {
+static DUSK_CONSTEXPR daNpcT_motionAnmData_c l_motionAnmData = {
     4, 2, 1, -1, 0, 0, 0
 };
 
-static daNpcT_MotionSeqMngr_c::sequenceStepData_c l_faceMotionSequenceData[4] = {
+static DUSK_CONSTEXPR daNpcT_MotionSeqMngr_c::sequenceStepData_c l_faceMotionSequenceData[4] = {
     {0, -1, 0}, {-1, 0, 0}, 
     {-1, 0, 0}, {-1, 0, 0}
 };
 
-static daNpcT_MotionSeqMngr_c::sequenceStepData_c l_motionSequenceData[4] = {
+static DUSK_CONSTEXPR daNpcT_MotionSeqMngr_c::sequenceStepData_c l_motionSequenceData[4] = {
     {0, -1, 0}, {-1, 0, 0}, 
     {-1, 0, 0}, {-1, 0, 0}
 };
 
-char* daNpc_Zant_c::mCutNameList = "";
+DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST daNpc_Zant_c::mCutNameList = "";
 
-daNpc_Zant_c::cutFunc daNpc_Zant_c::mCutList[1] = {
+DUSK_GAME_DATA daNpc_Zant_c::cutFunc DUSK_CONST daNpc_Zant_c::mCutList[1] = {
     NULL
 };
 
 static NPC_ZANT_HIO_CLASS l_HIO;
 
-daNpc_Zant_HIOParam const daNpc_Zant_Param_c::m  = {
+DUSK_GAME_DATA daNpc_Zant_HIOParam const daNpc_Zant_Param_c::m  = {
     270.0f, -3.0f, 1.0f, 500.0f, 255.0f, 250.0f, 35.0f, 50.0f,
     0.0f, 0.0f, 10.0f, -10.0f, 30.0f, -10.0f, 45.0f, -45.0f,
     0.6f, 12.0f, 3, 6, 5, 6, 110.0f, 0.0f, 0.0f, 0.0f, 60, 8,
@@ -551,7 +551,7 @@ static int daNpc_Zant_IsDelete(void* i_this) {
     return 1;
 }
 
-static actor_method_class daNpc_Zant_MethodTable = {
+static DUSK_CONST actor_method_class daNpc_Zant_MethodTable = {
     (process_method_func)daNpc_Zant_Create,
     (process_method_func)daNpc_Zant_Delete,
     (process_method_func)daNpc_Zant_Execute,
@@ -559,7 +559,7 @@ static actor_method_class daNpc_Zant_MethodTable = {
     (process_method_func)daNpc_Zant_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_ZANT = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_ZANT = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

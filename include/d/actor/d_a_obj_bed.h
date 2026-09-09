@@ -19,7 +19,7 @@ class daObj_Bed_Param_c {
 public:
     virtual ~daObj_Bed_Param_c() {}
 
-    static daObj_Bed_HIOParam const m;
+    static DUSK_GAME_DATA daObj_Bed_HIOParam const m;
 };
 
 #if DEBUG
@@ -71,7 +71,7 @@ public:
     int Draw();
     static int createHeapCallBack(fopAc_ac_c*);
     u8 getType();
-    char* getResName();
+    char DUSK_CONST* getResName();
     int isDelete();
     void setEnvTevColor();
     void setRoomNo();

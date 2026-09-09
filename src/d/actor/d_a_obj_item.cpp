@@ -158,8 +158,8 @@ void daItem_c::CreateInit() {
     mCcCyl.SetCoHitCallback(itemGetCoCallBack);
     mCcCyl.SetTgHitCallback(itemGetTgCallBack);
 
-    f32 cylHeight = dItem_data::getH(m_itemNo);
-    f32 cylRadius = dItem_data::getR(m_itemNo);
+    f32 cylHeight = DUSK_IF_ELSE(getCollisionH(), dItem_data::getH(m_itemNo));
+    f32 cylRadius = DUSK_IF_ELSE(getCollisionR(), dItem_data::getR(m_itemNo));
 
     if (scale.x > 1.0f) {
         cylHeight *= scale.x;
@@ -206,7 +206,7 @@ void daItem_c::CreateInit() {
     initBaseMtx();
     animPlay(1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 
-    if (m_itemNo == dItemNo_BOOMERANG_e) {
+    if (m_itemNo == dItemNo_BOOMERANG_e IF_DUSK(&&!mItemOverridden)) {
         itemGetNextExecute();
     } else if ((m_itemNo == dItemNo_ORANGE_RUPEE_e || m_itemNo == dItemNo_SILVER_RUPEE_e) &&
                mSparkleEmtr.getEmitter() == NULL)
@@ -264,14 +264,35 @@ int daItem_c::_daItem_create() {
         shape_angle.z = 0;
         shape_angle.x = 0;
 
+#if TARGET_PC
+        const u32 params = fopAcM_GetParam(this);
+        mOriginalItemNo = params & 0xFF;
+        mItemGiveTag = dusk::mods::item_give_tag_freestanding(daItem_prm::getItemBitNo(this));
+        const auto [item, displayItem, _] =
+            dusk::mods::item_check_resolve(mItemGiveTag, mOriginalItemNo, this);
+        mItemOverridden = item != mOriginalItemNo;
+        setDisplayItemNo(displayItem);
+        if (mItemOverridden) {
+            fopAcM_SetParam(this, (params & 0xFFFFFF00) | item);
+        }
+#endif
         field_0x95d = true;
     }
 
     m_itemNo = daItem_prm::getItemNo(this);
+#if TARGET_PC
+    if (dusk::getSettings().game.noHeartDrops && isHeart(m_itemNo)) {
+        return cPhs_ERROR_e;
+    }
+#endif
     BOOL flag = dItem_data::chkFlag(m_itemNo, 2);
 
 #if DEBUG
+#if TARGET_PC
+    if (dItem_fieldModelArc(getDisplayItemNo()) == NULL) {
+#else
     if (dItem_data::getFieldArc(m_itemNo) == NULL) {
+#endif
         // "Item Num<%d>: No Resource Archive specified!!\n"
         OS_REPORT_ERROR("アイテム番号<%d>:リソースのアーカイブ指定がありません！！\n", m_itemNo);
         return cPhs_ERROR_e;
@@ -303,10 +324,22 @@ int daItem_c::_daItem_create() {
     if (flag) {
         CreateInit();
     } else {
+#if TARGET_PC
+        const u8 displayItemNo = getDisplayItemNo();
+        phase_state = dComIfG_resLoad(&mPhase, dItem_fieldModelArc(displayItemNo));
+#else
         phase_state = dComIfG_resLoad(&mPhase, dItem_data::getFieldArc(m_itemNo));
+#endif
         if (phase_state == cPhs_COMPLEATE_e) {
+#if TARGET_PC
+            const bool useModelFallback = dItem_data::getFieldArc(displayItemNo) == NULL;
+            if (!fopAcM_entrySolidHeap(this,
+                    useModelFallback ? CheckItemCreateHeap : CheckFieldItemCreateHeap,
+                    useModelFallback ? 0x4000 : dItem_data::getFieldHeapSize(displayItemNo)))
+#else
             if (!fopAcM_entrySolidHeap(this, CheckFieldItemCreateHeap,
                                        dItem_data::getFieldHeapSize(m_itemNo)))
+#endif
             {
                 return cPhs_ERROR_e;
             }
@@ -323,7 +356,7 @@ int daItem_c::_daItem_execute() {
     CountTimer();
 
     eyePos = current.pos;
-    eyePos.y += (f32)dItem_data::getH(m_itemNo) / 2;
+    eyePos.y += (f32)DUSK_IF_ELSE(getCollisionH(), dItem_data::getH(m_itemNo)) / 2;
 
     attention_info.position = current.pos;
 
@@ -396,7 +429,11 @@ int daItem_c::_daItem_delete() {
         mSparkleEmtr.remove();
     }
 
+#if TARGET_PC
+    DeleteBase(dItem_fieldModelArc(getDisplayItemNo()));
+#else
     DeleteBase(dItem_data::getFieldArc(m_itemNo));
+#endif
     return 1;
 }
 
@@ -502,9 +539,19 @@ void daItem_c::procInitGetDemoEvent() {
     fopAcM_orderItemEvent(this, 0, 0);
     eventInfo.onCondition(dEvtCnd_CANGETITEM_e);
 
-    m_item_id = fopAcM_createItemForTrBoxDemo(&current.pos, m_itemNo, -1, fopAcM_GetRoomNo(this),
-                                              NULL, NULL);
+#if TARGET_PC
+    const u8 displayItemNo = m_itemNo;
+    const auto itemCheck = dusk::mods::item_check_commit(mItemGiveTag, mOriginalItemNo, this);
+    m_itemNo = itemCheck.itemNo;
+    mItemGiveTag = itemCheck.tag;
+    mItemOverridden = m_itemNo != mOriginalItemNo;
+#endif
+    m_item_id = fopAcM_createItemForTrBoxDemo(
+        &current.pos, m_itemNo, -1, fopAcM_GetRoomNo(this), NULL, NULL IF_DUSK_ARG(mItemGiveTag));
     JUT_ASSERT(0, m_item_id != fpcM_ERROR_PROCESS_ID_e);
+#if TARGET_PC
+    m_itemNo = displayItemNo;
+#endif
 
     setStatus(STATUS_WAIT_GET_DEMO_EVENT_e);
 }
@@ -516,7 +563,7 @@ void daItem_c::procWaitGetDemoEvent() {
             dComIfGp_event_setItemPartnerId(m_item_id);
         }
     } else {
-        if (m_itemNo == dItemNo_BOOMERANG_e) {
+        if (m_itemNo == dItemNo_BOOMERANG_e IF_DUSK(&&!mItemOverridden)) {
             fopAcM_orderItemEvent(this, 0, 0);
             eventInfo.onCondition(dEvtCnd_CANGETITEM_e);
             return;
@@ -532,7 +579,9 @@ void daItem_c::procWaitGetDemoEvent() {
 
             procInitSimpleGetDemo();
             itemGet();
-            if (!haveItem) {
+            if (!haveItem IF_DUSK(&&(!mItemOverridden || (m_itemNo >= dItemNo_GREEN_RUPEE_e &&
+                                                             m_itemNo <= dItemNo_SILVER_RUPEE_e))))
+            {
                 dComIfGs_offItemFirstBit(m_itemNo);
             }
         } else {
@@ -554,8 +603,8 @@ void daItem_c::procInitBoomerangCarry() {
     scale = mItemScale;
     mBoomerangMove.initOffset(&current.pos);
 
-    u8 height = dItem_data::getH(m_itemNo);
-    u8 radius = dItem_data::getR(m_itemNo);
+    u8 height = DUSK_IF_ELSE(getCollisionH(), dItem_data::getH(m_itemNo));
+    u8 radius = DUSK_IF_ELSE(getCollisionR(), dItem_data::getR(m_itemNo));
     mCcCyl.SetR((f32)radius * 2.0f);
     mCcCyl.SetH((f32)height * 2.0f);
     mCcCyl.OnCoSPrmBit(1);
@@ -859,6 +908,12 @@ void daItem_c::itemGetNextExecute() {
             procInitGetDemoEvent();
             break;
         default:
+#if TARGET_PC
+            if (mItemOverridden) {
+                procInitGetDemoEvent();
+                break;
+            }
+#endif
             // "[daItem_c] Get process not defined[%d]\n"
             OS_REPORT_ERROR("[daItem_c]ゲット処理が定義されていません[%d]\n", m_itemNo);
         }
@@ -872,38 +927,45 @@ void daItem_c::itemGetNextExecute() {
 }
 
 void daItem_c::itemGet() {
+#if TARGET_PC
+    const u8 displayItemNo = m_itemNo;
+    const auto itemCheck = dusk::mods::item_check_commit(mItemGiveTag, mOriginalItemNo, this);
+    m_itemNo = itemCheck.itemNo;
+    mItemGiveTag = itemCheck.tag;
+    mItemOverridden = m_itemNo != mOriginalItemNo;
+#endif
     switch (m_itemNo) {
     case dItemNo_HEART_e:
         mDoAud_seStart(Z2SE_HEART_PIECE_GET, NULL, 0, 0);
-        execItemGet(m_itemNo);
+        execItemGet(m_itemNo IF_DUSK_ARG(mItemGiveTag) IF_DUSK_ARG(this));
         break;
     case dItemNo_GREEN_RUPEE_e:
         mDoAud_seStart(Z2SE_GREEN_LUPY_GET, NULL, 0, 0);
-        execItemGet(m_itemNo);
+        execItemGet(m_itemNo IF_DUSK_ARG(mItemGiveTag) IF_DUSK_ARG(this));
         break;
     case dItemNo_BLUE_RUPEE_e:
         mDoAud_seStart(Z2SE_BLUE_LUPY_GET, NULL, 0, 0);
-        execItemGet(m_itemNo);
+        execItemGet(m_itemNo IF_DUSK_ARG(mItemGiveTag) IF_DUSK_ARG(this));
         break;
     case dItemNo_YELLOW_RUPEE_e:
         mDoAud_seStart(Z2SE_BLUE_LUPY_GET, NULL, 0, 0);
-        execItemGet(m_itemNo);
+        execItemGet(m_itemNo IF_DUSK_ARG(mItemGiveTag) IF_DUSK_ARG(this));
         break;
     case dItemNo_RED_RUPEE_e:
         mDoAud_seStart(Z2SE_RED_LUPY_GET, NULL, 0, 0);
-        execItemGet(m_itemNo);
+        execItemGet(m_itemNo IF_DUSK_ARG(mItemGiveTag) IF_DUSK_ARG(this));
         break;
     case dItemNo_PURPLE_RUPEE_e:
         mDoAud_seStart(Z2SE_RED_LUPY_GET, NULL, 0, 0);
-        execItemGet(m_itemNo);
+        execItemGet(m_itemNo IF_DUSK_ARG(mItemGiveTag) IF_DUSK_ARG(this));
         break;
     case dItemNo_ORANGE_RUPEE_e:
         mDoAud_seStart(Z2SE_RED_LUPY_GET, NULL, 0, 0);
-        execItemGet(m_itemNo);
+        execItemGet(m_itemNo IF_DUSK_ARG(mItemGiveTag) IF_DUSK_ARG(this));
         break;
     case dItemNo_SILVER_RUPEE_e:
         mDoAud_seStart(Z2SE_RED_LUPY_GET, NULL, 0, 0);
-        execItemGet(m_itemNo);
+        execItemGet(m_itemNo IF_DUSK_ARG(mItemGiveTag) IF_DUSK_ARG(this));
         break;
     case dItemNo_BOOMERANG_e:
         break;
@@ -913,12 +975,22 @@ void daItem_c::itemGet() {
     case dItemNo_ARROW_1_e:
     case dItemNo_PACHINKO_SHOT_e:
         mDoAud_seStart(Z2SE_CONSUMP_ITEM_GET, NULL, 0, 0);
-        execItemGet(m_itemNo);
+        execItemGet(m_itemNo IF_DUSK_ARG(mItemGiveTag) IF_DUSK_ARG(this));
     default:
+#if TARGET_PC
+        if (mItemOverridden) {
+            mDoAud_seStart(Z2SE_CONSUMP_ITEM_GET, NULL, 0, 0);
+            execItemGet(m_itemNo, mItemGiveTag, this);
+            break;
+        }
+#endif
         // "[daItem_c] Get process not defined[%d]\n"
         OS_REPORT_ERROR("[daItem_c]ゲット処理が定義されていません[%d]\n", m_itemNo);
         break;
     }
+#if TARGET_PC
+    m_itemNo = displayItemNo;
+#endif
 }
 
 BOOL daItem_c::checkCountTimer() {
@@ -1081,7 +1153,7 @@ void daItem_c::set_bound_se() {
     }
 }
 
-s32 daItem_c::m_timer_max = 10000;
+DUSK_GAME_DATA s32 daItem_c::m_timer_max = 10000;
 
 int daItem_c::CountTimer() {
     m_timer++;
@@ -1193,7 +1265,7 @@ void daItem_c::initScale() {
     }
 }
 
-procFunc daItem_c::mFuncPtr[] = {
+DUSK_GAME_DATA procFunc daItem_c::mFuncPtr[] = {
     &daItem_c::procMainNormal,        &daItem_c::procMainEnemyCarry,
     &daItem_c::procMainSimpleGetDemo, &daItem_c::procWaitGetDemoEvent,
     &daItem_c::procMainGetDemoEvent,  &daItem_c::procMainBoomerangCarry,
@@ -1201,7 +1273,7 @@ procFunc daItem_c::mFuncPtr[] = {
     &daItem_c::procMainForceGet,      NULL,
 };
 
-const dCcD_SrcCyl daItem_c::m_cyl_src = {
+DUSK_GAME_DATA const dCcD_SrcCyl daItem_c::m_cyl_src = {
     {
         {0, {{0, 0, 0}, {0xFFFFFFFF, 17}, 0x59}},
         {dCcD_SE_NONE, 0, 0, 0, {0}},
@@ -1275,13 +1347,13 @@ static int daItem_Create(fopAc_ac_c* i_this) {
     return static_cast<daItem_c*>(i_this)->_daItem_create();
 }
 
-static actor_method_class l_daItem_Method = {
+static DUSK_CONST actor_method_class l_daItem_Method = {
     (process_method_func)daItem_Create,  (process_method_func)daItem_Delete,
     (process_method_func)daItem_Execute, (process_method_func)NULL,
     (process_method_func)daItem_Draw,
 };
 
-actor_process_profile_definition g_profile_ITEM = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_ITEM = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

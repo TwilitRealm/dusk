@@ -18,6 +18,12 @@
 #include "m_Do/m_Do_graphic.h"
 #include <cstring>
 
+#include "dusk/version.hpp"
+
+#if TARGET_PC
+#include "dusk/menu_pointer.h"
+#endif
+
 typedef void (dMenu_Skill_c::*initFunc)();
 static initFunc map_init_process[] = {
     &dMenu_Skill_c::wait_init,
@@ -275,6 +281,12 @@ void dMenu_Skill_c::wait_init() {
 void dMenu_Skill_c::wait_move() {
     u8 oldIndex = mIndex;
     if (mDoGph_gInf_c::getFader()->getStatus() == 1) {
+#if TARGET_PC
+        if (pointerWait()) {
+            return;
+        }
+#endif
+
         if (mDoCPd_c::getTrigB(PAD_1) != 0) {
             mpDrawCursor->offPlayAnime(0);
             mStatus = 3;
@@ -298,6 +310,35 @@ void dMenu_Skill_c::wait_move() {
         }
     }
 }
+
+#if TARGET_PC
+bool dMenu_Skill_c::pointerWait() {
+    dusk::menu_pointer::begin_context(dusk::menu_pointer::Context::Collection);
+    for (u8 i = 0; i < mSkillNum; ++i) {
+        if (!dusk::menu_pointer::hit_pane(mpLetterParent[i], 8.0f)) {
+            continue;
+        }
+        dusk::menu_pointer::set_hover_target(i);
+
+        if (mIndex != i) {
+            mIndex = i;
+            changeActiveColor();
+            Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_ITEM, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                     -1.0f, 0);
+        }
+        if (dusk::menu_pointer::consume_click()) {
+            mProcess = PROC_WAIT_MOVE;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_EXP_WIN_OPEN, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                     -1.0f, 0);
+            dMeter2Info_set2DVibration();
+            return true;
+        }
+        return false;
+    }
+
+    return false;
+}
+#endif
 
 void dMenu_Skill_c::read_open_init() {
     static const u32 i_id[7] = {
@@ -428,7 +469,27 @@ void dMenu_Skill_c::screenSetMenu() {
     mpParent = JKR_NEW CPaneMgr(mpMenuScreen, MULTI_CHAR('n_all'), 2, NULL);
     mpParent->setAlphaRate(0.0f);
     for (int i = 0; i < 7; i++) {
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC
+        if (dusk::version::isRegionJpn()) {
+            mpFTagPicture[i][0] = (J2DTextBox*)mpMenuScreen->search(tag_sub0[i]);
+            mpFTagPicture[i][1] = (J2DTextBox*)mpMenuScreen->search(tag_sub1[i]);
+            mpFTagPicture[i][2] = (J2DTextBox*)mpMenuScreen->search(tag_name0[i]);
+            mpFTagPicture[i][3] = (J2DTextBox*)mpMenuScreen->search(tag_name1[i]);
+            mpMenuScreen->search(ftag_sub0[i])->hide();
+            mpMenuScreen->search(ftag_sub1[i])->hide();
+            mpMenuScreen->search(ftag_name0[i])->hide();
+            mpMenuScreen->search(ftag_name1[i])->hide();
+        } else {
+            mpFTagPicture[i][0] = (J2DTextBox*)mpMenuScreen->search(ftag_sub0[i]);
+            mpFTagPicture[i][1] = (J2DTextBox*)mpMenuScreen->search(ftag_sub1[i]);
+            mpFTagPicture[i][2] = (J2DTextBox*)mpMenuScreen->search(ftag_name0[i]);
+            mpFTagPicture[i][3] = (J2DTextBox*)mpMenuScreen->search(ftag_name1[i]);
+            mpMenuScreen->search(tag_sub0[i])->hide();
+            mpMenuScreen->search(tag_sub1[i])->hide();
+            mpMenuScreen->search(tag_name0[i])->hide();
+            mpMenuScreen->search(tag_name1[i])->hide();
+        }
+#elif VERSION == VERSION_GCN_JPN
         mpFTagPicture[i][0] = (J2DTextBox*)mpMenuScreen->search(tag_sub0[i]);
         mpFTagPicture[i][1] = (J2DTextBox*)mpMenuScreen->search(tag_sub1[i]);
         mpFTagPicture[i][2] = (J2DTextBox*)mpMenuScreen->search(tag_name0[i]);
@@ -483,7 +544,16 @@ void dMenu_Skill_c::screenSetMenu() {
             mSelectWhite[i] = mpFTagPicture[1][i]->getWhite();
         }
     }
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC
+    J2DTextBox* textBox;
+    if (dusk::version::isRegionJpn()) {
+        textBox = (J2DTextBox*)mpMenuScreen->search(MULTI_CHAR('t_t00'));
+        mpMenuScreen->search(MULTI_CHAR('f_t00'))->hide();
+    } else {
+        textBox = (J2DTextBox*)mpMenuScreen->search(MULTI_CHAR('f_t00'));
+        mpMenuScreen->search(MULTI_CHAR('t_t00'))->hide();
+    }
+#elif VERSION == VERSION_GCN_JPN
     J2DTextBox* textBox = (J2DTextBox*)mpMenuScreen->search(MULTI_CHAR('t_t00'));
     mpMenuScreen->search(MULTI_CHAR('f_t00'))->hide();
 #else
@@ -512,7 +582,15 @@ void dMenu_Skill_c::screenSetLetter() {
     mpLetterScreen = JKR_NEW J2DScreen();
     mpLetterScreen->setPriority("zelda_ougi_info.blo", 0x20000, mpArchive);
     dPaneClass_showNullPane(mpLetterScreen);
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC
+    if (dusk::version::isRegionJpn()) {
+        mpTextPane = JKR_NEW CPaneMgr(mpLetterScreen, MULTI_CHAR('mg_3line'), 0, NULL);
+        mpLetterScreen->search(MULTI_CHAR('n_e4line'))->hide();
+    } else {
+        mpTextPane = JKR_NEW CPaneMgr(mpLetterScreen, MULTI_CHAR('mg_e4lin'), 0, NULL);
+        mpLetterScreen->search(MULTI_CHAR('n_3line'))->hide();
+    }
+#elif VERSION == VERSION_GCN_JPN
     mpTextPane = JKR_NEW CPaneMgr(mpLetterScreen, MULTI_CHAR('mg_3line'), 0, NULL);
     mpLetterScreen->search(MULTI_CHAR('n_e4line'))->hide();
 #else
@@ -525,7 +603,15 @@ void dMenu_Skill_c::screenSetLetter() {
     J2DTextBox* paneString = (J2DTextBox*)mpTextPane->getPanePtr();
     paneString->setString(0x200, "");
     for (int i = 0; i < 4; i++) {
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC
+        if (dusk::version::isRegionJpn()) {
+            mpNameString[i] = (J2DTextBox*)mpLetterScreen->search(name_tag[i]);
+            mpLetterScreen->search(fame_tag[i])->hide();
+        } else {
+            mpNameString[i] = (J2DTextBox*)mpLetterScreen->search(fame_tag[i]);
+            mpLetterScreen->search(name_tag[i])->hide();
+        }
+#elif VERSION == VERSION_GCN_JPN
         mpNameString[i] = (J2DTextBox*)mpLetterScreen->search(name_tag[i]);
         mpLetterScreen->search(fame_tag[i])->hide();
 #else
@@ -610,7 +696,7 @@ void dMenu_Skill_c::setPageText() {
 void dMenu_Skill_c::setAButtonString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 5; i++) {
-            strcpy(mpAButtonString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpAButtonString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 5; i++) {
@@ -622,7 +708,7 @@ void dMenu_Skill_c::setAButtonString(u16 i_stringID) {
 void dMenu_Skill_c::setBButtonString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 5; i++) {
-            strcpy(mpBButtonString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpBButtonString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 5; i++) {
@@ -634,7 +720,7 @@ void dMenu_Skill_c::setBButtonString(u16 i_stringID) {
 void dMenu_Skill_c::setNameString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 4; i++) {
-            strcpy(mpNameString[i]->getStringPtr(), "");
+            SAFE_STRCPY(mpNameString[i]->getStringPtr(), "");
         }
     } else {
         for (int i = 0; i < 4; i++) {

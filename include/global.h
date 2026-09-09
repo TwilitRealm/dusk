@@ -83,10 +83,14 @@ extern void __dcbf(void*, int);
 extern void __dcbz(void*, int);
 extern void __sync();
 extern int __abs(int);
+#if defined(_MSVC_LANG) && !defined(__clang__)
+#define __memcpy memcpy
+#else
 #if defined(__has_builtin) && __has_builtin(__builtin_memcpy)
 #define __memcpy __builtin_memcpy
 #else
 #define __memcpy memcpy
+#endif
 #endif
 #ifdef __cplusplus
 }
@@ -112,6 +116,23 @@ inline int __builtin_clz(unsigned int v) {
 
 #define COMPOUND_LITERAL(x) (x)
 
+#endif
+
+// Data symbols exported from the main exe need dllimport on the mod side. The game itself
+// exports them through its generated .def, so the annotation is otherwise intentionally empty.
+#if defined(TARGET_PC) && defined(_WIN32) && !defined(DUSK_BUILDING_GAME)
+#define DUSK_GAME_DATA __declspec(dllimport)
+#else
+#define DUSK_GAME_DATA
+#endif
+#define DUSK_GAME_EXTERN extern DUSK_GAME_DATA
+
+#if defined(_MSC_VER)
+#define DUSK_NOINLINE __declspec(noinline)
+#elif defined(__GNUC__)
+#define DUSK_NOINLINE __attribute__((noinline))
+#else
+#define DUSK_NOINLINE
 #endif
 
 #define FAST_DIV(x, n) (x >> (n / 2))
@@ -225,7 +246,7 @@ using std::isnan;
 #define IS_REF_NONNULL(r) (1)
 #endif
 
-#define CRASH(msg, ...) OSPanic(__FILE__, __LINE__, "%s", msg, ##__VA_ARGS__)
+#define CRASH(msg) OSPanic(__FILE__, __LINE__, "%s", msg)
 
 // Some basic macros that are more convenient than putting down #if blocks for one-line changes.
 #if TARGET_PC
@@ -242,6 +263,28 @@ using std::isnan;
 #define IF_DUSK_BLOCK_END
 #define IF_NOT_DUSK(statement) statement
 #define DUSK_IF_ELSE(dusk, orig) orig
+#endif
+
+#define DUSK_CONST IF_DUSK(const)
+#define DUSK_CONSTEXPR IF_DUSK(constexpr)
+
+#if TARGET_PC && defined(DUSK_BUILDING_GAME)
+#include "dusk/mods/item.hpp"
+#define DUSK_ITEM_CHECK(name, item_no, giver)                                                      \
+    (item_no) = ::dusk::mods::item_check_commit(name, (item_no), giver).itemNo
+#define DUSK_ITEM_CHECK_EXPR(name, item_no, giver)                                                 \
+    (::dusk::mods::item_check_commit(name, (item_no), giver).itemNo)
+#define DUSK_ITEM_CHECK_PREVIEW(name, item_no, giver)                                              \
+    (item_no) = ::dusk::mods::item_check(name, (item_no), giver)
+#define DUSK_ITEM_CHECK_PREVIEW_EXPR(name, item_no, giver)                                         \
+    (::dusk::mods::item_check(name, (item_no), giver))
+#define DUSK_GIVE_TAG(name) IF_DUSK_ARG(::dusk::mods::item_give_tag(name))
+#else
+#define DUSK_ITEM_CHECK(name, item_no, giver)
+#define DUSK_ITEM_CHECK_EXPR(name, item_no, giver) (item_no)
+#define DUSK_ITEM_CHECK_PREVIEW(name, item_no, giver)
+#define DUSK_ITEM_CHECK_PREVIEW_EXPR(name, item_no, giver) (item_no)
+#define DUSK_GIVE_TAG(name)
 #endif
 
 #endif

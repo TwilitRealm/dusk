@@ -19,7 +19,7 @@ struct fopMsg_prm_class {
     /* 0x00 */ fopAc_ac_c* talk_actor;
     /* 0x04 */ cXyz pos;
     /* 0x10 */ u32 msg_idx;
-    /* 0x14 */ u32 field_0x14;
+    /* 0x14 */ u32 select_msg_idx;  // selection options message ID; 1000 = none
     /* 0x18 */ fpc_ProcID field_0x18;
 };  // Size: 0x1C
 
@@ -46,11 +46,11 @@ void fopMsgM_setMessageID(fpc_ProcID msg_id);
 void fopMsgM_destroyExpHeap(JKRExpHeap* i_heap);
 f32 fopMsgM_valueIncrease(int param_0, int param_1, u8 i_type);
 s32 fopMsgM_setStageLayer(void* i_process);
-fpc_ProcID fopMsgM_messageSet(u32 i_msgIdx, fopAc_ac_c* i_talkActor, u32 param_2);
-fpc_ProcID fopMsgM_messageSet(u32 i_msgIdx, u32 param_1);
+fpc_ProcID fopMsgM_messageSet(u32 i_msgIdx, fopAc_ac_c* i_talkActor, u32 i_selectMsgIdx);
+fpc_ProcID fopMsgM_messageSet(u32 i_msgIdx, u32 i_selectMsgIdx);
 fpc_ProcID fopMsgM_messageSetDemo(u32 i_msgidx);
 msg_class* fopMsgM_SearchByID(fpc_ProcID i_id);
-char* fopMsgM_messageGet(char* i_stringBuf, u32 i_msgId);
+TEXT_SPAN fopMsgM_messageGet(TEXT_SPAN i_stringBuf, u32 i_msgId);
 fpc_ProcID fop_Timer_create(s16 i_procName, u8 i_mode, u32 i_limitMs, u8 i_type, u8 param_4,
                             f32 param_5, f32 param_6, f32 param_7, f32 param_8,
                             fopMsgCreateFunc i_createFunc);

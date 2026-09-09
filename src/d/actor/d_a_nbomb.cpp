@@ -117,7 +117,7 @@ static dCcD_SrcSph l_sphSrc = {
     }  // mSphAttr
 };
 
-const char* daNbomb_c::m_arcNameList[6] = {
+DUSK_GAME_DATA const char* daNbomb_c::m_arcNameList[6] = {
     daAlink_c::getAlinkArcName(), daAlink_c::getAlinkArcName(), daAlink_c::getAlinkArcName(),
     l_arcNameBombF, l_arcNameBombE, l_arcNameBombEW,
 };
@@ -1676,7 +1676,7 @@ AUDIO_INSTANCES;
 template<>
 JAUSectionHeap* JASGlobalInstance<JAUSectionHeap>::sInstance;
 
-static actor_method_class l_daNbombMethod = {
+static DUSK_CONST actor_method_class l_daNbombMethod = {
     (process_method_func)daNbomb_Create,
     (process_method_func)daNbomb_Delete,
     (process_method_func)daNbomb_Execute,
@@ -1684,7 +1684,7 @@ static actor_method_class l_daNbombMethod = {
     (process_method_func)daNbomb_Draw,
 };
 
-actor_process_profile_definition g_profile_NBOMB = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NBOMB = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

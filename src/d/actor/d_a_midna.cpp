@@ -14,7 +14,10 @@
 #include "d/d_msg_object.h"
 #include "d/d_s_play.h"
 #include "d/d_debug_viewer.h"
+
+#if TARGET_PC
 #include "dusk/frame_interpolation.h"
+#endif
 
 static f32 dummy_lit_3777(int idx, u8 foo) {
     Vec dummy_vec = {0.0f, 0.0f, 0.0f};
@@ -109,7 +112,7 @@ void daMidna_hio_c::genMessage(JORMContext* ctx) {
 }
 #endif
 
-daMidna_hio_c1 const daMidna_hio_c0::m = {
+DUSK_GAME_DATA daMidna_hio_c1 const daMidna_hio_c0::m = {
     0,
     0,
     0,
@@ -126,8 +129,8 @@ daMidna_hio_c1 const daMidna_hio_c0::m = {
     25.0f,
 };
 
-bool daMidna_matAnm_c::sEyeMoveFlg;
-u8 daMidna_matAnm_c::sMorfFrame;
+DUSK_GAME_DATA bool daMidna_matAnm_c::sEyeMoveFlg;
+DUSK_GAME_DATA u8 daMidna_matAnm_c::sMorfFrame;
 
 void daMidna_matAnm_c::init() {
     mOldTransX = 0.0f;
@@ -173,7 +176,7 @@ int daMidna_McaMorfCB1_c::execute(u16 i_jointNo, J3DTransformInfo* transform) {
     return 1;
 }
 
-daMidna_texData_s const daMidna_c::m_texDataTable[21] = {
+DUSK_GAME_DATA daMidna_texData_s const daMidna_c::m_texDataTable[21] = {
     0x0405, 0x03A4,
     0x03F5, 0x0399,
     0x03F6, 0x0399,
@@ -197,7 +200,7 @@ daMidna_texData_s const daMidna_c::m_texDataTable[21] = {
     0x03FD, 0x0399,
 };
 
-daMidna_anmData_s const daMidna_c::m_anmDataTable[53] = {
+DUSK_GAME_DATA daMidna_anmData_s const daMidna_c::m_anmDataTable[53] = {
     0x01DC, 0x00, -1.0f, 0,
     0x01B7, 0x01, -1.0f, 0,
     0x01B8, 0x02, -1.0f, 0,
@@ -496,6 +499,7 @@ int daMidna_c::createHeap() {
         }
     }
 
+    IF_DUSK(mBckHeap[0].reserveBuffer(0x1DC);)
     JKRReadIdxResource(mBckHeap[0].getBuffer(), mBckHeap[0].getBufferSize(), 0x1DC, dComIfGp_getAnmArchive());
     J3DAnmTransform* md_anm = (J3DAnmTransform*)J3DAnmLoaderDataBase::load(mBckHeap[0].getBuffer());
     modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 14);
@@ -3300,7 +3304,7 @@ int daMidna_c::execute() {
             if (!checkStateFlg0(FLG0_UNK_8000)) {
                 offStateFlg0((daMidna_FLG0)(FLG0_NPC_NEAR | FLG0_NPC_FAR));
                 BOOL far_;
-                if (fopAcIt_Judge((fopAcIt_JudgeFunc)daMidna_searchNpc, &far_)) {
+                if (fopAcIt_Judge((fopAcIt_JudgeFunc)daMidna_searchNpc, &far_) IF_DUSK(&& !dusk::getSettings().game.canTransformAnywhere)) {
                     if (!far_) {
                         onStateFlg0(FLG0_NPC_NEAR);
                     } else {
@@ -3654,7 +3658,7 @@ static void dummy() {
 }
 template unsigned char cLib_calcTimer<unsigned char>(unsigned char*);
 
-static actor_method_class l_daMidna_Method = {
+static DUSK_CONST actor_method_class l_daMidna_Method = {
     (process_method_func)daMidna_Create,
     (process_method_func)daMidna_Delete,
     (process_method_func)daMidna_Execute,
@@ -3662,7 +3666,7 @@ static actor_method_class l_daMidna_Method = {
     (process_method_func)daMidna_Draw,
 };
 
-actor_process_profile_definition g_profile_MIDNA = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_MIDNA = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 6,
     /* List Prio    */ fpcPi_CURRENT_e,

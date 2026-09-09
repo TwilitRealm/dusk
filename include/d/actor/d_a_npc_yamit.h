@@ -12,7 +12,7 @@ class daNpc_yamiT_Param_c {
 public:
     virtual ~daNpc_yamiT_Param_c() {}
 
-    static const daNpc_yamiT_HIOParam m;
+    static DUSK_GAME_DATA const daNpc_yamiT_HIOParam m;
 };
 
 #if DEBUG
@@ -84,7 +84,7 @@ public:
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_faceMotionSequenceData,
         int i_faceMotionStepNum,
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData, int i_motionStepNum,
-        daNpcT_evtData_c const* i_evtData, char** i_arcNames)
+        daNpcT_evtData_c const* i_evtData, char DUSK_CONST* DUSK_CONST* i_arcNames)
         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
                    i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
                    i_arcNames) {}
@@ -123,10 +123,9 @@ public:
     }
     u8 _is_stopper_off() { return fopAcM_isSwitch(this, 0x3D) && fopAcM_isSwitch(this, 0x3E); }
 
-    static char* mCutNameList[2];
-    static cutFunc mCutList[2];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[2];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[2];
 
-private:
     /* 0xE40 */ NPC_YAMIT_HIO_CLASS* mpHIO;
     /* 0xE44 */ dCcD_Cyl field_0xe44;
     /* 0xF80 */ u8 mType;

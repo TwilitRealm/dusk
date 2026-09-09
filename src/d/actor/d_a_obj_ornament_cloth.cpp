@@ -58,7 +58,7 @@ public:
 };
 #endif
 
-daObjOnCloth_Attr_c const daObjOnCloth_c::M_attr = {
+DUSK_GAME_DATA daObjOnCloth_Attr_c const daObjOnCloth_c::M_attr = {
     8.0f,
     -40.0f,
     0.3f,
@@ -205,7 +205,7 @@ static int nodeCallBack(J3DJoint* i_joint, int param_2) {
     return 1;
 }
 
-static char* l_arcName = "J_Necktie";
+static DUSK_CONST char* l_arcName = "J_Necktie";
 
 int daObjOnCloth_c::createHeap() {
     J3DModelData* modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes(l_arcName, "J_Necktie.bmd"));
@@ -311,7 +311,7 @@ ClothJoint_c::ClothJoint_c() {
     /* empty function */
 }
 
-static actor_method_class l_daObjOnCloth_Method = {
+static DUSK_CONST actor_method_class l_daObjOnCloth_Method = {
     (process_method_func)daObjOnCloth_Create,
     (process_method_func)daObjOnCloth_Delete,
     (process_method_func)daObjOnCloth_Execute,
@@ -319,7 +319,7 @@ static actor_method_class l_daObjOnCloth_Method = {
     (process_method_func)daObjOnCloth_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_OnCloth = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_OnCloth = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

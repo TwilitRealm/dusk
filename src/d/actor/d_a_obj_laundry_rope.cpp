@@ -13,7 +13,7 @@
 #include "d/d_kankyo_wether.h"
 #include "d/d_path.h"
 
-daObjLndRope_Attr_c const daObjLndRope_c::mAttr = {-5.0f, 0.2f, 0.5f, 0.8f, 0.0f};
+DUSK_GAME_DATA daObjLndRope_Attr_c const daObjLndRope_c::mAttr = {-5.0f, 0.2f, 0.5f, 0.8f, 0.0f};
 
 static const s8 l_laundryList[13] = {-1, -1, 3, 0, -1, 1, 1, -1, 2, 2, -1, 2, -1};
 
@@ -207,7 +207,7 @@ void daObjLndRope_c::setNormalRopePos() {
     }
 }
 
-static char* l_arcName = "Obj_SRope";
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcName = "Obj_SRope";
 
 int daObjLndRope_c::createHeap() {
     ResTIMG* resTimg = (ResTIMG*)dComIfG_getObjectRes(l_arcName, "Obj_ItaRope.bti");
@@ -282,13 +282,13 @@ static int daObjLndRope_Create(fopAc_ac_c* i_this) {
     return ((daObjLndRope_c*)i_this)->create();
 }
 
-static actor_method_class l_daObjLndRope_Method = {
+static DUSK_CONST actor_method_class l_daObjLndRope_Method = {
     (process_method_func)daObjLndRope_Create,  (process_method_func)daObjLndRope_Delete,
     (process_method_func)daObjLndRope_Execute, (process_method_func)daObjLndRope_IsDelete,
     (process_method_func)daObjLndRope_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_LndRope = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_LndRope = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

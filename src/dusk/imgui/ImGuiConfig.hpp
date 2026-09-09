@@ -2,14 +2,15 @@
 #define DUSK_IMGUICONFIG_HPP
 
 #include "dusk/config.hpp"
-#include "imgui.h"
+
+#include <imgui.h>
 
 namespace dusk::config {
     inline bool ImGuiCheckbox(const char* title, ConfigVar<bool>& var) {
         bool copy = var.getValue();
         if (ImGui::Checkbox(title, &copy)) {
             var.setValue(copy);
-            Save();
+            save();
             return true;
         }
 
@@ -20,7 +21,7 @@ namespace dusk::config {
         float val = var;
         if (ImGui::SliderFloat(label, &val, v_min, v_max, format, flags)) {
             var.setValue(val);
-            Save();
+            save();
             return true;
         }
 
@@ -31,7 +32,7 @@ namespace dusk::config {
         int val = var;
         if (ImGui::SliderInt(label, &val, v_min, v_max, format, flags)) {
             var.setValue(val);
-            Save();
+            save();
             return true;
         }
 
@@ -42,7 +43,7 @@ namespace dusk::config {
         bool copy = p_selected.getValue();
         if (ImGui::MenuItem(label, shortcut, &copy, enabled)) {
             p_selected.setValue(copy);
-            Save();
+            save();
             return true;
         }
 

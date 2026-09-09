@@ -496,7 +496,7 @@ s32 cLib_distanceAngleS(s16 x, s16 y) {
 
 static Mtx mtx[10];
 
-Mtx* calc_mtx = mtx;
+DUSK_GAME_DATA Mtx* calc_mtx = mtx;
 
 /**
  * Initializes calc_mtx to mtx stack
@@ -530,7 +530,7 @@ void MtxScale(f32 x_trans, f32 y_trans, f32 z_trans, u8 param_3) {
  * @param src The src position to be multiplied
  * @param dest The resulting multiplied position
  */
-void MtxPosition(cXyz* src, cXyz* dest) {
+void MtxPosition(cXyz DUSK_CONST* src, cXyz* dest) {
     MTXMultVec(*calc_mtx, src, dest);
 }
 

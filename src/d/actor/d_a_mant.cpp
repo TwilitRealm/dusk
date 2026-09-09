@@ -14,14 +14,99 @@
 #include "dusk/dvd_asset.hpp"
 #include "dusk/frame_interpolation.h"
 
-using GameVersion = dusk::version::GameVersion;
+#include <aurora/texture.hpp>
 
-static u8* l_Egnd_mantTEX_get()   { alignas(32) static u8 buf[0x4000]; static bool _ = (dusk::LoadRelAsset(buf, "/rel/Final/Release/d_a_mant.rel", {{GameVersion::GcnUsa, 0x1C00}, {GameVersion::GcnPal, 0x1C00}}, 0x4000), true); return buf; }
-static u8* l_Egnd_mantTEX_U_get() { alignas(32) static u8 buf[0x4000]; static bool _ = (dusk::LoadRelAsset(buf, "/rel/Final/Release/d_a_mant.rel", {{GameVersion::GcnUsa, 0x5C00}, {GameVersion::GcnPal, 0x5C00}}, 0x4000), true); return buf; }
-static u8* l_Egnd_mantPAL_get()   { alignas(32) static u8 buf[0x60];   static bool _ = (dusk::LoadRelAsset(buf, "/rel/Final/Release/d_a_mant.rel", {{GameVersion::GcnUsa, 0x9C00}, {GameVersion::GcnPal, 0x9C00}}, 0x60),   true); return buf; }
+#include <type_traits>
+
+using namespace dusk::version;
+
+#define MANT_REL_PATH platformSelect<const char*>("/rel/Final/Release/d_a_mant.rel", "/rel/Rfinal/Release/d_a_mant.rel")
+
+#define DEFINE_MANT_ASSET(name, type, count, ...)                                                  \
+    static type* name##_get() {                                                                    \
+        alignas(32) static std::remove_cv_t<type> buf[count];                                      \
+        static bool _ = (dusk::LoadRelAsset(buf, MANT_REL_PATH, __VA_ARGS__), true);               \
+        return buf;                                                                                \
+    }
+
+// keep the original version of the cape texture const so we don't need to reload the file
+DEFINE_MANT_ASSET(l_Egnd_mantTEX, u8 const, 0x4000, {
+    {GameVersion::GcnUsa,     0x1C00},
+    {GameVersion::GcnPal,     0x1C00},
+    {GameVersion::GcnJpn,     0x1C00},
+    {GameVersion::WiiUsaRev0, 0x1B00},
+    {GameVersion::WiiUsa,     0x1900},
+    {GameVersion::WiiPal,     0x1900},
+    {GameVersion::WiiJpn,     0x1900},
+});
+
+DEFINE_MANT_ASSET(l_Egnd_mantTEX_U, u8, 0x4000, {
+    {GameVersion::GcnUsa,     0x5C00},
+    {GameVersion::GcnPal,     0x5C00},
+    {GameVersion::GcnJpn,     0x5C00},
+    {GameVersion::WiiUsaRev0, 0x5B00},
+    {GameVersion::WiiUsa,     0x5900},
+    {GameVersion::WiiPal,     0x5900},
+    {GameVersion::WiiJpn,     0x5900},
+});
+
+DEFINE_MANT_ASSET(l_Egnd_mantPAL, u8, 0x60, {
+    {GameVersion::GcnUsa,     0x9C00},
+    {GameVersion::GcnPal,     0x9C00},
+    {GameVersion::GcnJpn,     0x9C00},
+    {GameVersion::WiiUsaRev0, 0x9B00},
+    {GameVersion::WiiUsa,     0x9900},
+    {GameVersion::WiiPal,     0x9900},
+    {GameVersion::WiiJpn,     0x9900},
+});
+
 #define l_Egnd_mantTEX   (l_Egnd_mantTEX_get())
 #define l_Egnd_mantTEX_U (l_Egnd_mantTEX_U_get())
 #define l_Egnd_mantPAL   (l_Egnd_mantPAL_get())
+
+// make a copy of the cape texture that can be overwritten with the tears
+static u8 l_Egnd_mantTEX_copy[0x4000];
+
+// keep our cached texture objects out here so that we can update them from multiple places
+static bool textureObjsInitialized = false;
+static TGXTlutObj tlutObj;
+static TGXTexObj mainTexObj;
+static TGXTexObj undersideTexObj;
+
+// l_pos is unused
+// DEFINE_MANT_ASSET(l_pos, f32, 507, {
+//     {GameVersion::GcnUsa, 0x9C60},
+//     {GameVersion::GcnPal, 0x9C60},
+// });
+
+alignas(32) static f32 const l_normal[3] = {0.0f, 1.0f, 0.0f};
+
+DEFINE_MANT_ASSET(l_texCoord, f32, 338, {
+    {GameVersion::GcnUsa,     0xA458},
+    {GameVersion::GcnPal,     0xA458},
+    {GameVersion::GcnJpn,     0xA458},
+    {GameVersion::WiiUsaRev0, 0x9B60},
+    {GameVersion::WiiUsa,     0x9960},
+    {GameVersion::WiiPal,     0x9960},
+    {GameVersion::WiiJpn,     0x9960},
+});
+
+// #define l_pos      (l_pos_get())
+#define l_texCoord (l_texCoord_get())
+
+static bool l_Egnd_mantTEX_hasReplacement = false;
+
+DEFINE_MANT_ASSET(l_Egnd_mantDL, u8, 0x3EC, {
+    {GameVersion::GcnUsa,     0xA9A0},
+    {GameVersion::GcnPal,     0xA9A0},
+    {GameVersion::GcnJpn,     0xA9A0},
+    {GameVersion::WiiUsaRev0, 0xA0C0},
+    {GameVersion::WiiUsa,     0x9EC0},
+    {GameVersion::WiiPal,     0x9EC0},
+    {GameVersion::WiiJpn,     0x9EC0},
+});
+
+#define l_Egnd_mantDL (l_Egnd_mantDL_get())
 #else
 #include "assets/l_Egnd_mantTEX.h"
 
@@ -31,238 +116,9 @@ static u8* l_Egnd_mantPAL_get()   { alignas(32) static u8 buf[0x60];   static bo
 #endif
 #include "d/d_s_play.h"
 
-static u32 l_pos[507] = {
-    0x42480000, 0x3F5CFC93, 0xC365BD9C, 0x4226AAAA,
-    0x3F5CFC93, 0xC365BD9C, 0x42055556, 0x3F5CFC93,
-    0xC365BD9C, 0x41C80000, 0x3F5CFC93, 0xC365BD9C,
-    0x41855556, 0x3F5CFC93, 0xC365BD9C, 0x41055556,
-    0x3F5CFC93, 0xC365BD9C, 0x358637BD, 0x3F5CFC93,
-    0xC365BD9C, 0xC1055554, 0x3F5CFC93, 0xC365BD9C,
-    0xC1855554, 0x3F5CFC93, 0xC365BD9C, 0xC1C7FFFF,
-    0x3F5CFC93, 0xC365BD9C, 0xC2055554, 0x3F5CFC93,
-    0xC365BD9C, 0xC226AAAA, 0x3F5CFC93, 0xC365BD9C,
-    0xC2480000, 0x3F5CFC93, 0xC365BD9C, 0x42480000,
-    0x3F5CFC93, 0xC35292F0, 0x4226AAAA, 0x3F5CFC93,
-    0xC35292F0, 0x42055556, 0x3F5CFC93, 0xC35292F0,
-    0x41C80000, 0x3F5CFC93, 0xC35292F0, 0x41855556,
-    0x3F5CFC93, 0xC35292F0, 0x41055556, 0x3F5CFC93,
-    0xC35292F0, 0x358637BD, 0x3F5CFC93, 0xC35292F0,
-    0xC1055554, 0x3F5CFC93, 0xC35292F0, 0xC1855554,
-    0x3F5CFC93, 0xC35292F0, 0xC1C7FFFF, 0x3F5CFC93,
-    0xC35292F0, 0xC2055554, 0x3F5CFC93, 0xC35292F0,
-    0xC226AAAA, 0x3F5CFC93, 0xC35292F0, 0xC2480000,
-    0x3F5CFC93, 0xC35292F0, 0x42480000, 0x3F5CFC93,
-    0xC33F6846, 0x4226AAAA, 0x3F5CFC93, 0xC33F6846,
-    0x42055556, 0x3F5CFC93, 0xC33F6846, 0x41C80000,
-    0x3F5CFC93, 0xC33F6846, 0x41855556, 0x3F5CFC93,
-    0xC33F6846, 0x41055556, 0x3F5CFC93, 0xC33F6846,
-    0x358637BD, 0x3F5CFC93, 0xC33F6846, 0xC1055554,
-    0x3F5CFC93, 0xC33F6846, 0xC1855554, 0x3F5CFC93,
-    0xC33F6846, 0xC1C7FFFF, 0x3F5CFC93, 0xC33F6846,
-    0xC2055554, 0x3F5CFC93, 0xC33F6846, 0xC226AAAA,
-    0x3F5CFC93, 0xC33F6846, 0xC2480000, 0x3F5CFC93,
-    0xC33F6846, 0x42480000, 0x3F5CFC93, 0xC32C3D9C,
-    0x4226AAAA, 0x3F5CFC93, 0xC32C3D9C, 0x42055556,
-    0x3F5CFC93, 0xC32C3D9C, 0x41C80000, 0x3F5CFC93,
-    0xC32C3D9C, 0x41855556, 0x3F5CFC93, 0xC32C3D9C,
-    0x41055556, 0x3F5CFC93, 0xC32C3D9C, 0x358637BD,
-    0x3F5CFC93, 0xC32C3D9C, 0xC1055554, 0x3F5CFC93,
-    0xC32C3D9C, 0xC1855554, 0x3F5CFC93, 0xC32C3D9C,
-    0xC1C7FFFF, 0x3F5CFC93, 0xC32C3D9C, 0xC2055554,
-    0x3F5CFC93, 0xC32C3D9C, 0xC226AAAA, 0x3F5CFC93,
-    0xC32C3D9C, 0xC2480000, 0x3F5CFC93, 0xC32C3D9C,
-    0x42480000, 0x3F5CFC93, 0xC31912F1, 0x4226AAAA,
-    0x3F5CFC93, 0xC31912F1, 0x42055556, 0x3F5CFC93,
-    0xC31912F1, 0x41C80000, 0x3F5CFC93, 0xC31912F1,
-    0x41855556, 0x3F5CFC93, 0xC31912F1, 0x41055556,
-    0x3F5CFC93, 0xC31912F1, 0x358637BD, 0x3F5CFC93,
-    0xC31912F1, 0xC1055554, 0x3F5CFC93, 0xC31912F1,
-    0xC1855554, 0x3F5CFC93, 0xC31912F1, 0xC1C7FFFF,
-    0x3F5CFC93, 0xC31912F1, 0xC2055554, 0x3F5CFC93,
-    0xC31912F1, 0xC226AAAA, 0x3F5CFC93, 0xC31912F1,
-    0xC2480000, 0x3F5CFC93, 0xC31912F1, 0x42480000,
-    0x3F5CFC93, 0xC305E846, 0x4226AAAA, 0x3F5CFC93,
-    0xC305E846, 0x42055556, 0x3F5CFC93, 0xC305E846,
-    0x41C80000, 0x3F5CFC93, 0xC305E846, 0x41855556,
-    0x3F5CFC93, 0xC305E846, 0x41055556, 0x3F5CFC93,
-    0xC305E846, 0x358637BD, 0x3F5CFC93, 0xC305E846,
-    0xC1055554, 0x3F5CFC93, 0xC305E846, 0xC1855554,
-    0x3F5CFC93, 0xC305E846, 0xC1C7FFFF, 0x3F5CFC93,
-    0xC305E846, 0xC2055554, 0x3F5CFC93, 0xC305E846,
-    0xC226AAAA, 0x3F5CFC93, 0xC305E846, 0xC2480000,
-    0x3F5CFC93, 0xC305E846, 0x42480000, 0x3F5CFC93,
-    0xC2E57B38, 0x4226AAAA, 0x3F5CFC93, 0xC2E57B38,
-    0x42055556, 0x3F5CFC93, 0xC2E57B38, 0x41C80000,
-    0x3F5CFC93, 0xC2E57B38, 0x41855556, 0x3F5CFC93,
-    0xC2E57B38, 0x41055556, 0x3F5CFC93, 0xC2E57B38,
-    0x358637BD, 0x3F5CFC93, 0xC2E57B38, 0xC1055554,
-    0x3F5CFC93, 0xC2E57B38, 0xC1855554, 0x3F5CFC93,
-    0xC2E57B38, 0xC1C7FFFF, 0x3F5CFC93, 0xC2E57B38,
-    0xC2055554, 0x3F5CFC93, 0xC2E57B38, 0xC226AAAA,
-    0x3F5CFC93, 0xC2E57B38, 0xC2480000, 0x3F5CFC93,
-    0xC2E57B38, 0x42480000, 0x3F5CFC93, 0xC2BF25E2,
-    0x4226AAAA, 0x3F5CFC93, 0xC2BF25E2, 0x42055556,
-    0x3F5CFC93, 0xC2BF25E2, 0x41C80000, 0x3F5CFC93,
-    0xC2BF25E2, 0x41855556, 0x3F5CFC93, 0xC2BF25E2,
-    0x41055556, 0x3F5CFC93, 0xC2BF25E2, 0x358637BD,
-    0x3F5CFC93, 0xC2BF25E2, 0xC1055554, 0x3F5CFC93,
-    0xC2BF25E2, 0xC1855554, 0x3F5CFC93, 0xC2BF25E2,
-    0xC1C7FFFF, 0x3F5CFC93, 0xC2BF25E2, 0xC2055554,
-    0x3F5CFC93, 0xC2BF25E2, 0xC226AAAA, 0x3F5CFC93,
-    0xC2BF25E2, 0xC2480000, 0x3F5CFC93, 0xC2BF25E2,
-    0x42480000, 0x3F5CFC93, 0xC298D08D, 0x4226AAAA,
-    0x3F5CFC93, 0xC298D08D, 0x42055556, 0x3F5CFC93,
-    0xC298D08D, 0x41C80000, 0x3F5CFC93, 0xC298D08D,
-    0x41855556, 0x3F5CFC93, 0xC298D08D, 0x41055556,
-    0x3F5CFC93, 0xC298D08D, 0x358637BD, 0x3F5CFC93,
-    0xC298D08D, 0xC1055554, 0x3F5CFC93, 0xC298D08D,
-    0xC1855554, 0x3F5CFC93, 0xC298D08D, 0xC1C7FFFF,
-    0x3F5CFC93, 0xC298D08D, 0xC2055554, 0x3F5CFC93,
-    0xC298D08D, 0xC226AAAA, 0x3F5CFC93, 0xC298D08D,
-    0xC2480000, 0x3F5CFC93, 0xC298D08D, 0x42480000,
-    0x3F5CFC93, 0xC264F66F, 0x4226AAAA, 0x3F5CFC93,
-    0xC264F66F, 0x42055556, 0x3F5CFC93, 0xC264F66F,
-    0x41C80000, 0x3F5CFC93, 0xC264F66F, 0x41855556,
-    0x3F5CFC93, 0xC264F66F, 0x41055556, 0x3F5CFC93,
-    0xC264F66F, 0x358637BD, 0x3F5CFC93, 0xC264F66F,
-    0xC1055554, 0x3F5CFC93, 0xC264F66F, 0xC1855554,
-    0x3F5CFC93, 0xC264F66F, 0xC1C7FFFF, 0x3F5CFC93,
-    0xC264F66F, 0xC2055554, 0x3F5CFC93, 0xC264F66F,
-    0xC226AAAA, 0x3F5CFC93, 0xC264F66F, 0xC2480000,
-    0x3F5CFC93, 0xC264F66F, 0x42480000, 0x3F5CFC93,
-    0xC2184BC4, 0x4226AAAA, 0x3F5CFC93, 0xC2184BC4,
-    0x42055556, 0x3F5CFC93, 0xC2184BC4, 0x41C80000,
-    0x3F5CFC93, 0xC2184BC4, 0x41855556, 0x3F5CFC93,
-    0xC2184BC4, 0x41055556, 0x3F5CFC93, 0xC2184BC4,
-    0x358637BD, 0x3F5CFC93, 0xC2184BC4, 0xC1055554,
-    0x3F5CFC93, 0xC2184BC4, 0xC1855554, 0x3F5CFC93,
-    0xC2184BC4, 0xC1C7FFFF, 0x3F5CFC93, 0xC2184BC4,
-    0xC2055554, 0x3F5CFC93, 0xC2184BC4, 0xC226AAAA,
-    0x3F5CFC93, 0xC2184BC4, 0xC2480000, 0x3F5CFC93,
-    0xC2184BC4, 0x42480000, 0x3F5CFC93, 0xC1974231,
-    0x4226AAAA, 0x3F5CFC93, 0xC1974231, 0x42055556,
-    0x3F5CFC93, 0xC1974231, 0x41C80000, 0x3F5CFC93,
-    0xC1974231, 0x41855556, 0x3F5CFC93, 0xC1974231,
-    0x41055556, 0x3F5CFC93, 0xC1974231, 0x358637BD,
-    0x3F5CFC93, 0xC1974231, 0xC1055554, 0x3F5CFC93,
-    0xC1974231, 0xC1855554, 0x3F5CFC93, 0xC1974231,
-    0xC1C7FFFF, 0x3F5CFC93, 0xC1974231, 0xC2055554,
-    0x3F5CFC93, 0xC1974231, 0xC226AAAA, 0x3F5CFC93,
-    0xC1974231, 0xC2480000, 0x3F5CFC93, 0xC1974231,
-    0x42480000, 0x3F5CFC93, 0x3E84C964, 0x4226AAAA,
-    0x3F5CFC93, 0x3E84C964, 0x42055556, 0x3F5CFC93,
-    0x3E84C964, 0x41C80000, 0x3F5CFC93, 0x3E84C964,
-    0x41855556, 0x3F5CFC93, 0x3E84C964, 0x41055556,
-    0x3F5CFC93, 0x3E84C964, 0x358637BD, 0x3F5CFC93,
-    0x3E84C964, 0xC1055554, 0x3F5CFC93, 0x3E84C964,
-    0xC1855554, 0x3F5CFC93, 0x3E84C964, 0xC1C7FFFF,
-    0x3F5CFC93, 0x3E84C964, 0xC2055554, 0x3F5CFC93,
-    0x3E84C964, 0xC226AAAA, 0x3F5CFC93, 0x3E84C964,
-    0xC2480000, 0x3F5CFC93, 0x3E84C964,
-};
-
-static u32 l_normal[3] = {
-    0x00000000, 0x3F800000, 0x00000000,
-};
-
-static u32 l_texCoord[338] = {
-    0x00000000, 0x3F6AAAB0, 0x3DAAAA7E, 0x3F6AAAB0,
-    0x3DAAAA7E, 0x3F800000, 0x00000000, 0x3F800000,
-    0x3E2AAAC1, 0x3F6AAAB0, 0x3E2AAAC1, 0x3F800000,
-    0x3E800000, 0x3F6AAAB0, 0x3E800000, 0x3F800000,
-    0x3EAAAA9F, 0x3F6AAAB0, 0x3EAAAA9F, 0x3F800000,
-    0x3ED55561, 0x3F6AAAB0, 0x3ED55561, 0x3F800000,
-    0x3F000000, 0x3F6AAAB0, 0x3F000000, 0x3F800000,
-    0x3F155550, 0x3F6AAAB0, 0x3F155550, 0x3F800000,
-    0x3F2AAAB0, 0x3F6AAAB0, 0x3F2AAAB0, 0x3F800000,
-    0x3F400000, 0x3F6AAAB0, 0x3F400000, 0x3F800000,
-    0x3F555550, 0x3F6AAAB0, 0x3F555550, 0x3F800000,
-    0x3F6AAAB0, 0x3F6AAAB0, 0x3F6AAAB0, 0x3F800000,
-    0x3F800000, 0x3F6AAAB0, 0x3F800000, 0x3F800000,
-    0x00000000, 0x3F555550, 0x3DAAAA7E, 0x3F555550,
-    0x3E2AAAC1, 0x3F555550, 0x3E800000, 0x3F555550,
-    0x3EAAAA9F, 0x3F555550, 0x3ED55561, 0x3F555550,
-    0x3F000000, 0x3F555550, 0x3F155550, 0x3F555550,
-    0x3F2AAAB0, 0x3F555550, 0x3F400000, 0x3F555550,
-    0x3F555550, 0x3F555550, 0x3F6AAAB0, 0x3F555550,
-    0x3F800000, 0x3F555550, 0x00000000, 0x3F400000,
-    0x3DAAAA7E, 0x3F400000, 0x3E2AAAC1, 0x3F400000,
-    0x3E800000, 0x3F400000, 0x3EAAAA9F, 0x3F400000,
-    0x3ED55561, 0x3F400000, 0x3F000000, 0x3F400000,
-    0x3F155550, 0x3F400000, 0x3F2AAAB0, 0x3F400000,
-    0x3F400000, 0x3F400000, 0x3F555550, 0x3F400000,
-    0x3F6AAAB0, 0x3F400000, 0x3F800000, 0x3F400000,
-    0x00000000, 0x3F2AAAB0, 0x3DAAAA7E, 0x3F2AAAB0,
-    0x3E2AAAC1, 0x3F2AAAB0, 0x3E800000, 0x3F2AAAB0,
-    0x3EAAAA9F, 0x3F2AAAB0, 0x3ED55561, 0x3F2AAAB0,
-    0x3F000000, 0x3F2AAAB0, 0x3F155550, 0x3F2AAAB0,
-    0x3F2AAAB0, 0x3F2AAAB0, 0x3F400000, 0x3F2AAAB0,
-    0x3F555550, 0x3F2AAAB0, 0x3F6AAAB0, 0x3F2AAAB0,
-    0x3F800000, 0x3F2AAAB0, 0x00000000, 0x3F155550,
-    0x3DAAAA7E, 0x3F155550, 0x3E2AAAC1, 0x3F155550,
-    0x3E800000, 0x3F155550, 0x3EAAAA9F, 0x3F155550,
-    0x3ED55561, 0x3F155550, 0x3F000000, 0x3F155550,
-    0x3F155550, 0x3F155550, 0x3F2AAAB0, 0x3F155550,
-    0x3F400000, 0x3F155550, 0x3F555550, 0x3F155550,
-    0x3F6AAAB0, 0x3F155550, 0x3F800000, 0x3F155550,
-    0x00000000, 0x3F000000, 0x3DAAAA7E, 0x3F000000,
-    0x3E2AAAC1, 0x3F000000, 0x3E800000, 0x3F000000,
-    0x3EAAAA9F, 0x3F000000, 0x3ED55561, 0x3F000000,
-    0x3F000000, 0x3F000000, 0x3F155550, 0x3F000000,
-    0x3F2AAAB0, 0x3F000000, 0x3F400000, 0x3F000000,
-    0x3F555550, 0x3F000000, 0x3F6AAAB0, 0x3F000000,
-    0x3F800000, 0x3F000000, 0x00000000, 0x3ED55561,
-    0x3DAAAA7E, 0x3ED55561, 0x3E2AAAC1, 0x3ED55561,
-    0x3E800000, 0x3ED55561, 0x3EAAAA9F, 0x3ED55561,
-    0x3ED55561, 0x3ED55561, 0x3F000000, 0x3ED55561,
-    0x3F155550, 0x3ED55561, 0x3F2AAAB0, 0x3ED55561,
-    0x3F400000, 0x3ED55561, 0x3F555550, 0x3ED55561,
-    0x3F6AAAB0, 0x3ED55561, 0x3F800000, 0x3ED55561,
-    0x00000000, 0x3EAAAA9F, 0x3DAAAA7E, 0x3EAAAA9F,
-    0x3E2AAAC1, 0x3EAAAA9F, 0x3E800000, 0x3EAAAA9F,
-    0x3EAAAA9F, 0x3EAAAA9F, 0x3ED55561, 0x3EAAAA9F,
-    0x3F000000, 0x3EAAAA9F, 0x3F155550, 0x3EAAAA9F,
-    0x3F2AAAB0, 0x3EAAAA9F, 0x3F400000, 0x3EAAAA9F,
-    0x3F555550, 0x3EAAAA9F, 0x3F6AAAB0, 0x3EAAAA9F,
-    0x3F800000, 0x3EAAAA9F, 0x00000000, 0x3E800000,
-    0x3DAAAA7E, 0x3E800000, 0x3E2AAAC1, 0x3E800000,
-    0x3E800000, 0x3E800000, 0x3EAAAA9F, 0x3E800000,
-    0x3ED55561, 0x3E800000, 0x3F000000, 0x3E800000,
-    0x3F155550, 0x3E800000, 0x3F2AAAB0, 0x3E800000,
-    0x3F400000, 0x3E800000, 0x3F555550, 0x3E800000,
-    0x3F6AAAB0, 0x3E800000, 0x3F800000, 0x3E800000,
-    0x00000000, 0x3E2AAAC1, 0x3DAAAA7E, 0x3E2AAAC1,
-    0x3E2AAAC1, 0x3E2AAAC1, 0x3E800000, 0x3E2AAAC1,
-    0x3EAAAA9F, 0x3E2AAAC1, 0x3ED55561, 0x3E2AAAC1,
-    0x3F000000, 0x3E2AAAC1, 0x3F155550, 0x3E2AAAC1,
-    0x3F2AAAB0, 0x3E2AAAC1, 0x3F400000, 0x3E2AAAC1,
-    0x3F555550, 0x3E2AAAC1, 0x3F6AAAB0, 0x3E2AAAC1,
-    0x3F800000, 0x3E2AAAC1, 0x00000000, 0x3DAAAA7E,
-    0x3DAAAA7E, 0x3DAAAA7E, 0x3E2AAAC1, 0x3DAAAA7E,
-    0x3E800000, 0x3DAAAA7E, 0x3EAAAA9F, 0x3DAAAA7E,
-    0x3ED55561, 0x3DAAAA7E, 0x3F000000, 0x3DAAAA7E,
-    0x3F155550, 0x3DAAAA7E, 0x3F2AAAB0, 0x3DAAAA7E,
-    0x3F400000, 0x3DAAAA7E, 0x3F555550, 0x3DAAAA7E,
-    0x3F6AAAB0, 0x3DAAAA7E, 0x3F800000, 0x3DAAAA7E,
-    0x00000000, 0x00000000, 0x3DAAAA7E, 0x00000000,
-    0x3E2AAAC1, 0x00000000, 0x3E800000, 0x00000000,
-    0x3EAAAA9F, 0x00000000, 0x3ED55561, 0x00000000,
-    0x3F000000, 0x00000000, 0x3F155550, 0x00000000,
-    0x3F2AAAB0, 0x00000000, 0x3F400000, 0x00000000,
-    0x3F555550, 0x00000000, 0x3F6AAAB0, 0x00000000,
-    0x3F800000, 0x00000000,
-};
-
-#if TARGET_PC
-using GameVersion = dusk::version::GameVersion;
-
-static u8* l_Egnd_mantDL_get() { alignas(32) static u8 buf[0x3EC]; static bool _ = (dusk::LoadRelAsset(buf, "/rel/Final/Release/d_a_mant.rel", {{GameVersion::GcnUsa, 0xA9A0}, {GameVersion::GcnPal, 0xA9A0}}, 0x3EC), true); return buf; }
-#define l_Egnd_mantDL (l_Egnd_mantDL_get())
-#else
-#include "assets/l_Egnd_mantDL.h"
-#endif
-
 #if !TARGET_PC
+#include "assets/l_Egnd_mantDL.h"
+
 static void* pal_d = (void*)&l_Egnd_mantPAL;
 
 static void* tex_d[2] = {
@@ -305,8 +161,9 @@ static void mant_build_anchor_frame(const cXyz& anchor_a, const cXyz& anchor_b, 
 #endif
 
 void daMant_packet_c::draw() {
+    ZoneScoped;
 #if TARGET_PC
-    void* image = l_Egnd_mantTEX;
+    void* image = l_Egnd_mantTEX_copy;
     void* lut = l_Egnd_mantPAL;
 #else
     void* image = tex_d[0];
@@ -388,12 +245,12 @@ void daMant_packet_c::draw() {
         }
     }
     GXSETARRAY(GX_VA_POS, draw_pos, sizeof(mNrm[0]), 12, true);
-    GXSETARRAY(GX_VA_NRM, &l_normal, sizeof(l_normal), 12, false);
+    GXSETARRAY(GX_VA_NRM, l_normal, sizeof(f32) * 3, 12, false);
 #else
     GXSETARRAY(GX_VA_POS, this->getPos(), sizeof(mPos[0]), 12, true);
     GXSETARRAY(GX_VA_NRM, this->getNrm(), sizeof(mNrm[0]), 12, true);
 #endif
-    GXSETARRAY(GX_VA_TEX0, &l_texCoord, sizeof(l_texCoord), 8, false); // TODO: set to true when converted to float literals
+    GXSETARRAY(GX_VA_TEX0, l_texCoord, sizeof(f32) * 338, 8, false);
 
     GXSetZCompLoc(0);
     GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
@@ -418,15 +275,33 @@ void daMant_packet_c::draw() {
     GXSetTevKAlphaSel(GX_TEVSTAGE0, GX_TEV_KASEL_K3_A);
     GXSetAlphaCompare(GX_GREATER, 0, GX_AOP_OR, GX_GREATER, 0);
 
+#if TARGET_PC
+    if (!textureObjsInitialized) {
+        GXInitTlutObj(&tlutObj, lut, GX_TL_RGB5A3, 0x100);
+        GXInitTexObjCI(&mainTexObj, image, 0x80, 0x80, GX_TF_C8, GX_CLAMP, GX_CLAMP, 0, 0);
+        GXInitTexObjLOD(&mainTexObj, GX_LINEAR, GX_LINEAR, 0.0, 0.0, 0.0, 0, 0, GX_ANISO_1);
+        GXInitTexObjCI(
+            &undersideTexObj, l_Egnd_mantTEX_U, 0x80, 0x80, GX_TF_C8, GX_CLAMP, GX_CLAMP, 0, 0);
+        GXInitTexObjLOD(&undersideTexObj, GX_LINEAR, GX_LINEAR, 0.0, 0.0, 0.0, 0, 0, GX_ANISO_1);
+        l_Egnd_mantTEX_hasReplacement = aurora::texture::has_replacement(&mainTexObj, &tlutObj);
+        textureObjsInitialized = true;
+    }
+#else
     GXTlutObj GStack_80;
     GXInitTlutObj(&GStack_80, lut, GX_TL_RGB5A3, 0x100);
 
     TGXTexObj GStack_74;
     GXInitTexObjCI(&GStack_74, image, 0x80, 0x80, GX_TF_C8, GX_CLAMP, GX_CLAMP, 0, 0);
     GXInitTexObjLOD(&GStack_74, GX_LINEAR, GX_LINEAR, 0.0, 0.0, 0.0, 0, 0, GX_ANISO_1);
+#endif
 
-    GXLoadTlut(&GStack_80, 0);
+#if TARGET_PC
+    GXLoadTlut(&tlutObj, GX_TLUT0);
+    GXLoadTexObj(&mainTexObj, GX_TEXMAP0);
+#else
+    GXLoadTlut(&GStack_80, GX_TLUT0);
     GXLoadTexObj(&GStack_74, GX_TEXMAP0);
+#endif
 
     GXSetCullMode(GX_CULL_BACK);
 
@@ -442,12 +317,13 @@ void daMant_packet_c::draw() {
     GXLoadNrmMtxImm(MStack_54, GX_PNMTX0);
     GXCallDisplayList(l_Egnd_mantDL, 0x3e0);
 
-#ifdef TARGET_PC
-    GStack_74.reset();
-#endif
+#if TARGET_PC
+    GXLoadTexObj(&undersideTexObj, GX_TEXMAP0);
+#else
     GXInitTexObjCI(&GStack_74, l_Egnd_mantTEX_U, 0x80, 0x80, GX_TF_C8, GX_CLAMP, GX_CLAMP, 0, 0);
     GXInitTexObjLOD(&GStack_74, GX_LINEAR, GX_LINEAR, 0.0, 0.0, 0.0, 0, 0, GX_ANISO_1);
     GXLoadTexObj(&GStack_74, GX_TEXMAP0);
+#endif
 
     GXSetTevColor(GX_TEVREG0, COMPOUND_LITERAL(GXColor){0, 0, 0, 0});
     GXSetTevKColor(GX_KCOLOR0, COMPOUND_LITERAL(GXColor){0, 0, 0, 0});
@@ -821,7 +697,11 @@ static int daMant_Execute(mant_class* i_this) {
     iVar8 = 0;
 
     if (i_this->field_0x3967 != 0) {
+#if TARGET_PC
+        mant_cut_type = l_Egnd_mantTEX_hasReplacement ? 1 : i_this->field_0x3967;
+#else
         mant_cut_type = i_this->field_0x3967;
+#endif
 
         if (i_this->field_0x3968 < 15) {
             i_this->field_0x3968++;
@@ -833,9 +713,18 @@ static int daMant_Execute(mant_class* i_this) {
                 iVar8 = 20;
             }
 
-            unaff_r29 = cM_rndF(65536.0f);
-            var_f31 = cM_rndFX(32.0f);
-            var_f30 = cM_rndFX(32.0f);
+#if TARGET_PC
+            if (l_Egnd_mantTEX_hasReplacement) {
+                unaff_r29 = i_this->mMantRng.getF(65536.0f);
+                var_f31 = i_this->mMantRng.getFX(32.0f);
+                var_f30 = i_this->mMantRng.getFX(32.0f);
+            } else
+#endif
+            {
+                unaff_r29 = cM_rndF(65536.0f);
+                var_f31 = cM_rndFX(32.0f);
+                var_f30 = cM_rndFX(32.0f);
+            }
         }
 
         i_this->field_0x3967 = 0;
@@ -894,8 +783,14 @@ static int daMant_Execute(mant_class* i_this) {
 
             if (0 <= uVar1 && uVar1 < 0x4000) {
                 int iVar5 = (uVar1 & 7) + (uVar1 & 0x78) * 4 + (uVar1 >> 4 & 0x18) + (uVar1 & 0x3e00);
-                l_Egnd_mantTEX[iVar5] = l_Egnd_mantTEX_U[iVar5] = 0;
+                DUSK_IF_ELSE(l_Egnd_mantTEX_copy[iVar5], l_Egnd_mantTEX[iVar5]) = l_Egnd_mantTEX_U[iVar5] = 0;
             }
+
+#if TARGET_PC
+            if(textureObjsInitialized) {
+                GXInitTlutObjData(&tlutObj, l_Egnd_mantPAL);  // make sure the cached textures are updated
+            }
+#endif
         }
     }
 
@@ -933,6 +828,16 @@ static int daMant_Create(fopAc_ac_c* i_this) {
         l_Egnd_mantTEX_U[i] = 6;
     }
 
+#if TARGET_PC
+    memcpy(l_Egnd_mantTEX_copy, l_Egnd_mantTEX, sizeof(l_Egnd_mantTEX_copy));
+
+    if(textureObjsInitialized) {
+        GXInitTlutObjData(&tlutObj, l_Egnd_mantPAL); // make sure the cached textures are updated
+    }
+
+    m_this->mMantRng.init(66, 16983, 855);
+#endif
+
     lbl_277_bss_0 = 0;
     daMant_Execute(m_this);
     return 4;
@@ -949,7 +854,7 @@ extern "C" void __ct__4cXyzFv() {
     /* empty function */
 }
 
-static actor_method_class l_daMant_Method = {
+static DUSK_CONST actor_method_class l_daMant_Method = {
     (process_method_func)daMant_Create,
     (process_method_func)daMant_Delete,
     (process_method_func)daMant_Execute,
@@ -957,7 +862,7 @@ static actor_method_class l_daMant_Method = {
     (process_method_func)daMant_Draw,
 };
 
-actor_process_profile_definition g_profile_MANT = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_MANT = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 8,
     /* List Prio    */ fpcPi_CURRENT_e,

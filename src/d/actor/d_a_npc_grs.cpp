@@ -35,12 +35,12 @@ enum LookMode {
     /* 0x04 */ LOOK_MODE_UNK_4,
 };
 
-static daNpc_GetParam1 l_bmdGetParamList[2] = {
+DUSK_CONSTEXPR daNpc_GetParam1 l_bmdGetParamList[2] = {
     {16, 0},
     {17, 0},
 };
 
-static daNpc_GetParam1 l_bckGetParamList[8] = {
+DUSK_CONSTEXPR daNpc_GetParam1 l_bckGetParamList[8] = {
     {-1, 0},
     {8, 0},
     {7, 0},
@@ -51,49 +51,54 @@ static daNpc_GetParam1 l_bckGetParamList[8] = {
     {10, 0},
 };
 
-static daNpc_GetParam1 l_btpGetParamList[3] = {
+DUSK_CONSTEXPR daNpc_GetParam1 l_btpGetParamList[3] = {
     {23, 0},
     {24, 0},
     {25, 0},
 };
 
-static daNpc_GetParam1 l_btkGetParamList[1] = {
+DUSK_CONSTEXPR daNpc_GetParam1 l_btkGetParamList[1] = {
     {20, 0},
 };
 
-static daNpc_GetParam1 l_evtGetParamList[2] = {
+DUSK_CONSTEXPR daNpc_GetParam1 l_evtGetParamList[2] = {
     {0, 0},
     {1, 0},
 };
 
-static int l_loadRes_GRSa[3] = {0, -1, -1};
+DUSK_CONSTEXPR int l_loadRes_GRSa[3] = {0, -1, -1};
 
-static int l_loadRes_GRS0[3] = {0, -1, -1};
+DUSK_CONSTEXPR int l_loadRes_GRS0[3] = {0, -1, -1};
 
-static int* l_loadRes_list[2] = {
-    (int*)&l_loadRes_GRSa,
-    (int*)&l_loadRes_GRS0,
+DUSK_CONSTEXPR int DUSK_CONST* l_loadRes_list[2] = {
+#if TARGET_PC
+    l_loadRes_GRSa,
+    l_loadRes_GRS0,
+#else
+    (int DUSK_CONST*)&l_loadRes_GRSa,
+    (int DUSK_CONST*)&l_loadRes_GRS0,
+#endif
 };
 
-static char* l_resNames[1] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_resNames[1] = {
     "grS",
 };
 
-static char* l_evtNames[2] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_evtNames[2] = {
     NULL,
     "PUSHOUT",
 };
 
-static char* l_myName = "grS";
+static DUSK_CONSTEXPR char DUSK_CONST* l_myName = "grS";
 
 static NPC_GRS_HIO_CLASS l_HIO;
 
-char* daNpc_grS_c::mEvtCutNameList[2] = {
+DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST daNpc_grS_c::mEvtCutNameList[2] = {
     "",
     "PUSHOUT",
 };
 
-daNpc_grS_c::cutFunc daNpc_grS_c::mEvtCutList[2] = {
+DUSK_GAME_DATA daNpc_grS_c::cutFunc DUSK_CONST daNpc_grS_c::mEvtCutList[2] = {
     NULL,
     &daNpc_grS_c::cutPushOut,
 };
@@ -117,7 +122,7 @@ daNpc_grS_c::~daNpc_grS_c() {
 #endif
 }
 
-const daNpc_grS_HIOParam daNpc_grS_Param_c::m = {
+DUSK_GAME_DATA const daNpc_grS_HIOParam daNpc_grS_Param_c::m = {
     120.0f, -3.0f, 1.0f, 600.0f, 255.0f, 120.0f, 35.0f, 60.0f,
     0.0f, 0.0f, 10.0f, -10.0f, 30.0f, -30.0f, 45.0f, -45.0f,
     0.6f, 12.0f,
@@ -1185,8 +1190,9 @@ int daNpc_grS_c::talk(void* param_0) {
         if (unkFlag1 && talkProc(NULL, 1, NULL)) {
             if (mType == 0) {
                 if (mFlow.getEventId(&unkInt2) == 1) {
-                    mPresentItemId =
-                        fopAcM_createItemForPresentDemo(&current.pos, unkInt2, 0, -1, -1, 0, 0);
+                    DUSK_ITEM_CHECK("key_shard_1:D_MN04", unkInt2, this);
+                    mPresentItemId = fopAcM_createItemForPresentDemo(&current.pos, unkInt2, 0, -1,
+                        -1, 0, 0 DUSK_GIVE_TAG("key_shard_1:D_MN04"));
 
                     if (mPresentItemId != fpcM_ERROR_PROCESS_ID_e) {
                         s16 eventIdx =
@@ -1294,7 +1300,7 @@ static int daNpc_grS_IsDelete(void* i_this) {
     return TRUE;
 }
 
-static actor_method_class daNpc_grS_MethodTable = {
+static DUSK_CONST actor_method_class daNpc_grS_MethodTable = {
     (process_method_func)daNpc_grS_Create,
     (process_method_func)daNpc_grS_Delete,
     (process_method_func)daNpc_grS_Execute,
@@ -1302,7 +1308,7 @@ static actor_method_class daNpc_grS_MethodTable = {
     (process_method_func)daNpc_grS_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_GRS = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_GRS = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

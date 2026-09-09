@@ -5,16 +5,31 @@
 #include "JSystem/J3DGraphBase/J3DDrawBuffer.h"
 #include "SSystem/SComponent/c_counter.h"
 
+#if TARGET_PC
 #include "dusk/frame_interpolation.h"
+#endif
 
 const u16 l_J_Ohana00_64TEX__width = 63;
 const u16 l_J_Ohana00_64TEX__height = 63;
 
 #if TARGET_PC
-#include "dusk/dvd_asset.hpp"
-using GameVersion = dusk::version::GameVersion;
-static u8* l_J_Ohana00_64TEX_get() { static u8 buf[0x800]; static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0x9060}, {GameVersion::GcnPal, 0x9060}}, 0x800), true); return buf; }
+DEFINE_GRASS_ASSET(l_J_Ohana00_64TEX, u8, 0x800, {
+    {GameVersion::GcnUsa,     0x9060},
+    {GameVersion::GcnPal,     0x9060},
+    {GameVersion::GcnJpn,     0x9060},
+    {GameVersion::WiiUsaRev0, 0x7B60},
+    {GameVersion::WiiUsa,     0x7BC0},
+    {GameVersion::WiiPal,     0x7BC0},
+    {GameVersion::WiiJpn,     0x7BC0},
+});
+
 #define l_J_Ohana00_64TEX (l_J_Ohana00_64TEX_get())
+
+// from d_grass.inc
+static MtxP get_model_mtx(Mtx modelMtx, Mtx storage);
+static void transform_positions(
+    const batch::LeafTemplate& tpl, const Vec* posArray, const Mtx mtx, Vec* xfPos);
+static void split_batch(u32& emitted, u32 vtxCount);
 #else
 #include "assets/l_J_Ohana00_64TEX.h"
 #endif
@@ -109,12 +124,46 @@ static u8 l_flowerTexCoord[] = {
     0x3E, 0xA7, 0x72, 0xD6, 0xBD, 0x2F, 0x46, 0xAA};
 
 #if TARGET_PC
-using GameVersion = dusk::version::GameVersion;
+DEFINE_GRASS_ASSET(l_J_hana00DL, u8, 0x150, {
+    {GameVersion::GcnUsa,     0x9D20},
+    {GameVersion::GcnPal,     0x9D20},
+    {GameVersion::GcnJpn,     0x9D20},
+    {GameVersion::WiiUsaRev0, 0x8820},
+    {GameVersion::WiiUsa,     0x8880},
+    {GameVersion::WiiPal,     0x8880},
+    {GameVersion::WiiJpn,     0x8880},
+});
 
-static u8* l_J_hana00DL_get()   { static u8 buf[0x150]; static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0x9D20}, {GameVersion::GcnPal, 0x9D20}}, 0x150), true); return buf; }
-static u8* l_J_hana00_cDL_get() { static u8 buf[0xDE];  static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0x9E80}, {GameVersion::GcnPal, 0x9E80}}, 0xDE),  true); return buf; }
-static u8* l_matDL_get()        { static u8 buf[0x99];  static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0x9F60}, {GameVersion::GcnPal, 0x9F60}}, 0x99),  true); return buf; }
-static u8* l_matLight4DL_get()  { static u8 buf[0x99];  static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0xA000}, {GameVersion::GcnPal, 0xA000}}, 0x99),  true); return buf; }
+DEFINE_GRASS_ASSET(l_J_hana00_cDL, u8, 0xDE, {
+    {GameVersion::GcnUsa,     0x9E80},
+    {GameVersion::GcnPal,     0x9E80},
+    {GameVersion::GcnJpn,     0x9E80},
+    {GameVersion::WiiUsaRev0, 0x8980},
+    {GameVersion::WiiUsa,     0x89E0},
+    {GameVersion::WiiPal,     0x89E0},
+    {GameVersion::WiiJpn,     0x89E0},
+});
+
+DEFINE_GRASS_ASSET(l_matDL, u8, 0x99, {
+    {GameVersion::GcnUsa,     0x9F60},
+    {GameVersion::GcnPal,     0x9F60},
+    {GameVersion::GcnJpn,     0x9F60},
+    {GameVersion::WiiUsaRev0, 0x8A60},
+    {GameVersion::WiiUsa,     0x8AC0},
+    {GameVersion::WiiPal,     0x8AC0},
+    {GameVersion::WiiJpn,     0x8AC0},
+});
+
+DEFINE_GRASS_ASSET(l_matLight4DL, u8, 0x99, {
+    {GameVersion::GcnUsa,     0xA000},
+    {GameVersion::GcnPal,     0xA000},
+    {GameVersion::GcnJpn,     0xA000},
+    {GameVersion::WiiUsaRev0, 0x8B00},
+    {GameVersion::WiiUsa,     0x8B60},
+    {GameVersion::WiiPal,     0x8B60},
+    {GameVersion::WiiJpn,     0x8B60},
+});
+
 #define l_J_hana00DL   (l_J_hana00DL_get())
 #define l_J_hana00_cDL (l_J_hana00_cDL_get())
 #define l_matDL        (l_matDL_get())
@@ -135,8 +184,16 @@ const u16 l_J_Ohana01_64128_0419TEX__width = 63;
 const u16 l_J_Ohana01_64128_0419TEX__height = 127;
 
 #if TARGET_PC
-using GameVersion = dusk::version::GameVersion;
-static u8* l_J_Ohana01_64128_0419TEX_get() { static u8 buf[0x1000]; static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0xA0A0}, {GameVersion::GcnPal, 0xA0A0}}, 0x1000), true); return buf; }
+DEFINE_GRASS_ASSET(l_J_Ohana01_64128_0419TEX, u8, 0x1000, {
+    {GameVersion::GcnUsa,     0xA0A0},
+    {GameVersion::GcnPal,     0xA0A0},
+    {GameVersion::GcnJpn,     0xA0A0},
+    {GameVersion::WiiUsaRev0, 0x8BA0},
+    {GameVersion::WiiUsa,     0x8C00},
+    {GameVersion::WiiPal,     0x8C00},
+    {GameVersion::WiiJpn,     0x8C00},
+});
+
 #define l_J_Ohana01_64128_0419TEX (l_J_Ohana01_64128_0419TEX_get())
 #else
 #include "assets/l_J_Ohana01_64128_0419TEX.h"
@@ -268,13 +325,56 @@ static u8 l_flowerTexCoord2[] = {
     0x40, 0x1B, 0x7D, 0x52, 0x3F, 0x80, 0x3F, 0x79, 0x40, 0x1B, 0x7D, 0x52, 0x3F, 0x51, 0x10, 0x6F};
 
 #if TARGET_PC
-using GameVersion = dusk::version::GameVersion;
+DEFINE_GRASS_ASSET(l_J_hana01DL, u8, 0x138, {
+    {GameVersion::GcnUsa,     0xB7C0},
+    {GameVersion::GcnPal,     0xB7C0},
+    {GameVersion::GcnJpn,     0xB7C0},
+    {GameVersion::WiiUsaRev0, 0xA2C0},
+    {GameVersion::WiiUsa,     0xA320},
+    {GameVersion::WiiPal,     0xA320},
+    {GameVersion::WiiJpn,     0xA320},
+});
 
-static u8* l_J_hana01DL_get()      { static u8 buf[0x138]; static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0xB7C0}, {GameVersion::GcnPal, 0xB7C0}}, 0x138), true); return buf; }
-static u8* l_J_hana01_c_00DL_get() { static u8 buf[0xDE];  static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0xB900}, {GameVersion::GcnPal, 0xB900}}, 0xDE),  true); return buf; }
-static u8* l_J_hana01_c_01DL_get() { static u8 buf[0x128]; static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0xB9E0}, {GameVersion::GcnPal, 0xB9E0}}, 0x128), true); return buf; }
-static u8* l_mat2DL_get()          { static u8 buf[0x99];  static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0xBB20}, {GameVersion::GcnPal, 0xBB20}}, 0x99),  true); return buf; }
-static u8* l_mat2Light4DL_get()    { static u8 buf[0x99];  static bool _ = (dusk::LoadArchivedRelAsset(buf, 'AMEM', "d_a_grass.rel", {{GameVersion::GcnUsa, 0xBBC0}, {GameVersion::GcnPal, 0xBBC0}}, 0x99),  true); return buf; }
+DEFINE_GRASS_ASSET(l_J_hana01_c_00DL, u8, 0xDE, {
+    {GameVersion::GcnUsa,     0xB900},
+    {GameVersion::GcnPal,     0xB900},
+    {GameVersion::GcnJpn,     0xB900},
+    {GameVersion::WiiUsaRev0, 0xA400},
+    {GameVersion::WiiUsa,     0xA460},
+    {GameVersion::WiiPal,     0xA460},
+    {GameVersion::WiiJpn,     0xA460},
+});
+
+DEFINE_GRASS_ASSET(l_J_hana01_c_01DL, u8, 0x128, {
+    {GameVersion::GcnUsa,     0xB9E0},
+    {GameVersion::GcnPal,     0xB9E0},
+    {GameVersion::GcnJpn,     0xB9E0},
+    {GameVersion::WiiUsaRev0, 0xA4E0},
+    {GameVersion::WiiUsa,     0xA540},
+    {GameVersion::WiiPal,     0xA540},
+    {GameVersion::WiiJpn,     0xA540},
+});
+
+DEFINE_GRASS_ASSET(l_mat2DL, u8, 0x99, {
+    {GameVersion::GcnUsa,     0xBB20},
+    {GameVersion::GcnPal,     0xBB20},
+    {GameVersion::GcnJpn,     0xBB20},
+    {GameVersion::WiiUsaRev0, 0xA620},
+    {GameVersion::WiiUsa,     0xA680},
+    {GameVersion::WiiPal,     0xA680},
+    {GameVersion::WiiJpn,     0xA680},
+});
+
+DEFINE_GRASS_ASSET(l_mat2Light4DL, u8, 0x99, {
+    {GameVersion::GcnUsa,     0xBBC0},
+    {GameVersion::GcnPal,     0xBBC0},
+    {GameVersion::GcnJpn,     0xBBC0},
+    {GameVersion::WiiUsaRev0, 0xA6C0},
+    {GameVersion::WiiUsa,     0xA720},
+    {GameVersion::WiiPal,     0xA720},
+    {GameVersion::WiiJpn,     0xA720},
+});
+
 #define l_J_hana01DL      (l_J_hana01DL_get())
 #define l_J_hana01_c_00DL (l_J_hana01_c_00DL_get())
 #define l_J_hana01_c_01DL (l_J_hana01_c_01DL_get())
@@ -588,6 +688,12 @@ dFlower_packet_c::dFlower_packet_c() {
     GXInitTexObj(&mTexObj_l_J_Ohana01_64128_0419TEX, l_J_Ohana01_64128_0419TEX,
         l_J_Ohana01_64128_0419TEX__width + 1, l_J_Ohana01_64128_0419TEX__height + 1, GX_TF_CMPR, GX_MIRROR, GX_MIRROR, GX_FALSE
     );
+
+    batch::decode_leaf_template(l_J_hana00DL, 0x140, mTplHana00);
+    batch::decode_leaf_template(l_J_hana00_cDL, 0xC0, mTplHana00Cut);
+    batch::decode_leaf_template(l_J_hana01DL, 0x120, mTplHana01);
+    batch::decode_leaf_template(l_J_hana01_c_00DL, 0xC0, mTplHana01Cut00);
+    batch::decode_leaf_template(l_J_hana01_c_01DL, 0x120, mTplHana01Cut);
 #endif
 
     m_deleteRoom = &dFlower_packet_c::deleteRoom;
@@ -597,7 +703,373 @@ dFlower_packet_c::dFlower_packet_c() {
 #endif
 }
 
+#if TARGET_PC
+static void batch_setup_tev(u32 lightMask) {
+    GXSetCullMode(GX_CULL_NONE);
+
+    GXSetNumChans(2);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR1, GX_TRUE, GX_SRC_VTX, GX_SRC_REG, lightMask, GX_DF_CLAMP, GX_AF_SPOT);
+
+    GXSetNumTevStages(3);
+
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR1A1);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+
+    GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_RASC, GX_CC_ZERO);
+    GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+    GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+
+    GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_TEXC, GX_CC_CPREV, GX_CC_C0);
+    GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_4, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+}
+
+static GXColor hana00_amb_color(const dFlower_data_c* flower, const dKy_tevstr_c* tevstr) {
+    GXColor amb = {0, 0, 0, 0xFF};
+    if (DEBUG && g_kankyoHIO.navy.grass_adjust_ON != 0) {
+        amb.r = g_kankyoHIO.navy.grass_ambcol.r * 2;
+        amb.g = g_kankyoHIO.navy.grass_ambcol.g * 2;
+        amb.b = g_kankyoHIO.navy.grass_ambcol.b * 2;
+    } else {
+        amb.r = (flower->field_0x04 & 0x1F) * 2;
+        amb.g = ((flower->field_0x04 >> 5) & 0x1F) * 2;
+        amb.b = ((flower->field_0x04 >> 0xA) & 0x1F) * 2;
+    }
+
+    if (daPy_py_c::checkNowWolfPowerUp()) {
+        f32 ambRate = g_env_light.bg_amb_col[0].r / 255.0f;
+        f32 col = (((flower->field_0x04 & 0x1F) * 2 + 0x10));
+        amb.r = col * (ambRate * 4.0f);
+
+        ambRate = g_env_light.bg_amb_col[0].g / 255.0f;
+        f32 col2 = (((flower->field_0x04 >> 5) & 0x1F) * 2 + 0x10);
+        amb.g = col2 * (4.0f * ambRate);
+
+        ambRate = g_env_light.bg_amb_col[0].b / 255.0f;
+        f32 col3 = (((flower->field_0x04 >> 10) & 0x1F) * 2 + 0x10);
+        amb.b = col3 * (4.0f * ambRate);
+    }
+
+    if (amb.r == 0x3E) {
+        amb.r = tevstr->AmbCol.r;
+    }
+
+    if (amb.g == 0x3E) {
+        amb.g = tevstr->AmbCol.g;
+    }
+
+    if (amb.b == 0x3E) {
+        amb.b = tevstr->AmbCol.b;
+    }
+
+    return amb;
+}
+
+static GXColor hana01_amb_color(int idx, const dKy_tevstr_c* tevstr) {
+    f32 rRate = tevstr->AmbCol.r * 0.03125f;
+    if (rRate > 1.0f) {
+        rRate = 1.0f;
+    }
+
+    f32 gRate = tevstr->AmbCol.g * 0.03125f;
+    if (gRate > 1.0f) {
+        gRate = 1.0f;
+    }
+
+    f32 bRate = tevstr->AmbCol.b * 0.03125f;
+    if (bRate > 1.0f) {
+        bRate = 1.0f;
+    }
+
+    GXColor amb = {1, 1, 1, 1};
+
+    GXColor sub;
+    sub.r = -0.4f * tevstr->AmbCol.r * rRate;
+    sub.g = -0.4f * tevstr->AmbCol.g * gRate;
+    sub.b = -0.4f * tevstr->AmbCol.b * bRate;
+
+    switch (idx & 7) {
+    case 0:
+        amb.r = tevstr->AmbCol.r + sub.r;
+        amb.g = tevstr->AmbCol.g;
+        amb.b = tevstr->AmbCol.b;
+        break;
+    case 1:
+        amb.r = tevstr->AmbCol.r;
+        amb.g = tevstr->AmbCol.g + sub.g;
+        amb.b = tevstr->AmbCol.b;
+        break;
+    case 2:
+        amb.r = tevstr->AmbCol.r;
+        amb.g = tevstr->AmbCol.g;
+        amb.b = tevstr->AmbCol.b + sub.b;
+        break;
+    case 3:
+        amb.r = tevstr->AmbCol.r + sub.r;
+        amb.g = tevstr->AmbCol.g + sub.g;
+        amb.b = tevstr->AmbCol.b;
+        break;
+    case 4:
+        amb.r = tevstr->AmbCol.r;
+        amb.g = tevstr->AmbCol.g + sub.g;
+        amb.b = tevstr->AmbCol.b + sub.b;
+        break;
+    case 5:
+        amb.r = tevstr->AmbCol.r + sub.r;
+        amb.g = tevstr->AmbCol.g;
+        amb.b = tevstr->AmbCol.b + sub.b;
+        break;
+    case 6:
+        amb.r = tevstr->AmbCol.r + sub.r;
+        amb.g = tevstr->AmbCol.g + sub.g;
+        amb.b = tevstr->AmbCol.b + sub.b;
+        break;
+    case 7:
+        break;
+    }
+
+    if (daPy_py_c::checkNowWolfPowerUp()) {
+        f32 ambRate = g_env_light.bg_amb_col[0].r / 255.0f;
+        amb.r = (amb.r + 8) * (6.0f * ambRate);
+
+        ambRate = g_env_light.bg_amb_col[0].g / 255.0f;
+        amb.g = (amb.g + 8) * (6.0f * ambRate);
+
+        ambRate = g_env_light.bg_amb_col[0].b / 255.0f;
+        amb.b = (amb.b + 8) * (6.0f * ambRate);
+    }
+
+    amb.a = 0xFF;
+    return amb;
+}
+
+static void flower_emit(const batch::LeafTemplate& tpl, const Vec* xformedPos, GXColor amb) {
+    for (u32 i = 0; i < tpl.vtxCount; i++) {
+        const batch::LeafTemplate::Vtx& v = tpl.vtx[i];
+        const Vec& p = xformedPos[v.pos];
+        GXPosition3f32(p.x, p.y, p.z);
+        GXNormal1x8(v.nrm);
+        GXColor1x8(v.clr);
+        GXColor4u8(amb.r, amb.g, amb.b, amb.a);
+        GXTexCoord1x8(v.tex);
+    }
+}
+
 void dFlower_packet_c::draw() {
+    ZoneScoped;
+    dScnKy_env_light_c* kankyo = dKy_getEnvlight();
+    j3dSys.reinitGX();
+
+    GXSetNumIndStages(0);
+    dKy_setLight_again();
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_INDEX8);
+    GXSetVtxDesc(GX_VA_NRM, GX_INDEX8);
+    GXSetVtxDesc(GX_VA_CLR0, GX_INDEX8);
+    GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR1, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSETARRAY(GX_VA_POS, &l_flowerPos, sizeof(l_flowerPos), sizeof(Vec), true);
+    GXSETARRAY(GX_VA_NRM, &l_flowerNormal, sizeof(l_flowerNormal), sizeof(Vec), true);
+    GXSETARRAY(GX_VA_CLR0, &l_flowerColor, sizeof(l_flowerColor), sizeof(GXColor), true);
+    GXSETARRAY(GX_VA_TEX0, &l_flowerTexCoord, sizeof(l_flowerTexCoord), 8, true);
+
+    static GXVtxDescList vtxDescList[] = {
+        {GX_VA_POS, GX_DIRECT},
+        {GX_VA_NRM, GX_INDEX8},
+        {GX_VA_CLR0, GX_INDEX8},
+        {GX_VA_CLR1, GX_DIRECT},
+        {GX_VA_TEX0, GX_INDEX8},
+        {GX_VA_NULL, GX_NONE},
+    };
+    static Vec xfPos[256];
+    Mtx identity;
+    MTXIdentity(identity);
+
+    // --- hana00 ---
+    for (int i = 0; i < 64; i++) {
+        dFlower_data_c* first = m_room[i].getData();
+        if (first == nullptr || !dComIfGp_roomControl_checkStatusFlag(i, 0x10)) {
+            continue;
+        }
+
+        dKy_tevstr_c* tevstr = dComIfGp_roomControl_getTevStr(i);
+        int lightCount = 6;
+
+        if (dComIfGp_roomControl_getStatusRoomDt(i) != nullptr) {
+            lightCount = dComIfGp_roomControl_getStatusRoomDt(i)->getLightVecInfoNum();
+        }
+
+        if (dKy_SunMoon_Light_Check() && lightCount < 2) {
+            lightCount = 2;
+        }
+
+        for (int j = 0; j < 6; j++) {
+            if (kankyo->field_0x0c18[j].field_0x26 == 1) {
+                lightCount++;
+            }
+        }
+
+        if (lightCount <= 2) {
+            GXCallDisplayList(l_matLight4DL, 0x80);
+        } else {
+            GXCallDisplayList(l_matDL, 0x80);
+        }
+
+        GXSetTevColorS10(GX_TEVREG0, {0, 0, 0, 0});
+        dKy_Global_amb_set(tevstr);
+        dKy_GxFog_tevstr_set(tevstr);
+        dKy_setLight_nowroom_grass(tevstr->room_no, 1.0f);
+
+        GXLoadTexObj(&mTexObj_l_J_Ohana00_64TEX, GX_TEXMAP0);
+        batch_setup_tev(lightCount <= 2 ? (GX_LIGHT1 | GX_LIGHT2 | GX_LIGHT3 | GX_LIGHT4) :
+                                          (GX_LIGHT1 | GX_LIGHT2 | GX_LIGHT3 | GX_LIGHT4 |
+                                              GX_LIGHT5 | GX_LIGHT6 | GX_LIGHT7));
+        GXSetVtxDescv(vtxDescList);
+        GXLoadPosMtxImm(identity, GX_PNMTX0);
+        GXLoadNrmMtxImm(j3dSys.getViewMtx(), 0);
+
+        for (int bucket = 0; bucket < 2; bucket++) {
+            const bool cut = bucket != 0;
+            const batch::LeafTemplate& tpl = cut ? mTplHana00Cut : mTplHana00;
+
+            bool open = false;
+            u32 emitted = 0;
+            for (dFlower_data_c* flower = first; flower != nullptr; flower = flower->mp_next) {
+                if (cLib_checkBit<u8>(flower->m_state, 4) ||
+                    cLib_checkBit<u8>(flower->m_state, 0x40))
+                {
+                    continue;
+                }
+                if ((cLib_checkBit<u8>(flower->m_state, 8) != 0) != cut) {
+                    continue;
+                }
+
+                if (!open) {
+                    GXBegin(GX_TRIANGLES, GX_VTXFMT1, GX_AUTO);
+                    open = true;
+                }
+                split_batch(emitted, tpl.vtxCount);
+
+                Mtx interpMtx;
+                MtxP mtx = get_model_mtx(flower->m_modelMtx, interpMtx);
+                transform_positions(tpl, reinterpret_cast<Vec*>(l_flowerPos), mtx, xfPos);
+                flower_emit(tpl, xfPos, hana00_amb_color(flower, tevstr));
+            }
+            if (open) {
+                GXEnd();
+            }
+        }
+    }
+
+    // --- hana01 ---
+    GXSETARRAY(GX_VA_POS, mp_pos, sizeof(l_flowerPos2), sizeof(Vec), true);
+    GXSETARRAY(GX_VA_NRM, &l_flowerNormal2, sizeof(l_flowerNormal2), sizeof(Vec), true);
+    GXSETARRAY(GX_VA_CLR0, mp_colors, sizeof(l_flowerColor2), sizeof(GXColor), true);
+    GXSETARRAY(GX_VA_TEX0, mp_texCoords, sizeof(l_flowerTexCoord2), 8, true);
+
+    for (int i = 0; i < 64; i++) {
+        dFlower_data_c* first = m_room[i].getData();
+        if (first == NULL) {
+            continue;
+        }
+
+        dKy_tevstr_c* tevstr = dComIfGp_roomControl_getTevStr(i);
+        int lightCount = 6;
+
+        if (dComIfGp_roomControl_getStatusRoomDt(i) != NULL) {
+            lightCount = dComIfGp_roomControl_getStatusRoomDt(i)->getLightVecInfoNum();
+        }
+
+#if DEBUG
+        if (g_kankyoHIO.light.m_HOSTIO_setting != 0) {
+            lightCount = g_kankyoHIO.dungeonLight.usedLights;
+        }
+#endif
+
+        if (dKy_SunMoon_Light_Check() == TRUE && lightCount < 2) {
+            lightCount = 2;
+        }
+
+        if (lightCount <= 2) {
+            GXCallDisplayList(mp_mat2Light4DL, m_mat2Light4DL_size);
+        } else {
+            GXCallDisplayList(mp_mat2DL, m_mat2DL_size);
+        }
+
+        GXSetTevColorS10(GX_TEVREG0, {0, 0, 0, 0});
+        dKy_Global_amb_set(tevstr);
+        dKy_GxFog_tevstr_set(tevstr);
+        dKy_setLight_nowroom_grass(tevstr->room_no, 1.0f);
+
+        GXLoadTexObj(&mTexObj_l_J_Ohana01_64128_0419TEX, GX_TEXMAP0);
+        batch_setup_tev(lightCount <= 2 ? (GX_LIGHT1 | GX_LIGHT2 | GX_LIGHT3 | GX_LIGHT4) :
+                                          (GX_LIGHT1 | GX_LIGHT2 | GX_LIGHT3 | GX_LIGHT4 |
+                                              GX_LIGHT5 | GX_LIGHT6 | GX_LIGHT7));
+        GXSetVtxDescv(vtxDescList);
+        GXLoadPosMtxImm(identity, GX_PNMTX0);
+        GXLoadNrmMtxImm(j3dSys.getViewMtx(), 0);
+
+        const batch::LeafTemplate* const buckets[3] = {
+            &mTplHana01, &mTplHana01Cut00, &mTplHana01Cut};
+        for (int bucket = 0; bucket < 3; bucket++) {
+            const batch::LeafTemplate& tpl = *buckets[bucket];
+
+            bool open = false;
+            u32 emitted = 0;
+            int idx = 0;
+            for (dFlower_data_c* flower = first; flower != NULL; flower = flower->mp_next, idx++) {
+                if (cLib_checkBit<u8>(flower->m_state, 4) ||
+                    !cLib_checkBit<u8>(flower->m_state, 0x40))
+                {
+                    continue;
+                }
+                const int flowerBucket = cLib_checkBit<u8>(flower->m_state, 8)    ? 2 :
+                                         cLib_checkBit<u8>(flower->m_state, 0x10) ? 1 :
+                                                                                    0;
+                if (flowerBucket != bucket) {
+                    continue;
+                }
+
+                if (!open) {
+                    GXBegin(GX_TRIANGLES, GX_VTXFMT1, GX_AUTO);
+                    open = true;
+                }
+                split_batch(emitted, tpl.vtxCount);
+
+                Mtx interpMtx;
+                MtxP mtx = get_model_mtx(flower->m_modelMtx, interpMtx);
+                transform_positions(tpl, mp_pos, mtx, xfPos);
+                flower_emit(tpl, xfPos, hana01_amb_color(idx, tevstr));
+            }
+            if (open) {
+                GXEnd();
+            }
+        }
+    }
+
+    GXSetNumTevStages(1);
+    GXSetNumChans(1);
+    J3DShape::resetVcdVatCache();
+}
+#else
+void dFlower_packet_c::draw() {
+    ZoneScoped;
     dScnKy_env_light_c* kankyo = dKy_getEnvlight();
     j3dSys.reinitGX();
 
@@ -885,6 +1357,7 @@ void dFlower_packet_c::draw() {
 
     J3DShape::resetVcdVatCache();
 }
+#endif
 
 void dFlower_packet_c::calc() {
     dFlower_anm_c* anm_p = getAnm();

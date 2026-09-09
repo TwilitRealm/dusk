@@ -13,10 +13,34 @@
 #include "JSystem/JUtility/JUTFont.h"
 
 #if TARGET_PC
+#include "dusk/menu_pointer.h"
 #include "dusk/scope_guard.hpp"
-#endif
+#include "dusk/version.hpp"
+#include "helpers/bits.hpp"
 
-#if REGION_JPN
+static bool read_full_color(const void* data, u32 size, u32& ccColor, u32& gcColor) {
+    if (size == 4) {
+        ccColor = dusk::read_bits<u32>(data);
+        gcColor = ccColor;
+        return true;
+    }
+    if (size == 8) {
+        ccColor = dusk::read_bits<u32>(data);
+        gcColor = dusk::read_bits<u32>(static_cast<const u8*>(data) + sizeof(ccColor));
+        return true;
+    }
+    return false;
+}
+
+#define CHAR_CODE_MALE_ICON        (dusk::version::isRegionJpn() ? 0x8189 : 0xB2)
+#define CHAR_CODE_FEMALE_ICON      (dusk::version::isRegionJpn() ? 0x818A : 0xB3)
+#define CHAR_CODE_STAR_ICON        (dusk::version::isRegionJpn() ? 0x819A : 0xB1)
+#define CHAR_CODE_REFMARK          (dusk::version::isRegionJpn() ? 0x81A6 : 0x89)
+#define CHAR_CODE_THIN_LEFT_ARROW  (dusk::version::isRegionJpn() ? 0x81A9 : 0xB9)
+#define CHAR_CODE_THIN_RIGHT_ARROW (dusk::version::isRegionJpn() ? 0x81A8 : 0xBC)
+#define CHAR_CODE_THIN_UP_ARROW    (dusk::version::isRegionJpn() ? 0x81AA : 0xBD)
+#define CHAR_CODE_THIN_DOWN_ARROW  (dusk::version::isRegionJpn() ? 0x81AB : 0xBE)
+#elif REGION_JPN
 #define CHAR_CODE_MALE_ICON 0x8189
 #define CHAR_CODE_FEMALE_ICON 0x818A
 #define CHAR_CODE_STAR_ICON 0x819A
@@ -308,33 +332,33 @@ static u8 getOutFontNumberType(int param_0) {
 }
 
 #if TARGET_PC || VERSION == VERSION_GCN_PAL
-static void setPlayerName(char* i_player_name, u8 param_2) {
+static void setPlayerName(TEXT_SPAN i_player_name, u8 param_2) {
     if (param_2 != 0) {
-        strcpy(i_player_name, dComIfGs_getPlayerName());
+        SAFE_STRCPY(i_player_name, dComIfGs_getPlayerName());
         u32 name_length = strlen(i_player_name);
         char last = i_player_name[name_length - 1];
         if (last == 0x73 || last == 0x53 || last == 0x7a || last == 0x5a || last == 0x78 || last == 0x58 || last == 0xdf) {
-            strcat(i_player_name, "'");
+            SAFE_STRCAT(i_player_name, "'");
         } else {
-            strcat(i_player_name, "s");
+            SAFE_STRCAT(i_player_name, "s");
         }
     } else {
-        strcpy(i_player_name, dComIfGs_getPlayerName());
+        SAFE_STRCPY(i_player_name, dComIfGs_getPlayerName());
     }
 }
 
-static void setHorseName(char* i_horse_name, u8 param_2) {
+static void setHorseName(TEXT_SPAN i_horse_name, u8 param_2) {
     if (param_2 != 0) {
-        strcpy(i_horse_name, dComIfGs_getHorseName());
+        SAFE_STRCPY(i_horse_name, dComIfGs_getHorseName());
         u32 name_length = strlen(i_horse_name);
         char last = i_horse_name[name_length - 1];
         if (last == 0x73 || last == 0x53 || last == 0x7a || last == 0x5a || last == 0x78 || last == 0x58 || last == 0xdf) {
-            strcat(i_horse_name, "'");
+            SAFE_STRCAT(i_horse_name, "'");
         } else {
-            strcat(i_horse_name, "s");
+            SAFE_STRCAT(i_horse_name, "s");
         }
     } else {
-        strcpy(i_horse_name, dComIfGs_getHorseName());
+        SAFE_STRCPY(i_horse_name, dComIfGs_getHorseName());
     }
 }
 #endif
@@ -389,6 +413,9 @@ jmessage_tReference::jmessage_tReference() {
     resetCharCountBuffer();
     mNowColorType = 0;
     mTopColorType = 0;
+#if TARGET_PC
+    resetColors();
+#endif
     mButtonTagStopFlag = 0;
     mPageEndCount = 0;
     mSelectNum = 0;
@@ -430,8 +457,33 @@ void jmessage_tReference::calcDistance() {
 
 u8 jmessage_tReference::getLineMax() {
     int line_max;
-
-#if REGION_JPN
+#if TARGET_PC
+    if (dusk::version::isRegionJpn()) {
+        if (isKanban()) {
+            line_max = 6;
+        } else if (isBook()) {
+            line_max = 7;
+        } else if (isStaffRoll()) {
+            line_max = 10;
+        } else if (isSaveSeq()) {
+            line_max = 5;
+        } else {
+            line_max = 3;
+        }
+    } else {
+        if (isKanban()) {
+            line_max = 7;
+        } else if (isBook()) {
+            line_max = 9;
+        } else if (isStaffRoll()) {
+            line_max = 10;
+        } else if (isSaveSeq()) {
+            line_max = 6;
+        } else {
+            line_max = 4;
+        }
+    }
+#elif REGION_JPN
     if (isKanban()) {
         line_max = 6;
     } else if (isBook()) {
@@ -558,6 +610,13 @@ void jmessage_tReference::pageSend() {
     if (mNowColorType != mTopColorType) {
         mTopColorType = mNowColorType;
     }
+#if TARGET_PC
+    mTopFullColor = mNowFullColor;
+    if (mNowFullColor) {
+        mTopCCColor = mNowCCColor;
+        mTopGCColor = mNowGCColor;
+    }
+#endif
 
     mTopWordCount = mNowWordCount;
     mCharAlpha = 0.0f;
@@ -575,6 +634,20 @@ void jmessage_tReference::pageSend() {
 
 void jmessage_tReference::selectMessage() {
     if (mSelectNum != 0) {
+#if TARGET_PC
+        u8 pointerChoice = 0xFF;
+        if (dusk::menu_pointer::get_dialog_choice(pointerChoice) && pointerChoice < mSelectNum &&
+            pointerChoice != mSelectPos)
+        {
+            mSelectPos = pointerChoice;
+            if (mSelectType != 0) {
+                getObjectPtr()->getSequenceProcessor()->calcStringLength();
+            }
+            Z2GetAudioMgr()->seStart(Z2SE_SY_TALK_CURSOR, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                     -1.0f, 0);
+        }
+#endif
+
         mpStick->checkTrigger();
 
         if (mSelectType == 0) {
@@ -707,7 +780,7 @@ void jmessage_tReference::inputNumber() {
     getObjectPtr()->setInputValue(new_input_val);
 }
 
-char* jmessage_tReference::getWord(int i_no) {
+TEXT_SPAN jmessage_tReference::getWord(int i_no) {
     if (i_no >= 10) {
         JUT_WARN(1093, "%s", "message stack over!!");
         JUT_ASSERT(1094, i_no < (10));
@@ -877,15 +950,15 @@ void jmessage_tMeasureProcessor::do_begin(void const* pEntry, char const* pszTex
     pReference->setRevoMessageID(0);
     field_0x38 = 1.0f;
 
-    mSeSpeaker = ((JMSMesgEntry_c*)pEntry)->se_speaker;
-    mSeMood = ((JMSMesgEntry_c*)pEntry)->se_mood;
+    mSeSpeaker = ((JMSMesgEntry_c*)pEntry)->speaker;
+    mSeMood = ((JMSMesgEntry_c*)pEntry)->speaker_mood;
 
-    for (int i = 0; i < D_MSG_CLASS_PAGE_CNT_MAX; i++) {
+    for (int i = 0; i < DUSK_IF_ELSE((dusk::version::isRegionJpn() ? 30 : D_MSG_CLASS_PAGE_CNT_MAX), D_MSG_CLASS_PAGE_CNT_MAX); i++) {
         pReference->setLineLength(i, 0.0f, 0.0f);
         pReference->setPageLine(i, 0);
         pReference->setPageLineMax(i, 0);
         pReference->setPageType(i, 0);
-        pReference->setLineArrange(i, ((JMSMesgEntry_c*)pEntry)->unk_0xd);
+        pReference->setLineArrange(i, ((JMSMesgEntry_c*)pEntry)->line_alignment);
         pReference->setLineScale(i, 100);
 
         if (pReference->isPlaceName() || pReference->isStaffRoll() || pReference->isBossName() ||
@@ -897,8 +970,12 @@ void jmessage_tMeasureProcessor::do_begin(void const* pEntry, char const* pszTex
                 pReference->setLineArrange(i, 1);
             }
 
-#if !REGION_JPN
-            if (((JMSMesgEntry_c*)pEntry)->unk_0xd == 0) {
+#if TARGET_PC
+            if (!dusk::version::isRegionJpn() && ((JMSMesgEntry_c*)pEntry)->line_alignment == 0) {
+                pReference->setLineArrange(i, 1);
+            }
+#elif !REGION_JPN
+            if (((JMSMesgEntry_c*)pEntry)->line_alignment == 0) {
                 pReference->setLineArrange(i, 1);
             }
 #endif
@@ -1093,14 +1170,14 @@ bool jmessage_tMeasureProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_siz
         case MSGTAG_CURRENT_LETTER_PAGE: {
             char buffer[4];
             int number = dComIfGp_getMessageCountNumber() / 100;
-            sprintf(buffer, "%d", number);
+            SAFE_SPRINTF(buffer, "%d", number);
             push_word(buffer);
             return true;
         }
         case MSGTAG_MAX_LETTER_PAGE: {
             char buffer[4];
             int number = dComIfGp_getMessageCountNumber() % 100;
-            sprintf(buffer, "%d", number);
+            SAFE_SPRINTF(buffer, "%d", number);
             push_word(buffer);
             return true;
         }
@@ -1120,7 +1197,7 @@ bool jmessage_tMeasureProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_siz
             }
 
             char player_name[100];
-            strcpy(player_name, dComIfGs_getPlayerName());
+            SAFE_STRCPY(player_name, dComIfGs_getPlayerName());
             push_word(player_name);
             return true;
         }
@@ -1130,7 +1207,7 @@ bool jmessage_tMeasureProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_siz
             }
 
             char horse_name[100];
-            strcpy(horse_name, dComIfGs_getHorseName());
+            SAFE_STRCPY(horse_name, dComIfGs_getHorseName());
             push_word(horse_name);
             return true;
         }
@@ -1576,6 +1653,33 @@ void jmessage_tMeasureProcessor::do_scale(f32 i_scale) {
         mPageLineMax--;
         JUT_ASSERT(0x930, mPageLineMax > 0);
 
+#if TARGET_PC
+        if (dusk::version::isRegionJpn()) {
+            if (field_0x3e == 0) {
+                pReference->setPageType(field_0x40, 2);
+            } else {
+                pReference->setPageType(field_0x40, 3);
+                if (field_0x3e == 1 && pReference->getPageType(field_0x40) == 2) {
+                    pReference->setPageType(field_0x40, 4);
+                }
+            }
+        } else {
+            if (field_0x3e == 0) {
+                pReference->setPageType(field_0x40, 2);
+            } else if (field_0x3e == 2 && mPageLineMax == 3) {
+                if (pReference->getPageType(field_0x40) == 4) {
+                    pReference->setPageType(field_0x40, 5);
+                } else {
+                    pReference->setPageType(field_0x40, 8);
+                }
+            } else {
+                pReference->setPageType(field_0x40, 3);
+                if (field_0x3e == 1 && pReference->getPageType(field_0x40) == 2) {
+                    pReference->setPageType(field_0x40, 4);
+                }
+            }
+        }
+#else
 #if REGION_JPN
         if (field_0x3e == 0) {
             pReference->setPageType(field_0x40, 2);
@@ -1597,6 +1701,7 @@ void jmessage_tMeasureProcessor::do_scale(f32 i_scale) {
                 pReference->setPageType(field_0x40, 4);
             }
         }
+#endif
     }
 }
 
@@ -1747,7 +1852,10 @@ void jmessage_tMeasureProcessor::do_pageType(int param_0) {
 
 void jmessage_tMeasureProcessor::do_name1() {
     const char* name = dComIfGs_getPlayerName();
-#if REGION_JPN
+#if TARGET_PC || REGION_JPN
+    if (!dusk::version::isRegionJpn())
+        return;
+
     int c = (((char)name[0] & 0xFF) << 8) | ((char)name[1] & 0xFF);
     // if first character is hiragana or katakana
     if ((c >= 0x829F && c <= 0x82F1) || (c >= 0x8340 && c <= 0x8396)) {
@@ -1779,7 +1887,7 @@ void jmessage_tMeasureProcessor::do_rubyset(void const* i_data, u32 i_size) {
 
 void jmessage_tMeasureProcessor::push_word(char* i_word) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
-    strcpy(pReference->getWord(field_0x4b), i_word);
+    SAFE_STRCPY(pReference->getWord(field_0x4b), i_word);
     stack_pushCurrent(pReference->getWord(field_0x4b));
     field_0x4b++;
 }
@@ -1811,7 +1919,7 @@ void jmessage_tSequenceProcessor::do_begin(void const* pEntry, char const* pszTe
     mpEntry = pEntry;
     mpText = pszText;
 
-    if (((JMSMesgEntry_c*)pEntry)->fuki_kind == 8) {
+    if (((JMSMesgEntry_c*)pEntry)->box_kind == 8) {
         field_0xa8 = g_MsgObject_HIO_c.mDisplaySpeedSpirit;
     } else {
         field_0xa8 = g_MsgObject_HIO_c.mDisplaySpeed;
@@ -1825,13 +1933,16 @@ void jmessage_tSequenceProcessor::do_begin(void const* pEntry, char const* pszTe
     field_0xb2 = 0;
     field_0xaa = 0;
     field_0xac = 0;
-    field_0xb4 = ((JMSMesgEntry_c*)pEntry)->se_speaker;
-    field_0xb3 = ((JMSMesgEntry_c*)pEntry)->se_mood;
+    field_0xb4 = ((JMSMesgEntry_c*)pEntry)->speaker;
+    field_0xb3 = ((JMSMesgEntry_c*)pEntry)->speaker_mood;
 
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     pReference->resetCharCnt();
     pReference->setNowColorType(0);
     pReference->setTopColorType(0);
+#if TARGET_PC
+    pReference->resetColors();
+#endif
     pReference->setNowWordCount(0);
     pReference->setTopWordCount(0);
     pReference->setBatchColorFlag(0);
@@ -1839,8 +1950,8 @@ void jmessage_tSequenceProcessor::do_begin(void const* pEntry, char const* pszTe
     pReference->setNowTagScale(0);
     pReference->calcDistance();
 
-    dComIfGp_setMesgAnimeAttrInfo(((JMSMesgEntry_c*)pEntry)->base_anm_id);
-    dComIfGp_setMesgFaceAnimeAttrInfo(((JMSMesgEntry_c*)pEntry)->face_anm_id);
+    dComIfGp_setMesgAnimeAttrInfo(((JMSMesgEntry_c*)pEntry)->talk_anim);
+    dComIfGp_setMesgFaceAnimeAttrInfo(((JMSMesgEntry_c*)pEntry)->face_anim);
 
     if (dComIfGp_isHeapLockFlag() == 2) {
         pReference->setFukiPosType(1);
@@ -1848,20 +1959,20 @@ void jmessage_tSequenceProcessor::do_begin(void const* pEntry, char const* pszTe
         if (dComIfGp_isHeapLockFlag() == 3) {
             pReference->setFukiPosType(0);
         } else {
-            pReference->setFukiPosType(((JMSMesgEntry_c*)pEntry)->fuki_pos_type);
+            pReference->setFukiPosType(((JMSMesgEntry_c*)pEntry)->box_position);
         }
     }
 
-    pReference->setFukiKind(((JMSMesgEntry_c*)pEntry)->fuki_kind);
+    pReference->setFukiKind(((JMSMesgEntry_c*)pEntry)->box_kind);
 
     if (dMsgObject_getMsgOutputType() != 0xFF) {
         pReference->setForm(dMsgObject_getMsgOutputType());
     } else {
-        pReference->setForm(((JMSMesgEntry_c*)pEntry)->output_type);
+        pReference->setForm(((JMSMesgEntry_c*)pEntry)->draw_type);
     }
 
-    pReference->setArrange(((JMSMesgEntry_c*)pEntry)->unk_0xd);
-    pReference->setForm(((JMSMesgEntry_c*)pEntry)->unk_0xd);
+    pReference->setArrange(((JMSMesgEntry_c*)pEntry)->line_alignment);
+    pReference->setForm(((JMSMesgEntry_c*)pEntry)->line_alignment);
     pReference->setMsgID(((JMSMesgEntry_c*)pEntry)->message_id);
 
     if (((JMSMesgEntry_c*)pEntry)->event_label_id != 0) {
@@ -1895,7 +2006,7 @@ void jmessage_tSequenceProcessor::do_begin(void const* pEntry, char const* pszTe
     if (dMsgObject_getMsgOutputType() != 0xFF) {
         field_0xae = dMsgObject_getMsgOutputType();
     } else {
-        field_0xae = ((JMSMesgEntry_c*)pEntry)->output_type;
+        field_0xae = ((JMSMesgEntry_c*)pEntry)->draw_type;
     }
 
     if (mForceForm != 0xFF) {
@@ -2026,7 +2137,7 @@ bool jmessage_tSequenceProcessor::do_isReady() {
                 field_0xae = 1;
                 field_0xa4 = 0;
                 pReference->onBatchFlag();
-                pReference->setCharCnt(D_MSG_CLASS_CHAR_CNT_MAX);
+                pReference->setCharCnt(DUSK_IF_ELSE(dusk::version::isRegionJpn() ? D_MSG_CLASS_CHAR_CNT_MAX : 0x200, D_MSG_CLASS_CHAR_CNT_MAX));
                 field_0xa4 = field_0xa8;
                 return true;
             }
@@ -2046,7 +2157,7 @@ bool jmessage_tSequenceProcessor::do_isReady() {
                 field_0xae = 1;
                 field_0xa4 = 0;
                 pReference->onBatchFlag();
-                pReference->setCharCnt(D_MSG_CLASS_CHAR_CNT_MAX);
+                pReference->setCharCnt(DUSK_IF_ELSE(dusk::version::isRegionJpn() ? D_MSG_CLASS_CHAR_CNT_MAX : 0x200, D_MSG_CLASS_CHAR_CNT_MAX));
                 return true;
             }
             
@@ -2069,7 +2180,7 @@ bool jmessage_tSequenceProcessor::do_isReady() {
                 if (mDoCPd_c::getTrigA(PAD_1) || field_0xb2 != 0 IF_DUSK(|| (dusk::getSettings().game.instantText && mDoCPd_c::getHoldB(0)))) {
                     field_0xa4 = 0;
                     pReference->onBatchFlag();
-                    pReference->setCharCnt(D_MSG_CLASS_CHAR_CNT_MAX);
+                    pReference->setCharCnt(DUSK_IF_ELSE(dusk::version::isRegionJpn() ? D_MSG_CLASS_CHAR_CNT_MAX : 0x200, D_MSG_CLASS_CHAR_CNT_MAX));
                 }
                 break;
             case 1:
@@ -2078,7 +2189,7 @@ bool jmessage_tSequenceProcessor::do_isReady() {
             case 9:
                 field_0xa4 = 0;
                 pReference->onBatchFlag();
-                pReference->setCharCnt(D_MSG_CLASS_CHAR_CNT_MAX);
+                pReference->setCharCnt(DUSK_IF_ELSE(dusk::version::isRegionJpn() ? D_MSG_CLASS_CHAR_CNT_MAX : 0x200, D_MSG_CLASS_CHAR_CNT_MAX));
                 break;
             case 2:
                 if (field_0xb2 != 0) {
@@ -2093,7 +2204,9 @@ bool jmessage_tSequenceProcessor::do_isReady() {
             }
 
             field_0xa6++;
-#if REGION_JPN
+#if TARGET_PC
+            if ((dusk::version::isRegionJpn() && field_0xa6 >= 1) || (!dusk::version::isRegionJpn() && field_0xa6 >= 2)) {
+#elif REGION_JPN
             if (field_0xa6 >= 1) {
 #else
             if (field_0xa6 >= 2) {
@@ -2193,9 +2306,21 @@ bool jmessage_tSequenceProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_si
         return true;
     case MSGTAG_GROUP(255):
         switch (i_tag) {
-        case MSGTAG_COLOR:
+        case MSGTAG_COLOR: {
+#if TARGET_PC
+            u32 ccColor;
+            u32 gcColor;
+            if (read_full_color(i_data, i_size, ccColor, gcColor)) {
+                pReference->setFullColor(ccColor, gcColor);
+            } else if (i_size == 1) {
+                pReference->clearNowFullColor();
+                pReference->setNowColorType(*(u8*)i_data & 0xFF);
+            }
+#else
             pReference->setNowColorType(*(u8*)i_data & 0xFF);
+#endif
             return true;
+        }
         case MSGTAG_SCALE:
             pReference->setNowTagScale(*(BE(u16)*)i_data & 0xFFFF);
             return true;
@@ -2403,7 +2528,7 @@ bool jmessage_tSequenceProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_si
 
             u8 sel_bomb_num = objectPtr->getSelectBombNum();
             dMsgUnit_setTag(7, sel_bomb_num, buffer);
-            strcpy((char*)pReference->getWord(field_0xb5), buffer);
+            SAFE_STRCPY((TEXT_SPAN)pReference->getWord(field_0xb5), buffer);
             push_word();
             return true;
         }
@@ -2413,7 +2538,7 @@ bool jmessage_tSequenceProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_si
 
             s16 sel_bomb_price = objectPtr->getSelectBombPrice();
             dMsgUnit_setTag(1, sel_bomb_price, buffer);
-            strcpy((char*)pReference->getWord(field_0xb5), buffer);
+            SAFE_STRCPY((TEXT_SPAN)pReference->getWord(field_0xb5), buffer);
             push_word();
             return true;
         }
@@ -2518,7 +2643,10 @@ bool jmessage_tSequenceProcessor::do_jump_isReady() {
 
 void jmessage_tSequenceProcessor::do_name1() {
     const char* name = dComIfGs_getPlayerName();
-#if REGION_JPN
+#if TARGET_PC || REGION_JPN
+    if (!dusk::version::isRegionJpn())
+        return;
+
     int c = (((char)name[0] & 0xFF) << 8) | ((char)name[1] & 0xFF);
     // if first character is hiragana or katakana
     if ((c >= 0x829F && c <= 0x82F1) || (c >= 0x8340 && c <= 0x8396)) {
@@ -2760,20 +2888,28 @@ void jmessage_tRenderingProcessor::do_begin(void const* pEntry, char const* pszT
     }
 
     field_0x11c = 0;
-    strcpy(pReference->getTextPtr(), "");
-    strcpy(pReference->getTextSPtr(), "");
-    strcpy(pReference->getRubyPtr(), "");
+    SAFE_STRCPY(pReference->getTextPtr(), "");
+    SAFE_STRCPY(pReference->getTextSPtr(), "");
+    SAFE_STRCPY(pReference->getRubyPtr(), "");
 
     for (int i = 0; i < 3; i++) {
-        strcpy(pReference->getSelTextPtr(i), "");
-        strcpy(pReference->getSelRubyPtr(i), "");
+        SAFE_STRCPY(pReference->getSelTextPtr(i), "");
+        SAFE_STRCPY(pReference->getSelRubyPtr(i), "");
     }
 
     if (1.0f != pReference->getDistanceScale()) {
         do_scale(field_0x44);
     }
 
+#if TARGET_PC
+    if (pReference->hasTopFullColor()) {
+        do_fullcolor(pReference->getTopCCColor(), pReference->getTopGCColor());
+    } else {
+        do_color(pReference->getTopColorType());
+    }
+#else
     do_color(pReference->getTopColorType());
+#endif
     pReference->resetDrawLightCount();
 
     do_widthcenter();
@@ -2791,12 +2927,12 @@ void jmessage_tRenderingProcessor::do_end() {
     if (dMsgObject_getSelectWordFlag() != 0) {
         for (int i = 0; i < dMsgObject_getSelectWordFlag(); i++) {
             char buffer[200];
-            strcpy(buffer, dMsgObject_getSelectWord(i));
+            SAFE_STRCPY(buffer, dMsgObject_getSelectWord(i));
 
             if (pReference->getSelectNum() == 2) {
-                strcat(pReference->getSelTextPtr(i + 1), buffer);
+                SAFE_STRCAT(pReference->getSelTextPtr(i + 1), buffer);
             } else if (pReference->getSelectNum() == 3) {
-                strcat(pReference->getSelTextPtr(i), buffer);
+                SAFE_STRCAT(pReference->getSelTextPtr(i), buffer);
             }
         }
     }
@@ -2927,9 +3063,20 @@ bool jmessage_tRenderingProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_s
         return 1;
     case MSGTAG_GROUP(255):
         switch (i_tag) {
-        case MSGTAG_COLOR:
+        case MSGTAG_COLOR: {
+#if TARGET_PC
+            u32 ccColor;
+            u32 gcColor;
+            if (read_full_color(i_data, i_size, ccColor, gcColor)) {
+                do_fullcolor(ccColor, gcColor);
+            } else if (i_size == 1) {
+                do_color(*(u8*)i_data & 0xFF);
+            }
+#else
             do_color(*(u8*)i_data & 0xFF);
+#endif
             return 1;
+        }
         case MSGTAG_SCALE:
             field_0x13c = *(BE(u16)*)i_data & 0xFFFF;
             do_scale(field_0x13c / 100.0f);
@@ -3108,7 +3255,7 @@ bool jmessage_tRenderingProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_s
             char buffer[40];
             u8 bombNum = pReference->getObjectPtr()->getSelectBombNum();
             dMsgUnit_setTag(7, bombNum, buffer);
-            strcpy(pReference->getWord(field_0x14f), buffer);
+            SAFE_STRCPY(pReference->getWord(field_0x14f), buffer);
             push_word();
             return 1;
         }
@@ -3116,7 +3263,7 @@ bool jmessage_tRenderingProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_s
             char buffer[40];
             s16 bombPrice = pReference->getObjectPtr()->getSelectBombPrice();
             dMsgUnit_setTag(1, bombPrice, buffer);
-            strcpy(pReference->getWord(field_0x14f), buffer);
+            SAFE_STRCPY(pReference->getWord(field_0x14f), buffer);
             push_word();
             return 1;
         }
@@ -3342,9 +3489,9 @@ void jmessage_tRenderingProcessor::do_heightcenter() {
         }
         break;
     }
-#if REGION_JPN
+#if TARGET_PC || REGION_JPN
     case 2:
-        if ((s8)pReference->getLineMax() == 3) {
+        if (IF_DUSK(dusk::version::isRegionJpn() &&) (s8)pReference->getLineMax() == 3) {
             int nowPageLine = pReference->getNowPageLine();
             field_0x138 = pReference->getLineSpace() * (0.5f * (pReference->getLineMax() - (s16)nowPageLine));
             var_f31 += field_0x138;
@@ -3353,12 +3500,25 @@ void jmessage_tRenderingProcessor::do_heightcenter() {
         if (field_0x142 == 0) {
             field_0x138 = pReference->getLineSpace();
             var_f31 += field_0x138;
-        } else if (field_0x142 == 1) {
+        }
+#if TARGET_PC
+        else if (!dusk::version::isRegionJpn() || (dusk::version::isRegionJpn() && field_0x142 == 1))
+#else
+        else if (field_0x142 == 1)
+#endif
+        {
             field_0x138 = 0.5f * pReference->getLineSpace();
             var_f31 += field_0x138;
         }
         break;
     case 3: {
+#if TARGET_PC
+        if (!dusk::version::isRegionJpn()) {
+            field_0x138 = 0.5f * pReference->getLineSpace();
+            var_f31 += field_0x138;
+            break;
+        }
+#endif
         if (field_0x142 == 1) {
             int nowPageLine = pReference->getNowPageLine();
             field_0x138 = pReference->getLineSpace() * (0.5f * (pReference->getLineMax() - (s16)nowPageLine));
@@ -3368,8 +3528,25 @@ void jmessage_tRenderingProcessor::do_heightcenter() {
         break;
     }
     case 4: {
+        #if TARGET_PC
+        if (!dusk::version::isRegionJpn() && field_0x142 == 0) {
+            int nowPageLine = pReference->getNowPageLine();
+            field_0x138 = pReference->getLineSpace() * (0.5f * (pReference->getLineMax() - (s16)nowPageLine));
+            var_f31 += field_0x138;
+        }
+        #endif
+
         if (field_0x142 == 1) {
+            #if TARGET_PC
+            if (!dusk::version::isRegionJpn()) {
+                field_0x138 = 0.5f * pReference->getLineSpace();
+                var_f31 += field_0x138;
+            } else {
+                var_f31 += 0.5f * pReference->getLineSpace();
+            }
+            #else
             var_f31 += 0.5f * pReference->getLineSpace();
+            #endif
         }
 
         f32 sp8 = pReference->getLineScale(field_0x142) / 100.0f;
@@ -3501,7 +3678,7 @@ void jmessage_tRenderingProcessor::do_color(u8 i_colorNo) {
     mGCColor = getFontGCColorTable(i_colorNo, reference_p->getFukiKind());
 
     char buffer[40];
-    sprintf(buffer,
+    SAFE_SPRINTF(buffer,
             "\x1B"
             "CC[%08x]"
             "\x1B"
@@ -3509,6 +3686,18 @@ void jmessage_tRenderingProcessor::do_color(u8 i_colorNo) {
             mCCColor, mGCColor);
     do_strcat(buffer, false, false, false);
 }
+
+#if TARGET_PC
+void jmessage_tRenderingProcessor::do_fullcolor(u32 ccColor, u32 gcColor) {
+    mColorNo = 0xFF;
+    mCCColor = ccColor;
+    mGCColor = gcColor;
+
+    char buffer[40];
+    SAFE_SPRINTF(buffer, "\x1B" "CC[%08x]" "\x1B" "GC[%08x]", mCCColor, mGCColor);
+    do_strcat(buffer, false, false, false);
+}
+#endif
 
 void jmessage_tRenderingProcessor::do_scale(f32 param_1) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
@@ -3529,7 +3718,7 @@ void jmessage_tRenderingProcessor::do_scale(f32 param_1) {
     }
 
     char buffer[32];
-    sprintf(buffer,
+    SAFE_SPRINTF(buffer,
             "\x1B"
             "FX[%d]"
             "\x1B"
@@ -3541,7 +3730,7 @@ void jmessage_tRenderingProcessor::do_scale(f32 param_1) {
 void jmessage_tRenderingProcessor::do_linedown(s16 param_0) {
     char buffer[16];
 
-    sprintf(buffer, "\x1B" "CD[%d]", param_0);
+    SAFE_SPRINTF(buffer, "\x1B" "CD[%d]", param_0);
     do_strcat(buffer, false, true, false);
 }
 
@@ -3551,11 +3740,11 @@ void jmessage_tRenderingProcessor::do_transY(s16 i_transY, bool unused) {
         char buffer1[16];
 
         if (i_transY < 0) {
-            sprintf(buffer0, "\x1B" "CU[%d]", -i_transY);
-            sprintf(buffer1, "\x1B" "CD[%d]", -i_transY);
+            SAFE_SPRINTF(buffer0, "\x1B" "CU[%d]", -i_transY);
+            SAFE_SPRINTF(buffer1, "\x1B" "CD[%d]", -i_transY);
         } else {
-            sprintf(buffer0, "\x1B" "CD[%d]", i_transY);
-            sprintf(buffer1, "\x1B" "CU[%d]", i_transY);
+            SAFE_SPRINTF(buffer0, "\x1B" "CD[%d]", i_transY);
+            SAFE_SPRINTF(buffer1, "\x1B" "CU[%d]", i_transY);
         }
 
         field_0x4c -= i_transY;
@@ -3643,11 +3832,11 @@ void jmessage_tRenderingProcessor::do_strcat(char* i_str, bool param_2, bool par
         field_0x11c += strlen(i_str);
         if (field_0x14e != 0) {
             if (field_0x11c < 50) {
-                strcat(pReference->getSelTextPtr(field_0x14e - 1), i_str);
+                SAFE_STRCAT(pReference->getSelTextPtr(field_0x14e - 1), i_str);
             } else {
                 JUT_WARN(5316, "%s", "TextBox Alloc Byte Over!!");
             }
-        } else if (field_0x11c < D_MSG_CLASS_CHAR_CNT_MAX) {
+        } else if (field_0x11c < DUSK_IF_ELSE((dusk::version::isRegionJpn() ? D_MSG_CLASS_CHAR_CNT_MAX : 0x200), D_MSG_CLASS_CHAR_CNT_MAX)) {
             if (param_2) {
                 field_0x146++;
                 if (pReference->getBatchColorFlag() != 0) {
@@ -3662,33 +3851,33 @@ void jmessage_tRenderingProcessor::do_strcat(char* i_str, bool param_2, bool par
                     if (pReference->getCharAlpha() < 255.0f) {
                         pReference->addCharAlpha();
                         if (field_0x148 != 0) {
-                            char* textPtr = pReference->getTextPtr();
+                            TEXT_SPAN textPtr = pReference->getTextPtr();
                             textPtr[field_0x148] = 0;
-                            strcat(textPtr, field_0x184);
+                            SAFE_STRCAT(textPtr, field_0x184);
                         }
 
                         if (field_0x14a != 0) {
-                            char* textPtr = pReference->getTextSPtr();
+                            TEXT_SPAN textPtr = pReference->getTextSPtr();
                             textPtr[field_0x14a] = 0;
-                            strcat(textPtr, field_0x184);
+                            SAFE_STRCAT(textPtr, field_0x184);
                         }
 
 
                         u32 charColor = (mCCColor & 0xFFFFFF00) | ((int)pReference->getCharAlpha() & 0xFF);
                         u32 gradColor = (mGCColor & 0xFFFFFF00) | ((int)pReference->getCharAlpha() & 0xFF);
                         char buffer[36];
-                        sprintf(buffer, "\x1b" "CC[%08x]" "\x1b" "GC[%08x]", charColor, gradColor);
+                        SAFE_SPRINTF(buffer, "\x1b" "CC[%08x]" "\x1b" "GC[%08x]", charColor, gradColor);
 
                         int length = 0;
                         length = strlen(buffer);
 
-                        if (field_0x11c + length < D_MSG_CLASS_CHAR_CNT_MAX) {
+                        if (field_0x11c + length < DUSK_IF_ELSE((dusk::version::isRegionJpn() ? D_MSG_CLASS_CHAR_CNT_MAX : 0x200), D_MSG_CLASS_CHAR_CNT_MAX)) {
                             field_0x148 = strlen(pReference->getTextPtr());
                             field_0x14a = strlen(pReference->getTextSPtr());
 
-                            strcpy(field_0x184, i_str);
-                            strcat(pReference->getTextPtr(), buffer);
-                            strcat(pReference->getTextSPtr(), buffer);
+                            SAFE_STRCPY(field_0x184, i_str);
+                            SAFE_STRCAT(pReference->getTextPtr(), buffer);
+                            SAFE_STRCAT(pReference->getTextSPtr(), buffer);
                         } else {
                             JUT_WARN(5362, "%s", "TextBox Alloc Byte Over!!");
                         }
@@ -3699,9 +3888,9 @@ void jmessage_tRenderingProcessor::do_strcat(char* i_str, bool param_2, bool par
                 field_0x14a = 0;
             }
             
-            strcat(pReference->getTextPtr(), i_str);
+            SAFE_STRCAT(pReference->getTextPtr(), i_str);
             if (param_3) {
-                strcat(pReference->getTextSPtr(), i_str);
+                SAFE_STRCAT(pReference->getTextSPtr(), i_str);
             }
         } else {
             JUT_WARN(5380, "%s", "TextBox Alloc Byte Over!!");
@@ -3729,7 +3918,7 @@ void jmessage_tRenderingProcessor::do_rubyset(void const* i_data, u32 i_size) {
         buffer[0] = pRuby[index++];
         buffer[1] = pRuby[index++];
         buffer[2] = 0;
-        strcat(field_0x152, (const char*)buffer);
+        SAFE_STRCAT(field_0x152, (const char*)buffer);
     
         int character = (((char)buffer[0] & 0xFF) << 8) | ((char)buffer[1] & 0xFF);
         if (field_0x14e != 0) {
@@ -3751,7 +3940,7 @@ void jmessage_tRenderingProcessor::do_rubyset(void const* i_data, u32 i_size) {
     }
 }
 
-void jmessage_tRenderingProcessor::do_rubystrcat(char* i_src, char* i_dst, f32 i_charSpace, f32 param_4) {
+void jmessage_tRenderingProcessor::do_rubystrcat(char* i_src, TEXT_SPAN i_dst, f32 i_charSpace, f32 param_4) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     if (pReference->isCharSend()) {
         if (0.0f != param_4) {
@@ -3760,24 +3949,27 @@ void jmessage_tRenderingProcessor::do_rubystrcat(char* i_src, char* i_dst, f32 i
             if (cursor_trans >= 1.0f) {
                 char buffer[16];
                 snprintf(buffer, sizeof(buffer) - 1, "\x1B" "CR[%d]", (int)cursor_trans);
-                strcat(i_dst, buffer);
+                SAFE_STRCAT(i_dst, buffer);
                 field_0x12c += (int)cursor_trans;
             } else if (cursor_trans <= -1.0f) {
                 char buffer[16];
                 snprintf(buffer, sizeof(buffer) - 1, "\x1B" "CL[%d]", (int)-cursor_trans);
-                strcat(i_dst, buffer);
+                SAFE_STRCAT(i_dst, buffer);
                 field_0x12c += (int)cursor_trans;
             }
             field_0x12c += field_0x128 + i_charSpace;
         }
 
-        strcat(i_dst, i_src);
+        SAFE_STRCAT(i_dst, i_src);
     }
 }
 
 void jmessage_tRenderingProcessor::do_name1() {
     const char* name = dComIfGs_getPlayerName();
-#if REGION_JPN
+#if TARGET_PC || REGION_JPN
+    if (!dusk::version::isRegionJpn())
+        return;
+
     int c = (((char)name[0] & 0xFF) << 8) | ((char)name[1] & 0xFF);
     // if first character is hiragana or katakana
     if ((c >= 0x829F && c <= 0x82F1) || (c >= 0x8340 && c <= 0x8396)) {
@@ -3874,7 +4066,7 @@ void jmessage_string_tReference::init(J2DTextBox* panePtr, J2DTextBox* runyPaneP
     mRubyPanePtr = runyPanePtr;
     mOutFontPtr = outFontPtr;
     mLineCount = 0;
-    mLineMax = D_MSG_CLASS_LINE_MAX;
+    mLineMax = DUSK_IF_ELSE(dusk::version::isRegionJpn() ? 9 : D_MSG_CLASS_LINE_MAX, D_MSG_CLASS_LINE_MAX);
     mNowPage = 0;
     mFlags = flags;
     if (font != NULL) {
@@ -4046,13 +4238,13 @@ bool jmessage_string_tMeasureProcessor::do_tag(u32 i_tag, void const* i_data, u3
             break;
         case MSGTAG_CURRENT_LETTER_PAGE: {
             char buffer[4];
-            sprintf(buffer, "%d", dComIfGp_getMessageCountNumber() / 100);
+            SAFE_SPRINTF(buffer, "%d", dComIfGp_getMessageCountNumber() / 100);
             stack_pushCurrent(buffer);
             break;
         }
         case MSGTAG_MAX_LETTER_PAGE: {
             char buffer[4];
-            sprintf(buffer, "%d", dComIfGp_getMessageCountNumber() % 100);
+            SAFE_SPRINTF(buffer, "%d", dComIfGp_getMessageCountNumber() % 100);
             stack_pushCurrent(buffer);
             break;
         }
@@ -4469,11 +4661,11 @@ void jmessage_string_tRenderingProcessor::do_begin(void const* pEntry, char cons
 
 void jmessage_string_tRenderingProcessor::do_end() {
     if (mpReference->getPanePtr() != NULL) {
-        strcpy(mpReference->getPanePtr()->getStringPtr(), field_0x54);
+        SAFE_STRCPY(mpReference->getPanePtr()->getStringPtr(), field_0x54);
     }
 
     if (mpReference->getRubyPanePtr() != NULL) {
-        strcpy(mpReference->getRubyPanePtr()->getStringPtr(), field_0x254);
+        SAFE_STRCPY(mpReference->getRubyPanePtr()->getStringPtr(), field_0x254);
     }
 }
 
@@ -4561,9 +4753,20 @@ bool jmessage_string_tRenderingProcessor::do_tag(u32 i_tag, void const* i_data, 
     switch(i_tag & 0xFF0000) {
     case MSGTAG_GROUP(255):
         switch(i_tag) {
-        case MSGTAG_COLOR:
+        case MSGTAG_COLOR: {
+#if TARGET_PC
+            u32 ccColor;
+            u32 gcColor;
+            if (read_full_color(i_data, i_size, ccColor, gcColor)) {
+                do_fullcolor(ccColor, gcColor);
+            } else if (i_size == 1) {
+                do_color(*(u8*)i_data & 0xFF);
+            }
+#else
             do_color(*(u8*)i_data & 0xFF);
+#endif
             break;
+        }
         case MSGTAG_SCALE:
             do_scale(*(BE(u16)*)i_data / 100.0f);
             break;
@@ -4604,13 +4807,13 @@ bool jmessage_string_tRenderingProcessor::do_tag(u32 i_tag, void const* i_data, 
             break;
         case MSGTAG_CURRENT_LETTER_PAGE: {
             char buffer[4];
-            sprintf(buffer, "%d", dComIfGp_getMessageCountNumber() / 100);
+            SAFE_SPRINTF(buffer, "%d", dComIfGp_getMessageCountNumber() / 100);
             push_word(buffer);
             break;
         }
         case MSGTAG_MAX_LETTER_PAGE: {
             char buffer[4];
-            sprintf(buffer, "%d", dComIfGp_getMessageCountNumber() % 100);
+            SAFE_SPRINTF(buffer, "%d", dComIfGp_getMessageCountNumber() % 100);
             push_word(buffer);
             break;
         }
@@ -5086,7 +5289,7 @@ void jmessage_string_tRenderingProcessor::do_strcat(char* i_str) {
     if (getLineCountNowPage() >= 0) {
         field_0x54e += strlen(i_str);
         if (field_0x54e < ARRAY_SIZE(field_0x54)) {
-            strcat(field_0x54, i_str);
+            SAFE_STRCAT(field_0x54, i_str);
         } else {
             JUT_WARN(7531, "%s", "Message Alloc Byte Over!!");
         }
@@ -5117,7 +5320,7 @@ void jmessage_string_tRenderingProcessor::do_rubyset(void const* i_data, u32 i_s
                 bytes[0] = pRuby[i++];
                 bytes[1] = pRuby[i++];
                 bytes[2] = 0;
-                strcat(field_0x454, (const char*)bytes);
+                SAFE_STRCAT(field_0x454, (const char*)bytes);
 
                 int character = (((char)bytes[0] & 0xFF) << 8) | ((char)bytes[1] & 0xFF);
                 field_0x44 += charSpace + fontSize.mSizeX * ((f32)pFont->getWidth(character) / pFont->getCellWidth());
@@ -5135,7 +5338,7 @@ void jmessage_string_tRenderingProcessor::do_rubystrcat(char* i_str) {
     if (getLineCountNowPage() >= 0) {
         field_0x550 += strlen(i_str);
         if (field_0x550 < ARRAY_SIZE(field_0x254)) {
-            strcat(field_0x254, i_str);
+            SAFE_STRCAT(field_0x254, i_str);
         } else {
             JUT_WARN(7613, "%s", "Message Alloc Byte Over!!");
         }
@@ -5209,9 +5412,17 @@ void jmessage_string_tRenderingProcessor::do_color(u8 i_colorNo) {
     }
 
     char buffer[32];
-    sprintf(buffer, "\x1b" "CC[%08x]" "\x1b" "GC[%08x]", ccColor, gcColor);
+    SAFE_SPRINTF(buffer, "\x1b" "CC[%08x]" "\x1b" "GC[%08x]", ccColor, gcColor);
     do_strcat(buffer);
 }
+
+#if TARGET_PC
+void jmessage_string_tRenderingProcessor::do_fullcolor(u32 ccColor, u32 gcColor) {
+    char buffer[32];
+    SAFE_SPRINTF(buffer, "\x1b" "CC[%08x]" "\x1b" "GC[%08x]", ccColor, gcColor);
+    do_strcat(buffer);
+}
+#endif
 
 void jmessage_string_tRenderingProcessor::do_scale(f32 i_scale) {
     J2DTextBox::TFontSize fontSize;
@@ -5220,13 +5431,13 @@ void jmessage_string_tRenderingProcessor::do_scale(f32 i_scale) {
     s16 scaleY = 0.5f + fontSize.mSizeY * i_scale;
 
     char buffer[32];
-    sprintf(buffer, "\x1b" "FX[%d]" "\x1b" "FY[%d]", scaleX, scaleY);
+    SAFE_SPRINTF(buffer, "\x1b" "FX[%d]" "\x1b" "FY[%d]", scaleX, scaleY);
     do_strcat(buffer);
 }
 
 void jmessage_string_tRenderingProcessor::do_linedown(s16 i_lineNo) {
     char buffer[16];
-    sprintf(buffer, "\x1B" "CD[%d]", i_lineNo);
+    SAFE_SPRINTF(buffer, "\x1B" "CD[%d]", i_lineNo);
     do_strcat(buffer);
 }
 
@@ -5245,6 +5456,6 @@ void jmessage_string_tRenderingProcessor::do_numset(s16 i_num) {
 }
 
 void jmessage_string_tRenderingProcessor::push_word(char const* i_word) {
-    strcpy(field_0x486, i_word);
+    SAFE_STRCPY(field_0x486, i_word);
     stack_pushCurrent(field_0x486);
 }

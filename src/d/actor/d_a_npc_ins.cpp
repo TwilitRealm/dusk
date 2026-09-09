@@ -11,6 +11,10 @@
 #include "d/d_msg_object.h"
 #include <cstring>
 
+#if TARGET_PC
+static u8 s_givenInsectId = dItemNo_NONE_e;
+#endif
+
 enum Ins_RES_File_ID {
     /* BCK */
     /* 0x06 */ BCK_INS_F_HAPPY = 0x6,
@@ -215,7 +219,7 @@ enum Type {
 
 static NPC_INS_HIO_CLASS l_HIO;
 
-static daNpc_GetParam2 l_bckGetParamList[24] = {
+static DUSK_CONSTEXPR daNpc_GetParam2 l_bckGetParamList[24] = {
     {-1, J3DFrameCtrl::EMode_LOOP, INS},
     {BCK_INS_F_TALK_A, J3DFrameCtrl::EMode_NONE, INS},
     {BCK_INS_F_SNIFF, J3DFrameCtrl::EMode_NONE, INS},
@@ -242,7 +246,7 @@ static daNpc_GetParam2 l_bckGetParamList[24] = {
     {BCK_INS_K_STEP, J3DFrameCtrl::EMode_NONE, INS2},
 };
 
-static daNpc_GetParam2 l_btpGetParamList[8] = {
+static DUSK_CONSTEXPR daNpc_GetParam2 l_btpGetParamList[8] = {
     {BTP_INS, J3DFrameCtrl::EMode_LOOP, INS},
     {BTP_INS_F_SNIFF, J3DFrameCtrl::EMode_NONE, INS},
     {BTP_INS_F_SURPRISED, J3DFrameCtrl::EMode_NONE, INS},
@@ -253,7 +257,7 @@ static daNpc_GetParam2 l_btpGetParamList[8] = {
     {BTP_INS_FH_MAD, J3DFrameCtrl::EMode_LOOP, INS},
 };
 
-static daNpc_GetParam2 l_btkGetParamList[2] = {
+static DUSK_CONSTEXPR daNpc_GetParam2 l_btkGetParamList[2] = {
     {BTK_INS, J3DFrameCtrl::EMode_LOOP, INS},
     {BTK_INS_SNIFF, J3DFrameCtrl::EMode_NONE, INS1},
 };
@@ -270,25 +274,25 @@ static int l_loadRes_INS2[3] = {
     INS, INS2, -1,
 };
 
-static int* l_loadRes_list[3] = {
+static DUSK_CONSTEXPR int DUSK_CONST* l_loadRes_list[3] = {
     l_loadRes_INS0,
     l_loadRes_INS1,
     l_loadRes_INS2,
 };
 
-static char* l_arcNames[3] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcNames[3] = {
     "Ins",
     "Ins1",
     "Ins2",
 };
 
-static char* l_evtNames[1] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_evtNames[1] = {
     NULL,
 };
 
-static char* l_myName = "ins";
+static DUSK_CONSTEXPR char DUSK_CONST* l_myName = "ins";
 
-daNpcIns_c::eventFunc daNpcIns_c::mEvtSeqList[1] = {
+DUSK_GAME_DATA daNpcIns_c::eventFunc daNpcIns_c::mEvtSeqList[1] = {
     NULL,
 };
 
@@ -319,7 +323,7 @@ static insect_param_data const l_insectParams[24] = {
     {0x01A8, 0x714, 0, 0},
 };
 
-daNpcIns_HIOParam const daNpcIns_Param_c::m = {
+DUSK_GAME_DATA daNpcIns_HIOParam const daNpcIns_Param_c::m = {
     35.0f,
     -3.0f,
     1.0f,
@@ -1259,6 +1263,7 @@ int daNpcIns_c::waitPresent(void* param_1) {
                     daPy_py_c* player = daPy_getPlayerActorClass();
                     player->changeOriginalDemo();
                     player->changeDemoMode(0x25, 2, type, 0);
+                    IF_DUSK(s_givenInsectId = type;)
                 } else {
                     mInsectMsgNo = 0x719;
                 }
@@ -1487,7 +1492,19 @@ int daNpcIns_c::talk(void* param_1) {
                         OS_REPORT("会話終了時 イベントID=%d アイテムNo=%d\n", eventID, itemNo);
 
                         if (eventID == 1) {
-                            mItemID = fopAcM_createItemForPresentDemo(&current.pos, itemNo, 0, -1, -1, NULL, NULL);
+#if TARGET_PC
+                            u32 itemGiveTag = 0;
+                            if (s_givenInsectId != dItemNo_NONE_e) {
+                                const auto itemCheck = dusk::mods::item_check_commit(
+                                    dusk::mods::item_give_tag_bug(s_givenInsectId), itemNo & 0xFF,
+                                    this);
+                                itemNo = itemCheck.itemNo;
+                                itemGiveTag = itemCheck.tag;
+                                s_givenInsectId = dItemNo_NONE_e;
+                            }
+#endif
+                            mItemID = fopAcM_createItemForPresentDemo(&current.pos, itemNo, 0, -1,
+                                -1, NULL, NULL IF_DUSK_ARG(itemGiveTag));
 
                             if (mItemID != fpcM_ERROR_PROCESS_ID_e) {
                                 daPy_getPlayerActorClass()->cancelOriginalDemo();
@@ -1803,7 +1820,7 @@ static int daNpcIns_IsDelete(void* a_this) {
     return 1;
 }
 
-static actor_method_class daNpcIns_MethodTable = {
+static DUSK_CONST actor_method_class daNpcIns_MethodTable = {
     (process_method_func)daNpcIns_Create,
     (process_method_func)daNpcIns_Delete,
     (process_method_func)daNpcIns_Execute,
@@ -1811,7 +1828,7 @@ static actor_method_class daNpcIns_MethodTable = {
     (process_method_func)daNpcIns_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_INS = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_INS = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

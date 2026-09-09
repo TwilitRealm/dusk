@@ -103,8 +103,8 @@ public:
     void animePlay();
     int setMcaMorfAnm(J3DAnmTransformKey*, f32, f32, int, int, int);
     void setBtpAnm(J3DAnmTexPattern*, J3DModelData*, f32, int);
-    J3DAnmTransformKey* getTrnsfrmKeyAnm(char*);
-    J3DAnmTexPattern* getTexPtrnAnm(char*);
+    J3DAnmTransformKey* getTrnsfrmKeyAnm(DUSK_CONST char*);
+    J3DAnmTexPattern* getTexPtrnAnm(DUSK_CONST char*);
     int checkEndAnm(J3DFrameCtrl*);
     int checkEndAnm(f32);
     u8 getItemNumMax();
@@ -131,8 +131,8 @@ public:
     typedef void (daMyna_c::*ProcFunc)();
     typedef int (daMyna_c::*BaseMotionFunc)(int);
 
-    static dCcD_SrcSph const mCcDSph;
-    static daMyna_c::BaseMotionFunc mBaseMotionTBL[7];
+    static DUSK_GAME_DATA dCcD_SrcSph const mCcDSph;
+    static DUSK_GAME_DATA daMyna_c::BaseMotionFunc mBaseMotionTBL[7];
 
     /* 0x56C */ request_of_phase_process_class mPhase;
     /* 0x574 */ mDoExt_McaMorfSO* mpMorf;

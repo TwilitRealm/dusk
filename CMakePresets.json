@@ -19,7 +19,7 @@
       "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded"
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDLL"
       }
     },
     {
@@ -28,12 +28,26 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER_LAUNCHER": "sccache",
         "CMAKE_CXX_COMPILER_LAUNCHER": "sccache",
-        "DUSK_ENABLE_SENTRY_NATIVE": {
+        "BOREALIS_ENABLE_SENTRY": {
           "type": "BOOL",
           "value": true
         },
-        "DUSK_SENTRY_DSN": "$env{SENTRY_DSN}",
-        "DUSK_SENTRY_ENVIRONMENT": "production"
+        "BOREALIS_SENTRY_DSN": "$env{SENTRY_DSN}",
+        "BOREALIS_SENTRY_ENVIRONMENT": "production",
+        "Rust_RUSTUP_INSTALL_MISSING_TARGET": {
+          "type": "BOOL",
+          "value": true
+        }
+      }
+    },
+    {
+      "name": "asan",
+      "hidden": true,
+      "cacheVariables": {
+        "ENABLE_ASAN": {
+          "type": "BOOL",
+          "value": true
+        }
       }
     },
     {
@@ -42,6 +56,10 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
+        "BUILD_SHARED_LIBS": {
+          "type": "BOOL",
+          "value": false
+        },
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install"
       },
       "vendor": {
@@ -61,6 +79,15 @@
       "inherits": [
         "debug",
         "linux-default"
+      ]
+    },
+    {
+      "name": "linux-default-debug-asan",
+      "displayName": "Linux (default) Debug ASan",
+      "inherits": [
+        "debug",
+        "linux-default",
+        "asan"
       ]
     },
     {
@@ -91,6 +118,15 @@
       ]
     },
     {
+      "name": "linux-clang-debug-asan",
+      "displayName": "Linux (Clang) Debug ASan",
+      "inherits": [
+        "debug",
+        "linux-clang",
+        "asan"
+      ]
+    },
+    {
       "name": "linux-clang-relwithdebinfo",
       "displayName": "Linux (Clang) RelWithDebInfo",
       "inherits": [
@@ -110,7 +146,11 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install"
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install",
+        "CMAKE_DISABLE_FIND_PACKAGE_PkgConfig": {
+          "type": "BOOL",
+          "value": true
+        }
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -129,6 +169,15 @@
       ]
     },
     {
+      "name": "windows-msvc-debug-asan",
+      "displayName": "Windows (MSVC) Debug ASan",
+      "inherits": [
+        "debug",
+        "windows-msvc",
+        "asan"
+      ]
+    },
+    {
       "name": "windows-msvc-relwithdebinfo",
       "displayName": "Windows (MSVC) RelWithDebInfo",
       "inherits": [
@@ -139,16 +188,12 @@
     {
       "name": "windows-arm64-msvc",
       "displayName": "Windows ARM64 (MSVC)",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/${presetName}",
+      "inherits": [
+        "windows-msvc"
+      ],
       "architecture": {
         "value": "arm64",
         "strategy": "external"
-      },
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "cl",
-        "CMAKE_CXX_COMPILER": "cl",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -197,6 +242,10 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
+        "BUILD_SHARED_LIBS": {
+          "type": "BOOL",
+          "value": false
+        },
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install"
       },
       "vendor": {
@@ -213,6 +262,15 @@
       "inherits": [
         "debug",
         "macos-default"
+      ]
+    },
+    {
+      "name": "macos-default-debug-asan",
+      "displayName": "macOS (default) Debug ASan",
+      "inherits": [
+        "debug",
+        "macos-default",
+        "asan"
       ]
     },
     {
@@ -243,6 +301,10 @@
         "ENABLE_ARC": {
           "type": "BOOL",
           "value": false
+        },
+        "ENABLE_VISIBILITY": {
+          "type": "BOOL",
+          "value": true
         },
         "Rust_CARGO_TARGET": "aarch64-apple-ios",
         "BUILD_SHARED_LIBS": {
@@ -280,24 +342,25 @@
           "type": "BOOL",
           "value": false
         },
+        "ENABLE_ARC": {
+          "type": "BOOL",
+          "value": false
+        },
+        "ENABLE_VISIBILITY": {
+          "type": "BOOL",
+          "value": true
+        },
         "Rust_CARGO_TARGET": "aarch64-apple-tvos",
         "Rust_TOOLCHAIN": "nightly",
         "BUILD_SHARED_LIBS": {
           "type": "BOOL",
           "value": false
         },
-        "CMAKE_DISABLE_FIND_PACKAGE_BZip2": {
+        "CMAKE_DISABLE_FIND_PACKAGE_PkgConfig": {
           "type": "BOOL",
           "value": true
         },
-        "CMAKE_DISABLE_FIND_PACKAGE_LibLZMA": {
-          "type": "BOOL",
-          "value": true
-        },
-        "CMAKE_DISABLE_FIND_PACKAGE_zstd": {
-          "type": "BOOL",
-          "value": true
-        }
+        "CMAKE_IGNORE_PREFIX_PATH": "/opt/homebrew"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -322,6 +385,14 @@
         "BUILD_SHARED_LIBS": {
           "type": "BOOL",
           "value": false
+        },
+        "CMAKE_DISABLE_FIND_PACKAGE_PkgConfig": {
+          "type": "BOOL",
+          "value": true
+        },
+        "CMAKE_DISABLE_FIND_PACKAGE_zstd": {
+          "type": "BOOL",
+          "value": true
         }
       }
     },
@@ -353,7 +424,7 @@
         "ci"
       ],
       "cacheVariables": {
-        "DUSK_ENABLE_SENTRY_NATIVE": {
+        "BOREALIS_ENABLE_SENTRY": {
           "type": "BOOL",
           "value": false
         }
@@ -378,7 +449,8 @@
         "ci"
       ],
       "cacheVariables": {
-        "AURORA_SDL3_PROVIDER": "vendor"
+        "AURORA_SDL3_PROVIDER": "vendor",
+        "CMAKE_LINKER_TYPE": "MOLD"
       }
     },
     {
@@ -407,12 +479,8 @@
           "type": "BOOL",
           "value": true
         },
-        "CMAKE_OSX_DEPLOYMENT_TARGET": "11.0",
-        "CMAKE_IGNORE_PREFIX_PATH": "/opt/homebrew",
-        "BUILD_SHARED_LIBS": {
-          "type": "BOOL",
-          "value": false
-        }
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "12.0",
+        "CMAKE_IGNORE_PREFIX_PATH": "/opt/homebrew"
       }
     },
     {
@@ -430,7 +498,6 @@
         "x-macos-ci"
       ],
       "cacheVariables": {
-        "AURORA_DAWN_PROVIDER": "vendor",
         "CMAKE_OSX_ARCHITECTURES": "x86_64",
         "Rust_CARGO_TARGET": "x86_64-apple-darwin"
       }
@@ -490,7 +557,10 @@
       "inherits": [
         "x-windows-ci",
         "windows-arm64-msvc"
-      ]
+      ],
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "arm64-windows"
+      }
     }
   ],
   "buildPresets": [
@@ -499,6 +569,12 @@
       "configurePreset": "linux-default-debug",
       "description": "Linux (default) debug build",
       "displayName": "Linux (default) Debug"
+    },
+    {
+      "name": "linux-default-debug-asan",
+      "configurePreset": "linux-default-debug-asan",
+      "description": "Linux (default) debug build with AddressSanitizer",
+      "displayName": "Linux (default) Debug ASan"
     },
     {
       "name": "linux-default-relwithdebinfo",
@@ -513,6 +589,12 @@
       "displayName": "Linux (Clang) Debug"
     },
     {
+      "name": "linux-clang-debug-asan",
+      "configurePreset": "linux-clang-debug-asan",
+      "description": "Linux (Clang) debug build with AddressSanitizer",
+      "displayName": "Linux (Clang) Debug ASan"
+    },
+    {
       "name": "linux-clang-relwithdebinfo",
       "configurePreset": "linux-clang-relwithdebinfo",
       "description": "Linux (Clang) release build with debug info",
@@ -523,6 +605,12 @@
       "configurePreset": "macos-default-debug",
       "description": "macOS debug build",
       "displayName": "macOS Debug"
+    },
+    {
+      "name": "macos-default-debug-asan",
+      "configurePreset": "macos-default-debug-asan",
+      "description": "macOS debug build with AddressSanitizer",
+      "displayName": "macOS Debug ASan"
     },
     {
       "name": "macos-default-relwithdebinfo",
@@ -580,6 +668,12 @@
       "configurePreset": "windows-msvc-debug",
       "description": "Windows (MSVC) debug build",
       "displayName": "Windows (MSVC) Debug"
+    },
+    {
+      "name": "windows-msvc-debug-asan",
+      "configurePreset": "windows-msvc-debug-asan",
+      "description": "Windows (MSVC) debug build with AddressSanitizer",
+      "displayName": "Windows (MSVC) Debug ASan"
     },
     {
       "name": "windows-msvc-relwithdebinfo",

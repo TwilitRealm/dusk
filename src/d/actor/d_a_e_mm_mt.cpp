@@ -3,9 +3,10 @@
  *
 */
 
-#include "d/dolzel_rel.h" // IWYU pragma: keep
 #include "d/actor/d_a_e_mm_mt.h"
 #include "d/d_cc_d.h"
+#include "d/dolzel_rel.h"  // IWYU pragma: keep
+#include "dusk/version.hpp"
 #include "f_op/f_op_actor_enemy.h"
 
 static int daE_MM_MT_Draw(e_mm_mt_class* i_this) {
@@ -802,7 +803,9 @@ static int daE_MM_MT_Create(fopAc_ac_c* i_this) {
         if (i_this->argument == 1) {
             fopAcM_OffStatus(i_this, 0x80000);
             helmasaurShell->m_sphere.SetAtType(
-                #if VERSION == VERSION_GCN_JPN
+                #if TARGET_PC
+                dusk::version::isRegionJpn() ? AT_TYPE_CSTATUE_SWING : 0xD8FBBDFF
+                #elif VERSION == VERSION_GCN_JPN
                 AT_TYPE_CSTATUE_SWING
                 #else
                 0xD8FBBDFF
@@ -840,7 +843,7 @@ static int daE_MM_MT_Create(fopAc_ac_c* i_this) {
     return phase;
 }
 
-static actor_method_class l_daE_MM_MT_Method = {
+static DUSK_CONST actor_method_class l_daE_MM_MT_Method = {
     (process_method_func)daE_MM_MT_Create,
     (process_method_func)daE_MM_MT_Delete,
     (process_method_func)daE_MM_MT_Execute,
@@ -848,7 +851,7 @@ static actor_method_class l_daE_MM_MT_Method = {
     (process_method_func)daE_MM_MT_Draw,
 };
 
-actor_process_profile_definition g_profile_E_MM_MT = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_E_MM_MT = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 8,
     /* List Prio    */ fpcPi_CURRENT_e,

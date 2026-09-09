@@ -65,8 +65,8 @@ extern Vec const l_crawlSideOffset;
 extern Vec const l_wolfLieSideOffset;
 extern Vec const l_crawlMinSideOffset;
 extern f32 const l_wolfFootOnFrame[][4];
-extern cXyz l_wolfBaseAnime;
-extern cXyz l_wolfRopeBaseAnime;
+extern cXyz DUSK_CONST l_wolfBaseAnime;
+extern cXyz DUSK_CONST l_wolfRopeBaseAnime;
 
 
 void daAlink_c::changeCommon() {
@@ -348,7 +348,7 @@ void daAlink_c::changeLink(int param_0) {
             initModel(static_cast<J3DModelData*>(dComIfG_getObjectRes(l_mArcName, "al_hands.bmd")), 0);
 
 #if TARGET_PC
-        if (dComIfGs_getRupee() != 0 || dusk::getSettings().game.freeMagicArmor)
+        if (dComIfGs_getRupee() != 0 || dusk::getSettings().game.armorRupeeDrain.getValue() != dusk::MagicArmorMode::NORMAL)
 #else
         if (dComIfGs_getRupee() != 0)
 #endif
@@ -458,7 +458,7 @@ void daAlink_c::changeLink(int param_0) {
         field_0x06f0 = field_0x064C->getMaterialNodePointer(2)->getShape();
 
 #if TARGET_PC
-        if (dComIfGs_getRupee() != 0 || dusk::getSettings().game.freeMagicArmor) {
+        if (dComIfGs_getRupee() != 0 || dusk::getSettings().game.armorRupeeDrain.getValue() != dusk::MagicArmorMode::NORMAL) {
 #else
         if (dComIfGs_getRupee() != 0) {
 #endif
@@ -4005,7 +4005,13 @@ int daAlink_c::procWolfHowlDemoInit() {
         } else if (name == fpcNm_Tag_WaraHowl_e) {
             mZ2WolfHowlMgr.setCorrectCurve(static_cast<daTagWrHowl_c*>(field_0x27f4)->getTuneId());
         } else {
+            #if TARGET_PC
+            if (mZ2WolfHowlMgr.getCorrectCurveID() != 9) {
+                mZ2WolfHowlMgr.setCorrectCurve(-1);
+            }
+            #else
             mZ2WolfHowlMgr.setCorrectCurve(-1);
+            #endif
         }
     } else {
         #if TARGET_PC

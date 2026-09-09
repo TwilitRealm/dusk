@@ -35,7 +35,6 @@ public:
 
     u8 getType() { return fopAcM_GetParamBit(this, 0, 4); }
 
-private:
     /* 0x5A8 */ Mtx mBgMtx;
     /* 0x5D8 */ Mtx field_0x5d8;
     /* 0x608 */ J3DModel* mModel;
@@ -55,10 +54,10 @@ private:
     /* 0x7B4 */ u8 field_0x7b4;
     /* 0x7B5 */ u8 field_0x7b5;
     /* 0x7B8 */ int field_0x7b8;
-    /* 0x7BC */ char* mArcName;
+    /* 0x7BC */ char DUSK_CONST* mArcName;
     /* 0x7C0 */ u32 mDzbId;
     /* 0x7C4 */ u32 mBmdId;
-    /* 0x7C8 */ cull_box* mCullBox;
+    /* 0x7C8 */ cull_box DUSK_CONST* mCullBox;
     /* 0x7CC */ f32 field_0x7cc;
     /* 0x7D0 */ u8 field_0x7d0;
     /* 0x7D4 */ int field_0x7d4;

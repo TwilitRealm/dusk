@@ -13,7 +13,7 @@ class daNpc_Seirei_Param_c {
 public:
     virtual ~daNpc_Seirei_Param_c() {}
 
-    static daNpc_Seirei_HIOParam const m;
+    static DUSK_GAME_DATA daNpc_Seirei_HIOParam const m;
 };
 
 #if DEBUG
@@ -83,7 +83,7 @@ public:
             daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData,
             int i_motionStepNum,
             daNpcT_evtData_c const* i_evtData,
-            char** i_arcNames)
+            char DUSK_CONST* DUSK_CONST* i_arcNames)
         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
         i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
         i_arcNames) {}
@@ -99,10 +99,9 @@ public:
     u32 getBitSW() { return (fopAcM_GetParam(this) & 0xFF000) >> 12; }
     bool getDoBtnChkFlag() { return (fopAcM_GetParam(this) & 0x100) == 0; }
 
-    static char* mCutNameList[2];
-    static cutFunc mCutList[2];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[2];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[2];
 
-private:
     /* 0xE40 */ NPC_SEIREI_HIO_CLASS* mpHIO;
     /* 0xE44 */ u8 mType;
     /* 0xE45 */ u8 arg0;

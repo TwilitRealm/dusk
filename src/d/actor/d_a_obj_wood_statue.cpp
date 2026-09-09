@@ -28,9 +28,9 @@ const static dCcD_SrcCyl l_cyl_src = {
     }
 };
 
-static char* l_arcName = "O_wood";
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcName = "O_wood";
 
-static char* l_eventName = "GET_WOOD_STATUE";
+static DUSK_CONSTEXPR char DUSK_CONST* l_eventName = "GET_WOOD_STATUE";
 
 class daObjWStatue_HIO_c : public fOpAcm_HIO_entry_c {
 public:
@@ -255,8 +255,9 @@ int daObjWStatue_c::initActionOrderGetDemo() {
     s16 eventIdx = dComIfGp_getEventManager().getEventIdx(this, "DEFAULT_GETITEM", 0xff);
     dComIfGp_getEvent()->reset(this);
     fopAcM_orderChangeEventId(this, eventIdx, 1, 0xffff);
-    mItemId = fopAcM_createItemForTrBoxDemo(&current.pos, m_itemNo, 0xffffffff,
-                                            fopAcM_GetRoomNo(this), 0, 0);
+    mItemId = fopAcM_createItemForTrBoxDemo(&current.pos,
+        DUSK_ITEM_CHECK_EXPR("wood_statue", m_itemNo, this), 0xffffffff, fopAcM_GetRoomNo(this),
+        0, 0 DUSK_GIVE_TAG("wood_statue"));
     JUT_ASSERT(544, mItemId != fpcM_ERROR_PROCESS_ID_e);
     setStatus(STATUS_ORDER_GET_DEMO);
     return 1;
@@ -351,7 +352,7 @@ int daObjWStatue_c::actionBoomerangCarry() {
 }
 
 void daObjWStatue_c::demoProc() {
-    static char* action_table[4] = {
+    static DUSK_CONSTEXPR char DUSK_CONST* action_table[4] = {
         "WAIT",
         "MOVE",
         "SETPOS",
@@ -478,13 +479,13 @@ static int daObjWStatue_Create(fopAc_ac_c* i_this) {
     return a_this->create();
 }
 
-static actor_method_class l_daObjWStatue_Method = {
+static DUSK_CONST actor_method_class l_daObjWStatue_Method = {
     (process_method_func)daObjWStatue_Create,  (process_method_func)daObjWStatue_Delete,
     (process_method_func)daObjWStatue_Execute, NULL,
     (process_method_func)daObjWStatue_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_WoodStatue = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_WoodStatue = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

@@ -98,10 +98,10 @@ T cLib_calcTimer(T* value) {
 void MtxInit(void);
 void MtxTrans(f32, f32, f32, u8);
 void MtxScale(f32, f32, f32, u8);
-void MtxPosition(cXyz*, cXyz*);
+void MtxPosition(cXyz DUSK_CONST*, cXyz*);
 void MtxPush(void);
 void MtxPull(void);
 
-extern Mtx* calc_mtx;
+DUSK_GAME_EXTERN Mtx* calc_mtx;
 
 #endif

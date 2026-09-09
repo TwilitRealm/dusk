@@ -1,16 +1,16 @@
-﻿#include "fmt/format.h"
-#include "imgui.h"
-#include "aurora/gfx.h"
+﻿#include "ImGuiSaveEditor.hpp"
 
 #include "ImGuiConsole.hpp"
-#include "ImGuiSaveEditor.hpp"
 #include "ImGuiEventFlags.hpp"
 
+#include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_item_data.h"
 #include "d/d_meter2_info.h"
 #include "d/d_save.h"
-#include "d/actor/d_a_player.h"
+
+#include <fmt/format.h>
+#include <imgui.h>
 
 #include <map>
 
@@ -76,7 +76,7 @@ namespace dusk {
         { dItemNo_WEAR_KOKIRI_e, {"Hero's Clothes"} },
         { dItemNo_ARMOR_e, {"Magic Armor"} },
         { dItemNo_WEAR_ZORA_e, {"Zora Armor"} },
-        { dItemNo_MAGIC_LV1_e, {"Magic Level 1"} },
+        { dItemNo_SHADOW_CRYSTAL_e, {"Shadow Crystal"} },
         { dItemNo_DUNGEON_EXIT_2_e, {"Ooccoo Sr.", ITEMTYPE_EQUIP_e} },
         { dItemNo_WALLET_LV1_e, {"Wallet"} },
         { dItemNo_WALLET_LV2_e, {"Big Wallet"} },
@@ -550,7 +550,7 @@ namespace dusk {
         char nameBuffer[8];
         snprintf(nameBuffer, sizeof(nameBuffer), "%s", playerName);
         if (ImGui::InputText("##PlayerNameInput", nameBuffer, 8)) {
-            strcpy(dComIfGs_getPlayerName(), nameBuffer);
+            SAFE_STRCPY(dComIfGs_getPlayerName(), nameBuffer);
         }
 
         const char* horseName = dComIfGs_getHorseName();
@@ -559,7 +559,7 @@ namespace dusk {
         char horseNameBuffer[8];
         snprintf(horseNameBuffer, sizeof(horseNameBuffer), "%s", horseName);
         if (ImGui::InputText("##HorseNameInput", horseNameBuffer, 8)) {
-            strcpy(dComIfGs_getHorseName(), horseNameBuffer);
+            SAFE_STRCPY(dComIfGs_getHorseName(), horseNameBuffer);
         }
 
         ImGui::Separator();
@@ -713,7 +713,7 @@ namespace dusk {
                 transformLevel++;
             }
         }
-        if (ImGui::SliderInt("Transform Level", &transformLevel, 0, 3)) {
+        if (ImGui::SliderInt("Transform Level", &transformLevel, 0, 4)) {
             u8 newFlags = 0;
             for (int i = 0; i < transformLevel; i++) {
                 newFlags |= (1 << i);
@@ -745,8 +745,8 @@ namespace dusk {
         ImGui::SameLine();
         char nameBuffer[8];
         snprintf(nameBuffer, sizeof(nameBuffer), "%s", returnPlace.mName);
-        if (ImGui::InputText("##SaveStageNameInput", nameBuffer, 8)) {
-            strcpy(returnPlace.mName, nameBuffer);
+        if (ImGui::InputText("##SaveStageNameInput", nameBuffer, sizeof(nameBuffer))) {
+            SAFE_STRCPY(returnPlace.mName, nameBuffer);
         }
 
         ImGui::Text("Room:     ");
@@ -787,8 +787,8 @@ namespace dusk {
         ImGui::SameLine();
         char horseStageBuffer[8];
         snprintf(horseStageBuffer, sizeof(horseStageBuffer), "%s", horsePlace.mName);
-        if (ImGui::InputText("##HorseStageNameInput", horseStageBuffer, 8)) {
-            strcpy(horsePlace.mName, horseStageBuffer);
+        if (ImGui::InputText("##HorseStageNameInput", horseStageBuffer, sizeof(horseStageBuffer))) {
+            SAFE_STRCPY(horsePlace.mName, horseStageBuffer);
         }
 
         ImGui::Text("Room:     ");

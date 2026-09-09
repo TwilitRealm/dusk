@@ -75,11 +75,11 @@ public:
     BOOL ChkLine(cXyz&, cXyz&, f32, fopAc_ac_c**);
 #endif
 
-    static bool m_mtrl_hit_tbl[64];
+    static DUSK_GAME_DATA bool m_mtrl_hit_tbl[64];
 
     // /* 0x0000 */ cCcS mCCcS;
     /* 0x284C */ dCcMassS_Mng mMass_Mng;
-#if DEBUG
+#if PARTIAL_DEBUG || DEBUG
     /* 0x2AD0 */ u8 m_is_mass_all_timer;
 #endif
 };  // Size = 0x2AC4

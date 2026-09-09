@@ -14,7 +14,11 @@
 #include "Z2AudioLib/Z2Instances.h"
 #include <cstring>
 
-const daNpc_grA_HIOParam daNpc_grA_Param_c::m = {
+#if TARGET_PC
+#include "mods/items.h"
+#endif
+
+DUSK_GAME_DATA const daNpc_grA_HIOParam daNpc_grA_Param_c::m = {
     {90.0f,  -4.0f,  1.0f,   850.0f,  255.0f, 280.0f, 40.0f, 100.0f, 0.0f, 0.0f, 20.0f,
      -20.0f, 40.0f,  -30.0f, 40.0f,   -40.0f, 0.4f,   12.0f, 4,      6,    6,    6,
      60.0f,  500.0f, 300.0f, -300.0f, 0x3c,   8,      0,     0,      0,    0,    0},
@@ -27,7 +31,7 @@ const daNpc_grA_HIOParam daNpc_grA_Param_c::m = {
     1.35f,
 };
 
-static int l_bmdGetParamList[][2] = {
+static DUSK_CONSTEXPR int l_bmdGetParamList[][2] = {
     3, 1,
     3, 2,
     3, 12,
@@ -35,7 +39,7 @@ static int l_bmdGetParamList[][2] = {
     11, 15,
 };
 
-static int l_bckGetParamList[][2] = {
+static DUSK_CONSTEXPR int l_bckGetParamList[][2] = {
     0x0E, 0x00,
     0x0C, 0x00,
     0x0D, 0x00,
@@ -89,7 +93,7 @@ static int l_bckGetParamList[][2] = {
     0x07, 0x0F,
 };
 
-static int l_btpGetParamList[][2] = {
+static DUSK_CONSTEXPR int l_btpGetParamList[][2] = {
     0x1C, 0x00,
     0x1F, 0x00,
     0x20, 0x00,
@@ -108,9 +112,9 @@ static int l_btpGetParamList[][2] = {
     0x1D, 0x00,
 };
 
-static int l_btkGetParamList[][2] = {-1, 0};
+static DUSK_CONSTEXPR int l_btkGetParamList[][2] = {-1, 0};
 
-static int l_evtGetParamList[][2] = {
+static DUSK_CONSTEXPR int l_evtGetParamList[][2] = {
     0x00, 0x00,
     0x01, 0x03,
     0x02, 0x05,
@@ -132,7 +136,7 @@ daNpc_grA_HIO_c::daNpc_grA_HIO_c() {
 
 static NPC_GRA_HIO_CLASS l_HIO;
 
-static char* l_evtNames[11] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_evtNames[11] = {
     NULL,
     "TALK_SPA",
     "TEACH_ELV",
@@ -146,59 +150,59 @@ static char* l_evtNames[11] = {
     "ROLL_ROCK_CRASH",
 };
 
-static int l_loadRes_GRAa[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRAa[] = {
     0, 1, -1, -1, -1, -1, -1, -1,
 };
 
-static int l_loadRes_GRA_Tw[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_Tw[] = {
     0, 2, -1, -1, -1, -1, -1, -1,
 };
 
-static int l_loadRes_GRA_Spa[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_Spa[] = {
     0, 1, 3, -1, -1, -1, -1, -1,
 };
 
-static int l_loadRes_GRA_SDEMO[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_SDEMO[] = {
     0, 1, 4, -1, -1, -1, -1, -1,
 };
 
-static int l_loadRes_GRA_GATE[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_GATE[] = {
     0, 1, 4, 5, -1, -1, -1, -1,
 };
 
-static int l_loadRes_GRA_KICKOUT[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_KICKOUT[] = {
     0, 1, 6, 10, -1, -1, -1, -1,
 };
 
-static int l_loadRes_GRA_ROCK[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_ROCK[] = {
     0, 1, 7, 8, -1, -1, -1, -1,
 };
 
-static int l_loadRes_GRA_SPAWATER[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_SPAWATER[] = {
     0, 1, 3, 9, 10, 11, 12, -1,
 };
 
-static int l_loadRes_GRA_SPABUYER[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_SPABUYER[] = {
     0, 1, 15, -1, -1, -1, -1, -1,
 };
 
-static int l_loadRes_GRA_SPABUYER_TW[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_SPABUYER_TW[] = {
     0, 2, 15, -1, -1, -1, -1, -1,
 };
 
-static int l_loadRes_GRA_ROCKCRASHER[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_ROCKCRASHER[] = {
     0, 1, 13, 11, 14, -1, -1, -1,
 };
 
-static int l_loadRes_GRA_BUYER[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA_BUYER[] = {
     0, 1, 4, -1, -1, -1, -1, -1,
 };
 
-static int l_loadRes_GRA0[] = {
+static DUSK_CONSTEXPR int l_loadRes_GRA0[] = {
     0, 1, -1, -1, -1, -1, -1, -1,
 };
 
-static int* l_loadRes_list[13] = {
+static DUSK_CONSTEXPR int DUSK_CONST* l_loadRes_list[13] = {
     l_loadRes_GRAa,
     l_loadRes_GRA_Tw,
     l_loadRes_GRA_Spa,
@@ -214,7 +218,7 @@ static int* l_loadRes_list[13] = {
     l_loadRes_GRA0,
 };
 
-static char* l_resNames[16] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_resNames[16] = {
     "grA_base",
     "grA_mdl",
     "grA_TW",
@@ -233,7 +237,7 @@ static char* l_resNames[16] = {
     "grA_town",
 };
 
-static char* l_myName[3] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_myName[3] = {
     "grA",
     "grA_spa",
     "grA_Elv",
@@ -288,7 +292,7 @@ void daNpc_grA_HIO_c::genMessage(JORMContext* context) {
 }
 #endif
 
-char* daNpc_grA_c::mEvtCutNameList[12] = {
+DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST daNpc_grA_c::mEvtCutNameList[12] = {
     "",
     "TALK_SPA",
     "GRDS_ROLL",
@@ -303,7 +307,7 @@ char* daNpc_grA_c::mEvtCutNameList[12] = {
     "ROLL_ROCK_CRASH",
 };
 
-daNpc_grA_c::cut_type daNpc_grA_c::mEvtCutList[] = {
+DUSK_GAME_DATA daNpc_grA_c::cut_type DUSK_CONST daNpc_grA_c::mEvtCutList[] = {
     NULL, 
     &daNpc_grA_c::ECut_talkSpa,
     &daNpc_grA_c::ECut_grDSRoll,
@@ -1323,7 +1327,7 @@ BOOL daNpc_grA_c::isDelete() {
             return FALSE;
         }
         fopAcM_createItemForBoss(&current.pos, 0x21, fopAcM_GetRoomNo(this), NULL, NULL, 0.0f, 0.0f,
-                                 0x80);
+                                 0x80 IF_DUSK_ARG(ITEM_CHECK_GORON_SPRINGWATER_RUSH));
         return TRUE;
     }
     return TRUE;
@@ -2812,7 +2816,7 @@ BOOL daNpc_grA_c::ECut_carrySpaWater(int i_staffID) {
             c.y += 200.0f;
             csXyz c2(0, fopAcM_searchPlayerAngleY(this), 0);
             fopAcM_createItemForBoss(&c, 0x21, fopAcM_GetRoomNo(this), &c2, NULL, 0.0f, 20.0f,
-                                     0x80);
+                                     0x80 IF_DUSK_ARG(ITEM_CHECK_GORON_SPRINGWATER_RUSH));
         } break;
         }
     }
@@ -4018,8 +4022,54 @@ BOOL daNpc_grA_c::talk(void*) {
         }
         if (r26 && talkProc(NULL, TRUE, NULL)) {
             if (mFlow.getEventId(&sp8) == 1) {
-                field_0x1480 =
-                    fopAcM_createItemForPresentDemo(&current.pos, sp8, 0, -1, -1, NULL, NULL);
+#if TARGET_PC
+                const u8 originalItem = sp8;
+                u32 itemGiveTag = 0;
+                bool isItemCheck = false;
+                if (originalItem == dItemNo_BOMB_IN_BAG_e) {
+                    const auto itemCheck =
+                        dusk::mods::item_check_commit("goron_reward:F_SP113", originalItem, this);
+                    sp8 = itemCheck.itemNo;
+                    itemGiveTag = itemCheck.tag;
+                    isItemCheck = true;
+                } else {
+                    const char* stage = dComIfGp_getStartStageName();
+                    const bool isAdultGoronShop = (strcmp(stage, "R_SP160") == 0 && originalItem == dItemNo_HYLIA_SHIELD_e) ||
+                                                  (strcmp(stage, "F_SP116") == 0 && originalItem == dItemNo_ARROW_30_e);
+                    if (isAdultGoronShop) {
+                        const auto itemCheck = dusk::mods::item_check_commit(
+                            dusk::mods::item_give_tag_shop(originalItem), originalItem, this);
+                        sp8 = itemCheck.itemNo;
+                        itemGiveTag = itemCheck.tag;
+                        isItemCheck = true;
+                    }
+                }
+
+                if (isItemCheck && sp8 == dItemNo_NONE_e) {
+                    dusk::mods::item_check_complete({itemGiveTag, dItemNo_NONE_e}, this);
+                    r29 = 1;
+                    if (mType == 0xb) {
+                        field_0x1691 = 1;
+                    }
+                } else {
+                    field_0x1480 = fopAcM_createItemForPresentDemo(
+                        &current.pos, sp8, 0, -1, -1, NULL, NULL, itemGiveTag);
+                    if (field_0x1480 != fpcM_ERROR_PROCESS_ID_e) {
+                        s16 r25 =
+                            dComIfGp_getEventManager().getEventIdx(this, "DEFAULT_GETITEM", 0xff);
+                        dComIfGp_getEvent()->reset(this);
+                        fopAcM_orderChangeEventId(this, r25, 1, -1);
+                        field_0x9ec = 1;
+                        r29 = 1;
+                        mOrderNewEvt = 1;
+                        if (mType == 0xb) {
+                            field_0x1691 = 1;
+                        }
+                    }
+                }
+#else
+                field_0x1480 = fopAcM_createItemForPresentDemo(&current.pos, sp8, 0, -1, -1, NULL,
+                    NULL);
                 if (field_0x1480 != fpcM_ERROR_PROCESS_ID_e) {
                     s16 r25 = dComIfGp_getEventManager().getEventIdx(this, "DEFAULT_GETITEM", 0xff);
                     dComIfGp_getEvent()->reset(this);
@@ -4031,6 +4081,7 @@ BOOL daNpc_grA_c::talk(void*) {
                         field_0x1691 = 1;
                     }
                 }
+#endif
             } else {
                 if (mType == 0xa && field_0x1486 == 0 && daNpcF_chkEvtBit(0x187)) {
                     dComIfGp_getEvent()->reset(this);
@@ -4101,7 +4152,7 @@ static BOOL daNpc_grA_IsDelete(void* i_this) {
     return true;
 }
 
-static actor_method_class daNpc_grA_MethodTable = {
+static DUSK_CONST actor_method_class daNpc_grA_MethodTable = {
     (process_method_func)daNpc_grA_Create,
     (process_method_func)daNpc_grA_Delete,
     (process_method_func)daNpc_grA_Execute,
@@ -4109,7 +4160,7 @@ static actor_method_class daNpc_grA_MethodTable = {
     (process_method_func)daNpc_grA_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_GRA = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_GRA = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

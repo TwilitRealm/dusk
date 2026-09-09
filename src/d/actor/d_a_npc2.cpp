@@ -7,7 +7,7 @@ static s32 daBaseNpc_chkPnt(cXyz param_0, dPnt* param_1, u16 param_2, u16 param_
 static u16 daBaseNpc_putNurbs(dPnt* i_CPnts, int i_CPntNum, int i_maxPntNum, dPnt* o_curve_p, BOOL i_isClosed);
 static s16 daBaseNpc_getGroundAngle(cBgS_PolyInfo* param_0, s16 param_1);
 
-dCcD_SrcCyl daBaseNpc_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daBaseNpc_c::mCcDCyl = {
     daBaseNpc_c::mCcDObj,
     {
         {
@@ -18,7 +18,7 @@ dCcD_SrcCyl daBaseNpc_c::mCcDCyl = {
     }
 };
 
-dCcD_SrcSph daBaseNpc_c::mCcDSph = {
+DUSK_GAME_DATA dCcD_SrcSph daBaseNpc_c::mCcDSph = {
     daBaseNpc_c::mCcDObj,
     {
             {{0.0f, 0.0f, 0.0f}, 0.0f}  // mSph
@@ -490,7 +490,7 @@ const char* daBaseNpc_c::getResName() {
     return NULL;
 }
 
-J3DAnmTransform* daBaseNpc_c::getTrnsfrmKeyAnmP(char* i_arcName, int i_resIdx) {
+J3DAnmTransform* daBaseNpc_c::getTrnsfrmKeyAnmP(char DUSK_CONST* i_arcName, int i_resIdx) {
     void* objectRes = dComIfG_getObjectRes(i_arcName, i_resIdx);
     return (J3DAnmTransform*)objectRes;
 }
@@ -510,7 +510,7 @@ int daBaseNpc_c::setBckAnm(J3DAnmTransform* i_anm, f32 i_speed, int i_mode, int 
     return mBck.init(i_anm, TRUE, i_mode, i_speed, start, end, i_modify);
 }
 
-J3DAnmTransform* daBaseNpc_c::getTexPtrnAnmP(char* i_arcName, int i_resIdx) {
+J3DAnmTransform* daBaseNpc_c::getTexPtrnAnmP(char DUSK_CONST* i_arcName, int i_resIdx) {
     void* objectRes = dComIfG_getObjectRes(i_arcName, i_resIdx);
     return (J3DAnmTransform*)objectRes;
 }
@@ -540,7 +540,7 @@ void daBaseNpc_c::attnSttsOn(int param_0, int param_1) {
 
 void daBaseNpc_c::setParam() {}
 
-void daBaseNpc_c::orderEvent(int param_0, char* i_evtName) {
+void daBaseNpc_c::orderEvent(int param_0, char DUSK_CONST* i_evtName) {
     if (i_evtName != NULL) {
         mEvtIdx = dComIfGp_getEventManager().getEventIdx(this, i_evtName, -1);
         fopAcM_orderOtherEventId(this, mEvtIdx, 0xFF, 0xFFFF, 0, 1);
@@ -701,11 +701,11 @@ static int CheckCreateHeap(fopAc_ac_c* i_this) {
     return moveBgActor->MoveBGCreateHeap();
 }
 
-const char* daBaseNpc_moveBgActor_c::m_name;
+DUSK_GAME_DATA const char* daBaseNpc_moveBgActor_c::m_name;
 
-int daBaseNpc_moveBgActor_c::m_dzb_id;
+DUSK_GAME_DATA int daBaseNpc_moveBgActor_c::m_dzb_id;
 
-MoveBGActor_SetFunc daBaseNpc_moveBgActor_c::m_set_func;
+DUSK_GAME_DATA MoveBGActor_SetFunc daBaseNpc_moveBgActor_c::m_set_func;
 
 int daBaseNpc_moveBgActor_c::MoveBGCreateHeap() {
     if (!CreateHeap()) {

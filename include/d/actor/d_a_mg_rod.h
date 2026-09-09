@@ -90,7 +90,7 @@ public:
 
     /* 0x0000 */ fopAc_ac_c actor;
     /* 0x0568 */ request_of_phase_process_class phase;
-    /* 0x0570 */ char* arcname;
+    /* 0x0570 */ DUSK_CONST char* arcname;
     /* 0x0574 */ u8 arg0;
     /* 0x0575 */ u8 arg1;
     /* 0x0576 */ u8 arg2;
@@ -299,8 +299,13 @@ public:
     /* 0x168C */ u8 field_0x168c;
     /* 0x168D */ u8 field_0x168d;
     /* 0x168E */ u8 HIOInit;
-};
 
-STATIC_ASSERT(sizeof(dmg_rod_class) == 0x1690);
+#if TARGET_PC
+    cXyz mLineInterpPrev[MG_ROD_LURE_LINE_LEN];
+    cXyz mLineInterpCurr[MG_ROD_LURE_LINE_LEN];
+    bool mLineInterpPrevValid;
+    bool mLineInterpCurrValid;
+#endif
+};
 
 #endif /* D_A_MG_ROD_H */

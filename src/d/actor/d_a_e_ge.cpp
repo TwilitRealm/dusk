@@ -1081,7 +1081,7 @@ void daE_GE_c::executeShield() {
     }
 }
 
-daE_GE_c::actionFunc daE_GE_c::l_actionmenu[9] = {
+DUSK_GAME_DATA daE_GE_c::actionFunc daE_GE_c::l_actionmenu[9] = {
     (&daE_GE_c::executeWait), (&daE_GE_c::executeFly),  (&daE_GE_c::executeAttack),
     (&daE_GE_c::executeBack), (&daE_GE_c::executeDown), (&daE_GE_c::executeSurprise),
     (&daE_GE_c::executeCaw),  (&daE_GE_c::executeWind), (&daE_GE_c::executeShield),
@@ -1370,13 +1370,13 @@ static int daE_GE_Create(daE_GE_c* i_this) {
     return i_this->create();
 }
 
-static actor_method_class l_daE_GE_Method = {
+static DUSK_CONST actor_method_class l_daE_GE_Method = {
     (process_method_func)daE_GE_Create,  (process_method_func)daE_GE_Delete,
     (process_method_func)daE_GE_Execute, (process_method_func)daE_GE_IsDelete,
     (process_method_func)daE_GE_Draw,
 };
 
-actor_process_profile_definition g_profile_E_GE = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_E_GE = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

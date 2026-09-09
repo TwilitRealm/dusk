@@ -19,7 +19,7 @@ daZrTurara_HIO_c::daZrTurara_HIO_c() {
 
 static daZrTurara_HIO_c l_HIO;
 
-dCcD_SrcGObjInf const daZrTurara_c::mCcDObjInfo = {
+DUSK_GAME_DATA dCcD_SrcGObjInf const daZrTurara_c::mCcDObjInfo = {
     {0, {
         {0, 0, 0},
         {0x20, 0x11},
@@ -30,7 +30,7 @@ dCcD_SrcGObjInf const daZrTurara_c::mCcDObjInfo = {
     {0}
 };
 
-dCcD_SrcCyl daZrTurara_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daZrTurara_c::mCcDCyl = {
     mCcDObjInfo,
     {
         {{0.0f, 0.0f, 0.0f}, 0.0f, 0.0f}
@@ -252,7 +252,7 @@ static cPhs_Step daZrTurara_Create(fopAc_ac_c* i_this) {
     return static_cast<daZrTurara_c*>(i_this)->create();
 }
 
-static actor_method_class l_daZrTurara_Method = {
+static DUSK_CONST actor_method_class l_daZrTurara_Method = {
     (process_method_func)daZrTurara_Create,
     (process_method_func)daZrTurara_Delete,
     (process_method_func)daZrTurara_Execute,
@@ -260,7 +260,7 @@ static actor_method_class l_daZrTurara_Method = {
     (process_method_func)daZrTurara_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_zrTurara = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_zrTurara = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

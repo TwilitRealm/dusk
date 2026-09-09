@@ -14,7 +14,7 @@ s16 fpcLf_GetPriority(const leafdraw_class* i_leaf) {
     return fpcDwPi_Get(&i_leaf->draw_priority);
 }
 
-int fpcLf_DrawMethod(leafdraw_method_class* i_methods, void* i_process) {
+int fpcLf_DrawMethod(leafdraw_method_class DUSK_CONST* i_methods, void* i_process) {
     return fpcMtd_Method(i_methods->draw_method, i_process);
 }
 
@@ -56,7 +56,7 @@ int fpcLf_Delete(leafdraw_class* i_leaf) {
     return ret;
 }
 
-int g_fpcLf_type;
+DUSK_GAME_DATA int g_fpcLf_type;
 
 int fpcLf_Create(leafdraw_class* i_leaf) {
     if (LEAFDRAW_BASE(i_leaf).state.init_state == 0) {
@@ -65,16 +65,14 @@ int fpcLf_Create(leafdraw_class* i_leaf) {
         LEAFDRAW_BASE(i_leaf).subtype = fpcBs_MakeOfType(&g_fpcLf_type);
         fpcDwPi_Init(&i_leaf->draw_priority, pprofile->priority);
         i_leaf->unk_0xBC = 0;
-#if TARGET_PC
-        i_leaf->draw_interp_frame = false;
-#endif
+        IF_DUSK(i_leaf->draw_interp_frame = false);
     }
 
     int ret = fpcMtd_Create(&i_leaf->leaf_methods->base, i_leaf);
     return ret;
 }
 
-leafdraw_method_class g_fpcLf_Method = {
+DUSK_GAME_DATA leafdraw_method_class DUSK_CONST g_fpcLf_Method = {
     (process_method_func)fpcLf_Create,  (process_method_func)fpcLf_Delete,
     (process_method_func)fpcLf_Execute, (process_method_func)fpcLf_IsDelete,
     (process_method_func)fpcLf_Draw,

@@ -13,7 +13,7 @@
 class fopAc_ac_c;
 
 class dBgS_AcchCir : public cBgS_PolyInfo {
-private:
+public:
     /* 0x10 */ u32 m_flags;
     /* 0x14 */ cM3dGCir m_cir;
     /* 0x28 */ f32 m_wall_rr;
@@ -197,11 +197,10 @@ public:
     f32 GetCx() const { return pm_pos->x; }
     f32 GetCz() const { return pm_pos->z; }
     
-private:
     /* 0x02C */ u32 m_flags;
     /* 0x030 */ cXyz* pm_pos;
     /* 0x034 */ cXyz* pm_old_pos;
-#if DEBUG
+#if PARTIAL_DEBUG || DEBUG
     /* 0x038 */ cXyz unk_0x38;
 #endif
     /* 0x038 */ cXyz* pm_speed;
@@ -229,7 +228,7 @@ private:
     /* 0x0CC */ f32 field_0xcc;
     /* 0x0D0 */ f32 m_wtr_chk_offset;
     /* 0x0D4 */ cBgS_PolyInfo* pm_out_poly_info;
-#if DEBUG
+#if PARTIAL_DEBUG || DEBUG
     /* 0x0E4 */ cXyz unk_0xe4;
 #endif
     /* 0x0D8 */ f32 field_0xd8;
@@ -237,7 +236,6 @@ public:
     /* 0x0DC */ dBgS_GndChk m_gnd;
     /* 0x130 */ dBgS_RoofChk m_roof;
     /* 0x180 */ dBgS_WtrChk m_wtr;
-private:
     /* 0x1D4 */ u8 m_wtr_mode;
 }; // Size: 0x1D8
 

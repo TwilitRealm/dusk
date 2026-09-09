@@ -12,7 +12,7 @@ static int daObjPicture_c_createHeap(fopAc_ac_c* i_this) {
     return ((daObjPicture_c*)i_this)->createHeap();
 }
 
-static char* l_arcName = "L9Picture";
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcName = "L9Picture";
 
 static Vec l_LINE_OFFSET_POS[] = {
     {-100.0f, 200.0f, -2.0f},
@@ -517,7 +517,7 @@ static int daObjPicture_draw(daObjPicture_c* i_this) {
 #if DEBUG
 const
 #endif
-dCcD_SrcCps daObjPicture_c::s_CcDCps = {
+DUSK_GAME_DATA dCcD_SrcCps daObjPicture_c::s_CcDCps = {
     {
         {0x0, {{0x0, 0x0, 0x0}, {0x20A0, 0x11}, 0x0}}, // mObj
         {dCcD_SE_SWORD, 0x0, 0x0, 0x0, 0x0}, // mGObjAt
@@ -532,7 +532,7 @@ dCcD_SrcCps daObjPicture_c::s_CcDCps = {
 #if DEBUG
 const
 #endif
-dCcD_SrcCyl daObjPicture_c::s_CcDCyl_pic_at = {
+DUSK_GAME_DATA dCcD_SrcCyl daObjPicture_c::s_CcDCyl_pic_at = {
     {
         {0x0, {{0x400, 0x1, 0x11}, {0x0, 0x11}, 0x79}},  // mObj
         {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x0},              // mGObjAt
@@ -548,7 +548,7 @@ dCcD_SrcCyl daObjPicture_c::s_CcDCyl_pic_at = {
     }
 };
 
-static actor_method_class daObjPicture_METHODS = {
+static DUSK_CONST actor_method_class daObjPicture_METHODS = {
     (process_method_func)daObjPicture_create,
     (process_method_func)daObjPicture_Delete,
     (process_method_func)daObjPicture_execute,
@@ -556,7 +556,7 @@ static actor_method_class daObjPicture_METHODS = {
     (process_method_func)daObjPicture_draw,
 };
 
-actor_process_profile_definition g_profile_Obj_Picture = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Picture = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

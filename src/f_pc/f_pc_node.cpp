@@ -8,10 +8,10 @@
 #include "f_pc/f_pc_debug_sv.h"
 
 #if TARGET_PC
+#include "dusk/frame_interpolation.h"
+
 #include "f_op/f_op_draw_iter.h"
 #include "f_pc/f_pc_manager.h"
-
-#include "dusk/frame_interpolation.h"
 #endif
 
 int fpcNd_DrawMethod(nodedraw_method_class* i_method_class, void* i_data) {
@@ -61,7 +61,7 @@ int fpcNd_Execute(process_node_class* i_procNode) {
     return ret;
 }
 
-int g_fpcNd_type;
+DUSK_GAME_DATA int g_fpcNd_type;
 
 void* fpcNd_IsCreatingFromUnder(void* i_procNode) {
     if (i_procNode != NULL && fpcBs_Is_JustOfType(g_fpcNd_type, ((process_node_class*)i_procNode)->base.subtype) != FALSE)
@@ -79,7 +79,7 @@ void* fpcNd_IsCreatingFromUnder(void* i_procNode) {
     return NULL;
 }
 
-BOOL g_fpcNd_IsCheckOfDeleteTiming = TRUE;
+DUSK_GAME_DATA BOOL g_fpcNd_IsCheckOfDeleteTiming = TRUE;
 
 int fpcNd_IsDeleteTiming(process_node_class* i_procNode) {
     if (g_fpcNd_IsCheckOfDeleteTiming == TRUE && fpcNd_IsCreatingFromUnder(i_procNode) != NULL) {
@@ -124,7 +124,7 @@ int fpcNd_Create(process_node_class* i_procNode) {
     return ret;
 }
 
-nodedraw_method_class g_fpcNd_Method = {
+DUSK_GAME_DATA nodedraw_method_class g_fpcNd_Method = {
     (process_method_func)fpcNd_Create, (process_method_func)fpcNd_Delete,
     (process_method_func)fpcNd_Execute, (process_method_func)fpcNd_IsDelete,
     (process_method_func)fpcNd_Draw,

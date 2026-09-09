@@ -46,9 +46,9 @@ static const cM3dGCylS l_cyl_info[] = {
     },
 };
 
-static char* l_arcName = "Tbox2";
+static DUSK_CONST char* l_arcName = "Tbox2";
 
-static char* l_staff_name = "TREASURE";
+static DUSK_CONST char* l_staff_name = "TREASURE";
 
 static dCcD_SrcCyl l_cyl_src = {
     {
@@ -138,6 +138,17 @@ int daTbox2_c::create1st() {
     fopAcM_ct(this, daTbox2_c);
     mModelType = getModelType();
 
+#if TARGET_PC
+    if (!mParamsInit) {
+        mOriginalItemNo = getItemNo();
+        int tboxNo = fopAcM_GetParamBit(this, 16, 8);
+        const u8 resolvedItem = dusk::mods::item_check_chest(tboxNo, mOriginalItemNo, this);
+        u32 params = (fopAcM_GetParam(this) & 0xFFFFFF00) | resolvedItem;
+        fopAcM_SetParam(this, params);
+        mParamsInit = true;
+    }
+#endif
+
     int phase_state = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase_state == cPhs_COMPLEATE_e) {
         u32 heap_size;
@@ -158,7 +169,7 @@ int daTbox2_c::create1st() {
 }
 
 int daTbox2_c::demoProc() {
-    static char* action_table[] = {"WAIT", "OPEN", "APPEAR", "OPEN_SHORT"};
+    static DUSK_CONST char* action_table[] = {"WAIT", "OPEN", "APPEAR", "OPEN_SHORT"};
     int act_idx =
         dComIfGp_evmng_getMyActIdx(mStaffIdx, action_table, ARRAY_SIZEU(action_table), 0, 0);
 
@@ -370,12 +381,20 @@ void daTbox2_c::actionOpenWait() {
 
 int daTbox2_c::setGetDemoItem() {
     u8 item_no = getItemNo();
+#if TARGET_PC
+    int tboxNo = fopAcM_GetParamBit(this, 16, 8);
+    const auto itemCheck = dusk::mods::item_check_commit(
+        dusk::mods::item_give_tag_chest(tboxNo), mOriginalItemNo, this);
+    item_no = itemCheck.itemNo;
+#endif
 
     u32 partner_id;
     if (mReturnRupee) {
-        partner_id = fopAcM_createItemForPresentDemo(&current.pos, item_no, 1, -1, -1, NULL, NULL);
+        partner_id = fopAcM_createItemForPresentDemo(
+            &current.pos, item_no, 1, -1, -1, NULL, NULL IF_DUSK_ARG(itemCheck.tag));
     } else {
-        partner_id = fopAcM_createItemForTrBoxDemo(&current.pos, item_no, -1, -1, NULL, NULL);
+        partner_id = fopAcM_createItemForTrBoxDemo(
+            &current.pos, item_no, -1, -1, NULL, NULL IF_DUSK_ARG(itemCheck.tag));
     }
 
     if (partner_id != -1) {
@@ -449,13 +468,13 @@ static int daTbox2_MoveBGDraw(daTbox2_c* i_this) {
     return i_this->MoveBGDraw();
 }
 
-static actor_method_class daTbox2_METHODS = {
+static DUSK_CONST actor_method_class daTbox2_METHODS = {
     (process_method_func)daTbox2_create1st,     (process_method_func)daTbox2_MoveBGDelete,
     (process_method_func)daTbox2_MoveBGExecute, (process_method_func)NULL,
     (process_method_func)daTbox2_MoveBGDraw,
 };
 
-actor_process_profile_definition g_profile_TBOX2 = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_TBOX2 = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 4,
     /* List Prio    */ fpcPi_CURRENT_e,

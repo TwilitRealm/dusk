@@ -49,12 +49,15 @@ public:
     u8 getSkillNum();
     void setHIO(bool);
 
+#if TARGET_PC
+    bool pointerWait();
+#endif
+
     virtual void draw() { _draw(); }
     virtual ~dMenu_Skill_c();
 
     u8 getStatus() { return mStatus; }
 
-private:
     /* 0x004 */ JKRExpHeap* mpHeap;
     /* 0x008 */ JKRArchive* mpArchive;
     /* 0x00C */ STControl* mpStick;

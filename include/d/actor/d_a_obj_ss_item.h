@@ -30,7 +30,7 @@ public:
     void setSoldOut();
     u32 getProcessID();
     daObj_SSItem_c* getExchangeItemPtr();
-    char* getResName();
+    char DUSK_CONST* getResName();
     u8 getTypeFromParam();
     u16 getFlowNodeNum();
     u16 getValue();
@@ -46,10 +46,9 @@ public:
     int buy(void* param_0);
     int cancel(void* param_0);
 
-    static dCcD_SrcGObjInf const mCcDObjInfo;
-    static dCcD_SrcCyl mCcDCyl;
+    static DUSK_GAME_DATA dCcD_SrcGObjInf const mCcDObjInfo;
+    static DUSK_GAME_DATA dCcD_SrcCyl DUSK_CONST mCcDCyl;
 
-private:
     /* 0x578 */ request_of_phase_process_class mPhase;
     /* 0x580 */ J3DModel* mpModel;
     /* 0x584 */ dBgS_ObjAcch mAcch;

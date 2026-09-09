@@ -19,6 +19,10 @@
 #include "f_op/f_op_actor_enemy.h"
 #include "Z2AudioLib/Z2Instances.h"
 
+#if TARGET_PC
+#include "mods/items.h"
+#endif
+
 enum daB_DS_Joint {
     DS_JNT_BACKBONE1,
     DS_JNT_BACKBONE2,
@@ -4084,6 +4088,11 @@ void daB_DS_c::executeBattle2Dead() {
             camera->mCamera.SetTrimSize(0);
             dComIfGp_event_reset();
             dComIfGs_onStageBossEnemy(0x13);
+#if TARGET_PC
+            // This reward has no original grant at this point in the cutscene.
+            dusk::mods::item_check_enqueue_deferred(
+                ITEM_CHECK_DUNGEON_REWARD_ARBITERS, dItemNo_NONE_e);
+#endif
             /* dSv_event_flag_c::F_0265 - Arbiter's Grounds - Arbiter's Grounds clear */
             dComIfGs_onEventBit(0x2010);
             fopAcM_delete(this);
@@ -5680,13 +5689,13 @@ static cPhs_Step daB_DS_Create(daB_DS_c* i_this) {
     return i_this->create();
 }
 
-static actor_method_class l_daB_DS_Method = {
+static DUSK_CONST actor_method_class l_daB_DS_Method = {
     (process_method_func)daB_DS_Create,  (process_method_func)daB_DS_Delete,
     (process_method_func)daB_DS_Execute, (process_method_func)daB_DS_IsDelete,
     (process_method_func)daB_DS_Draw,
 };
 
-actor_process_profile_definition g_profile_B_DS = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_B_DS = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 4,
     /* List Prio    */ fpcPi_CURRENT_e,

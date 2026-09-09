@@ -4,7 +4,7 @@
 #include "JSystem/J2DGraph/J2DPane.h"
 #include "JSystem/JUtility/JUTTexture.h"
 #include "JSystem/JUtility/TColor.h"
-#include "dusk/endian.h"
+#include "helpers/endian.h"
 
 class J2DMaterial;
 class JUTPalette;
@@ -212,6 +212,9 @@ public:
     void setCornerColor(JUtility::TColor c0) {
         setCornerColor(c0, c0, c0, c0);
     }
+#if TARGET_PC
+    JUtility::TColor corner(size_t index) const { return mCornerColor[index]; }
+#endif
 
 protected:
     /* 0x100 */ JUTTexture* mTexture[2];

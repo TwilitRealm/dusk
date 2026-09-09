@@ -14,7 +14,7 @@
 
 static daWdStick_HIO_c l_HIO;
 
-dCcD_SrcSph daWdStick_c::mCcDSph = {daWdStick_c::mCcDObjInfo, {{{0.0f, 0.0f, 0.0f}, 4.0f}}};
+DUSK_GAME_DATA dCcD_SrcSph daWdStick_c::mCcDSph = {daWdStick_c::mCcDObjInfo, {{{0.0f, 0.0f, 0.0f}, 4.0f}}};
 
 daWdStick_HIO_c::daWdStick_HIO_c() {
     field_0x04 = 60;
@@ -37,7 +37,7 @@ int daWdStick_c::CreateHeap() {
     return mModel != 0 ? 1 : 0;
 }
 
-dCcD_SrcGObjInf const daWdStick_c::mCcDObjInfo = {
+DUSK_GAME_DATA dCcD_SrcGObjInf const daWdStick_c::mCcDObjInfo = {
     {0, {{0x200, 0, 0x1f}, {0xd8fbffff, 0x1f}, {0x0}}},
     {dCcD_SE_NONE, 0, 0, 0, 0},
     {dCcD_SE_NONE, 0, 0, 0, 4},
@@ -499,7 +499,7 @@ static int daWdStick_Create(fopAc_ac_c* i_this) {
     return static_cast<daWdStick_c*>(i_this)->create();
 }
 
-static actor_method_class l_daWdStick_Method = {
+static DUSK_CONST actor_method_class l_daWdStick_Method = {
     (process_method_func)daWdStick_Create,
     (process_method_func)daWdStick_Delete,
     (process_method_func)daWdStick_Execute,
@@ -507,7 +507,7 @@ static actor_method_class l_daWdStick_Method = {
     (process_method_func)daWdStick_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_WdStick = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_WdStick = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

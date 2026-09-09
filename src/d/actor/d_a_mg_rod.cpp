@@ -25,7 +25,13 @@
 #include <cmath>
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/frame_interpolation.h"
+#include "dusk/mods/item.hpp"
+#include "dusk/settings.h"
 #include "dusk/version.hpp"
+#include "mods/items.h"
+#endif
 
 class dmg_rod_HIO_c : public JORReflexible {
 public:
@@ -177,6 +183,25 @@ static int Worm_nodeCallBack(J3DJoint* i_joint, int param_1) {
     return 1;
 }
 
+#if TARGET_PC
+static void dmg_rod_interp_callback(bool isSimFrame, void* pUserWork) {
+    dmg_rod_class* i_this = (dmg_rod_class*)pUserWork;
+    if (!i_this->mLineInterpPrevValid || !i_this->mLineInterpCurrValid) {
+        return;
+    }
+    const f32 alpha = dusk::frame_interp::get_interpolation_step();
+    const int count = i_this->kind == MG_ROD_KIND_LURE ? MG_ROD_LURE_LINE_LEN : MG_ROD_UKI_LINE_LEN;
+    cXyz* dst = i_this->linemat.getPos(0);
+    for (int i = 0; i < count; i++) {
+        const cXyz& p0 = i_this->mLineInterpPrev[i];
+        const cXyz& p1 = i_this->mLineInterpCurr[i];
+        dst[i] = p0 + (p1 - p0) * alpha;
+    }
+    static GXColor l_color = {0xFF, 0xFF, 0x96, 0xFF};
+    i_this->linemat.update(count, l_color, &i_this->actor.tevStr);
+}
+#endif
+
 static int dmg_rod_Draw(dmg_rod_class* i_this) {
     int unused;
     fopAc_ac_c* actor = &i_this->actor;
@@ -217,6 +242,18 @@ static int dmg_rod_Draw(dmg_rod_class* i_this) {
         i_this->linemat.update(MG_ROD_LURE_LINE_LEN, l_color, &i_this->actor.tevStr);
         dComIfGd_set3DlineMat(&i_this->linemat);
 
+#if TARGET_PC
+        if (dusk::frame_interp::is_enabled()) {
+            if (i_this->mLineInterpCurrValid) {
+                memcpy(i_this->mLineInterpPrev, i_this->mLineInterpCurr, MG_ROD_LURE_LINE_LEN * sizeof(cXyz));
+                i_this->mLineInterpPrevValid = true;
+            }
+            memcpy(i_this->mLineInterpCurr, i_this->linemat.getPos(0), MG_ROD_LURE_LINE_LEN * sizeof(cXyz));
+            i_this->mLineInterpCurrValid = true;
+            dusk::frame_interp::add_interpolation_callback(&dmg_rod_interp_callback, i_this);
+        }
+#endif
+
         model = i_this->rod_modelMorf->getModel();
         g_env_light.setLightTevColorType_MAJI(model, &i_this->actor.tevStr);
         i_this->rod_modelMorf->entryDL();
@@ -240,6 +277,18 @@ static int dmg_rod_Draw(dmg_rod_class* i_this) {
         static GXColor l_color = {0xFF, 0xFF, 0x96, 0xFF};
         i_this->linemat.update(MG_ROD_UKI_LINE_LEN, l_color, &i_this->actor.tevStr);
         dComIfGd_set3DlineMat(&i_this->linemat);
+
+#if TARGET_PC
+        if (dusk::frame_interp::is_enabled()) {
+            if (i_this->mLineInterpCurrValid) {
+                memcpy(i_this->mLineInterpPrev, i_this->mLineInterpCurr, MG_ROD_UKI_LINE_LEN * sizeof(cXyz));
+                i_this->mLineInterpPrevValid = true;
+            }
+            memcpy(i_this->mLineInterpCurr, i_this->linemat.getPos(0), MG_ROD_UKI_LINE_LEN * sizeof(cXyz));
+            i_this->mLineInterpCurrValid = true;
+            dusk::frame_interp::add_interpolation_callback(&dmg_rod_interp_callback, i_this);
+        }
+#endif
 
         for (int i = 0; i < 15; i++) {
             g_env_light.setLightTevColorType_MAJI(i_this->rod_uki_model[i], &actor->tevStr);
@@ -1137,8 +1186,14 @@ static int lure_standby(dmg_rod_class* i_this) {
         dComIfGp_setDoStatusForce(42, 0);
     }
 
-    i_this->rod_stick_x = mDoCPd_c::getStickX3D(PAD_1) * mDoCPd_c::getStickX3D(PAD_1);
-    if (mDoCPd_c::getStickX3D(PAD_1) < 0.0f) {
+    f32 stick_x = mDoCPd_c::getStickX3D(PAD_1);
+#if TARGET_PC
+    if (dusk::getSettings().game.enableMirrorMode) {
+        stick_x = -stick_x;
+    }
+#endif
+    i_this->rod_stick_x = stick_x * stick_x;
+    if (stick_x < 0.0f) {
         i_this->rod_stick_x *= -1.0f;
     }
 
@@ -2902,7 +2957,17 @@ static void lure_heart(dmg_rod_class* i_this) {
             if (obj_life != NULL) {
                 fopAcM_delete(obj_life);
                 fopAcM_onItem(obj_life, 0x80);
+#if TARGET_PC
+                const auto itemCheck = dusk::mods::item_check_commit(
+                    ITEM_CHECK_FISHING_HEART_PIECE, dItemNo_KAKERA_HEART_e, actor);
+                if (itemCheck.itemNo == dItemNo_KAKERA_HEART_e) {
+                    execItemGet(dItemNo_KAKERA_HEART_e, itemCheck.tag, actor);
+                } else if (itemCheck.itemNo == dItemNo_NONE_e) {
+                    dusk::mods::item_check_complete(itemCheck, actor);
+                }
+#else
                 execItemGet(dItemNo_KAKERA_HEART_e);
+#endif
                 u8 eventReg = dComIfGs_getEventReg(0xECFF);
                 eventReg |= (u8)0x40;
                 dComIfGs_setEventReg(0xECFF, eventReg);
@@ -3671,7 +3736,13 @@ static void uki_standby(dmg_rod_class* i_this) {
     cLib_addCalc2(&i_this->field_0x150c, substickX, 0.5f, 0.2f);
 
     if (i_this->field_0x1508 > 0.3f && i_this->play_cam_mode < 5) {
-        ANGLE_ADD(i_this->field_0x1418, (-500.0f + VREG_F(3)) * mDoCPd_c::getStickX3D(PAD_1));
+        f32 stick_x = mDoCPd_c::getStickX3D(PAD_1);
+#if TARGET_PC
+        if (dusk::getSettings().game.enableMirrorMode) {
+            stick_x = -stick_x;
+        }
+#endif
+        ANGLE_ADD(i_this->field_0x1418, (-500.0f + VREG_F(3)) * stick_x);
     }
 
     cMtx_YrotS(*calc_mtx, i_this->field_0x1418);
@@ -4031,7 +4102,15 @@ static void uki_catch(dmg_rod_class* i_this) {
             } else if (mgfish->mCaughtType == MG_CATCH_BIN) {
                 i_this->msgflow.init(actor, 0x139A, 0, NULL);
                 dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[468]);
+#if TARGET_PC
+                const auto itemCheck = dusk::mods::item_check_commit(
+                    ITEM_CHECK_FISHING_BOTTLE, dItemNo_EMPTY_BOTTLE_e, actor);
+                if (itemCheck.itemNo == dItemNo_EMPTY_BOTTLE_e) {
+                    dComIfGs_setEmptyBottle();
+                }
+#else
                 dComIfGs_setEmptyBottle();
+#endif
             } else if (mgfish->mCaughtType == MG_CATCH_KN) {
                 i_this->msgflow.init(actor, 0x139C, 0, NULL);
             } else if (mgfish->mCaughtType == MG_CATCH_ED) {
@@ -4108,6 +4187,18 @@ static void uki_catch(dmg_rod_class* i_this) {
                 if (mgfish->mCaughtType == MG_CATCH_LH) {
                     dComIfGp_setItemRupeeCount(10.0f + cM_rndF(40.9f));
                 }
+#if TARGET_PC
+                else if (mgfish->mCaughtType == MG_CATCH_BIN)
+                {
+                    const auto itemCheck = dusk::mods::item_check_commit(
+                        ITEM_CHECK_FISHING_BOTTLE, dItemNo_EMPTY_BOTTLE_e, actor);
+                    if (itemCheck.itemNo == dItemNo_EMPTY_BOTTLE_e ||
+                        itemCheck.itemNo == dItemNo_NONE_e)
+                    {
+                        dusk::mods::item_check_complete(itemCheck, actor);
+                    }
+                }
+#endif
             } else {
                 dComIfGs_addFishNum(fish_kind);
                 if (i_this->field_0x14c0 != 0) {
@@ -5043,8 +5134,15 @@ static void play_camera(dmg_rod_class* i_this) {
             static f32 old_stick_x = 0.0f;
             static f32 old_stick_sx = 0.0f;
 
+            f32 stick_x = mDoCPd_c::getStickX3D(PAD_1);
+#if TARGET_PC
+            if (dusk::getSettings().game.enableMirrorMode) {
+                stick_x = -stick_x;
+            }
+#endif
+
             if (
-                (mDoCPd_c::getStickX3D(PAD_1) >= 0.8f && old_stick_x < 0.8f) || (mDoCPd_c::getStickX3D(PAD_1) <= -0.8f && old_stick_x > -0.8f)
+                (stick_x >= 0.8f && old_stick_x < 0.8f) || (stick_x <= -0.8f && old_stick_x > -0.8f)
                 #if VERSION != VERSION_SHIELD_DEBUG
                 || (mDoCPd_c::getSubStickX3D(PAD_1) >= 0.8f && old_stick_sx < 0.8f) || (mDoCPd_c::getSubStickX3D(PAD_1) <= -0.8f && old_stick_sx > -0.8f)
                 #endif
@@ -5060,7 +5158,7 @@ static void play_camera(dmg_rod_class* i_this) {
                 }
 
                 if (i_this->play_cam_timer >= 15) {
-                    if (mDoCPd_c::getStickX3D(PAD_1) >= 0.5f
+                    if (stick_x >= 0.5f
                         #if VERSION != VERSION_SHIELD_DEBUG
                         || mDoCPd_c::getSubStickX3D(PAD_1) >= 0.5f
                         #endif
@@ -5082,8 +5180,8 @@ static void play_camera(dmg_rod_class* i_this) {
                 }
             }
 
-            old_stick_x = mDoCPd_c::getStickX3D(PAD_1);
-            old_stick_sx = mDoCPd_c::getSubStickX(PAD_1);
+            old_stick_x = stick_x;
+            old_stick_sx = mDoCPd_c::getSubStickX3D(PAD_1);
 
             if (i_this->play_cam_timer == 1) {
                 if (i_this->field_0xf81 == 0) {
@@ -5733,6 +5831,12 @@ static void play_camera_u(dmg_rod_class* i_this) {
     }
 }
 
+#if TARGET_PC
+BOOL item_any_fishing_rod(int itemId) {
+    return itemId == dItemNo_FISHING_ROD_1_e || (itemId >= dItemNo_BEE_ROD_e && itemId <= dItemNo_JEWEL_WORM_ROD_e);
+}
+#endif
+
 static int dmg_rod_Execute(dmg_rod_class* i_this) {
     fopAc_ac_c* actor = &i_this->actor;
 
@@ -5788,9 +5892,27 @@ static int dmg_rod_Execute(dmg_rod_class* i_this) {
 
     i_this->rod_stick_x = mDoCPd_c::getStickX3D(PAD_1);
     i_this->rod_stick_y = mDoCPd_c::getStickY(PAD_1);
+#if TARGET_PC
+    if (dusk::getSettings().game.enableMirrorMode) {
+        i_this->rod_stick_x = -i_this->rod_stick_x;
+    }
+    i_this->rod_substick_x = mDoCPd_c::getSubStickX3D(PAD_1);
+#else
     i_this->rod_substick_x = mDoCPd_c::getSubStickX(PAD_1);
+#endif
     i_this->prev_rod_substick_y = i_this->rod_substick_y;
     i_this->rod_substick_y = mDoCPd_c::getSubStickY(PAD_1);
+
+    #if TARGET_PC
+    if (dusk::getSettings().game.buttonFishing) {
+        if ((item_any_fishing_rod(dComIfGp_getSelectItem(0)) && mDoCPd_c::getHoldX(PAD_1)) ||
+            (item_any_fishing_rod(dComIfGp_getSelectItem(1)) && mDoCPd_c::getHoldY(PAD_1)) ||
+            (i_this->action == ACTION_LURE_STANDBY && mDoCPd_c::getTrigB(PAD_1))) {
+            i_this->rod_stick_y = -1.0f;
+            i_this->rod_substick_y = -1.0f;
+        }
+    }
+    #endif
 
     i_this->reel_speed = 5.0f;
     i_this->reel_btn_flags = mDoCPd_c::getHoldB(PAD_1) | mDoCPd_c::getHoldDown(PAD_1);
@@ -6359,6 +6481,11 @@ static int dmg_rod_Create(fopAc_ac_c* i_this) {
             return cPhs_ERROR_e;
         }
 
+#if TARGET_PC
+        rod->mLineInterpPrevValid = false;
+        rod->mLineInterpCurrValid = false;
+#endif
+
         OS_REPORT("//////////////MG_ROD SET 2 !!\n");
         if (!hio_set) {
             rod->HIOInit = TRUE;
@@ -6435,7 +6562,7 @@ static int dmg_rod_Create(fopAc_ac_c* i_this) {
     return phase_state;
 }
 
-static actor_method_class l_dmg_rod_Method = {
+static DUSK_CONST actor_method_class l_dmg_rod_Method = {
     (process_method_func)dmg_rod_Create,
     (process_method_func)dmg_rod_Delete,
     (process_method_func)dmg_rod_Execute,
@@ -6443,7 +6570,7 @@ static actor_method_class l_dmg_rod_Method = {
     (process_method_func)dmg_rod_Draw,
 };
 
-actor_process_profile_definition g_profile_MG_ROD = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_MG_ROD = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 8,
     /* List Prio    */ fpcPi_CURRENT_e,

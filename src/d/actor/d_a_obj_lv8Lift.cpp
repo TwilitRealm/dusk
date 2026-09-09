@@ -37,7 +37,7 @@ void daL8Lift_c::setBaseMtx() {
     mpModel->setBaseTRMtx(mDoMtx_stack_c::now);
 }
 
-f32 const daL8Lift_c::mSpeed[16] = {
+DUSK_GAME_DATA f32 const daL8Lift_c::mSpeed[16] = {
     5.0f, 6.6666665f, 8.333333f, 10.0f, 11.666667f, 13.333333f,
     15.0f, 16.666666f, 18.333334f, 20.0f, 21.666666, 23.333334,
     25.0f, 26.666666f, 28.333334f, 3.3333333f
@@ -477,7 +477,7 @@ static int daL8Lift_Create(fopAc_ac_c* a_this) {
     return i_this->create();
 }
 
-static actor_method_class l_daL8Lift_Method = {
+static DUSK_CONST actor_method_class l_daL8Lift_Method = {
     (process_method_func)daL8Lift_Create,
     (process_method_func)daL8Lift_Delete,
     (process_method_func)daL8Lift_Execute,
@@ -485,7 +485,7 @@ static actor_method_class l_daL8Lift_Method = {
     (process_method_func)daL8Lift_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_Lv8Lift = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Lv8Lift = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

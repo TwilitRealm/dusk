@@ -1,11 +1,13 @@
 #include "achievements.hpp"
 
-#include "Z2AudioLib/Z2SeMgr.h"
-#include "dusk/achievements.h"
-#include "fmt/format.h"
-#include "m_Do/m_Do_audio.h"
 #include "nav_types.hpp"
 #include "pane.hpp"
+
+#include "dusk/achievements.h"
+
+#include "m_Do/m_Do_audio.h"
+
+#include <fmt/format.h>
 
 namespace dusk::ui {
 namespace {
@@ -185,8 +187,6 @@ AchievementsWindow::AchievementsWindow() {
                 *confirmingAll = false;
                 clearAllPtr->set_text("Clear All Achievements");
             });
-
-            pane.finalize();
         });
     }
 }
@@ -217,7 +217,7 @@ void AchievementsWindow::updateTotal() {
         return;
     }
     const auto all = AchievementSystem::get().getAchievements();
-    int total = static_cast<int>(all.size());
+    const int total = std::count_if(all.begin(), all.end(), [](const Achievement& achievement){ return achievement.category != AchievementCategory::Glitched;});
     int unlocked = 0;
     for (const auto& a : all) {
         if (a.unlocked) {

@@ -54,15 +54,15 @@ public:
 
     typedef int (daMBdoorL1_c::*actionFunc)();
 
-    char* getAnmArcName();
-    char* getArcName();
-    char* getAlwaysArcName();
+    DUSK_CONST char* getAnmArcName();
+    DUSK_CONST char* getArcName();
+    DUSK_CONST char* getAlwaysArcName();
     int getDoorType();
-    char* getOpenAnm();
-    char* getCloseAnm();
-    char* getBmd();
-    char* getBtk();
-    char* getDzb();
+    DUSK_CONST char* getOpenAnm();
+    DUSK_CONST char* getCloseAnm();
+    DUSK_CONST char* getBmd();
+    DUSK_CONST char* getBtk();
+    DUSK_CONST char* getDzb();
     J3DModelData* getDoorModelData();
     int CreateHeap();
     void calcMtx();
@@ -121,7 +121,6 @@ public:
         mAction = action;
     }
 
-private:
     /* 0x568 */ request_of_phase_process_class mPhase1;
     /* 0x570 */ request_of_phase_process_class mPhase2;
     /* 0x578 */ request_of_phase_process_class mPhase3;

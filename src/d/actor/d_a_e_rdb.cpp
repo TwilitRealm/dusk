@@ -16,6 +16,10 @@
 #include "f_op/f_op_camera_mng.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "mods/items.h"
+#endif
+
 class daE_RDB_HIO_c : public JORReflexible {
 public:
     daE_RDB_HIO_c();
@@ -1250,7 +1254,18 @@ static void demo_camera(e_rdb_class* i_this) {
             }
 
             if (iVar1 != 0) {
-                daPy_getPlayerActorClass()->changeDemoMode(11, 32, 0, 0);
+#if TARGET_PC
+                const auto itemCheck = dusk::mods::item_check_commit(
+                    ITEM_CHECK_BULBLIN_KEY, dItemNo_SMALL_KEY_e, &i_this->enemy);
+                if (itemCheck.itemNo == dItemNo_NONE_e) {
+                    dusk::mods::item_check_complete(itemCheck, &i_this->enemy);
+                }
+                daPy_getPlayerActorClass()->changeDemoMode(
+                    11, itemCheck.itemNo == dItemNo_NONE_e ? 0 : itemCheck.itemNo,
+                    itemCheck.itemNo == dItemNo_NONE_e ? 0 : static_cast<int>(itemCheck.tag), 0);
+#else
+                daPy_getPlayerActorClass()->changeDemoMode(11, dItemNo_SMALL_KEY_e, 0, 0);
+#endif
                 i_this->mDemoMode = 12;
                 i_this->field_0x10aa = 0;
                 i_this->field_0xfe5 = 1;
@@ -1801,7 +1816,7 @@ static int daE_RDB_Create(fopAc_ac_c* actor) {
         }  // mSphAttr
     };
 
-    static dCcD_SrcCyl co_cyl_src = {
+    static DUSK_CONSTEXPR dCcD_SrcCyl co_cyl_src = {
         {
             {0x0, {{0x0, 0x0, 0x0}, {0x0, 0x0}, 0x75}},  // mObj
             {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x0},          // mGObjAt
@@ -1914,13 +1929,13 @@ static s32 unused_bss_29c = 0;
 
 AUDIO_INSTANCES
 
-static actor_method_class l_daE_RDB_Method = {
+static DUSK_CONST actor_method_class l_daE_RDB_Method = {
     (process_method_func)daE_RDB_Create,  (process_method_func)daE_RDB_Delete,
     (process_method_func)daE_RDB_Execute, (process_method_func)daE_RDB_IsDelete,
     (process_method_func)daE_RDB_Draw,
 };
 
-actor_process_profile_definition g_profile_E_RDB = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_E_RDB = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

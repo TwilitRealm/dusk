@@ -273,10 +273,10 @@ namespace JASKernel {
     u32 getAramFreeSize();
     u32 getAramSize();
 
-    extern JASHeap audioAramHeap;
-    extern uintptr_t sAramBase;
-    extern JKRHeap* sSystemHeap;
-    extern JASMemChunkPool<1024, JASThreadingModel::ObjectLevelLockable>* sCommandHeap;
+    DUSK_GAME_EXTERN JASHeap audioAramHeap;
+    DUSK_GAME_EXTERN uintptr_t sAramBase;
+    DUSK_GAME_EXTERN JKRHeap* sSystemHeap;
+    DUSK_GAME_EXTERN JASMemChunkPool<1024, JASThreadingModel::ObjectLevelLockable>* sCommandHeap;
 };
 
 /**
@@ -287,28 +287,28 @@ template <typename T>
 class JASPoolAllocObject {
 public:
 #if TARGET_PC
-    static void* operator new(size_t n, JKRHeapToken) {
+    static void* operator new(size_t n, JKRHeapToken) IF_DUSK(noexcept) {
         return operator new(n);
     }
 #endif
 
-    static void* operator new(size_t n) {
+    static void* operator new(size_t n) IF_DUSK(noexcept) {
 #if PLATFORM_GCN
         JASMemPool<T>& memPool_ = getMemPool_();
 #endif
         return memPool_.alloc(n);
     }
-    static void* operator new(size_t n, void* ptr) {
+    static void* operator new(size_t n, void* ptr) IF_DUSK(noexcept) {
         return ptr;
     }
 
 #if TARGET_PC
-    static void operator delete(void* ptr, size_t n, JKRHeapToken) {
+    static void operator delete(void* ptr, size_t n, JKRHeapToken) IF_DUSK(noexcept) {
         operator delete(ptr, n);
     }
 #endif
 
-    static void operator delete(void* ptr, size_t n) {
+    static void operator delete(void* ptr, size_t n) IF_DUSK(noexcept) {
 #if PLATFORM_GCN
         JASMemPool<T>& memPool_ = getMemPool_();
 #endif
@@ -402,28 +402,28 @@ template <typename T>
 class JASPoolAllocObject_MultiThreaded {
 public:
 #if TARGET_PC
-    static void* operator new(size_t n, JKRHeapToken) {
+    static void* operator new(size_t n, JKRHeapToken) IF_DUSK(noexcept) {
         return operator new(n);
     }
 #endif
 
-    static void* operator new(size_t n) {
+    static void* operator new(size_t n) IF_DUSK(noexcept) {
 #if PLATFORM_GCN
         JASMemPool_MultiThreaded<T>& memPool_ = getMemPool();
 #endif
         return memPool_.alloc(n);
     }
-    static void* operator new(size_t n, void* ptr) {
+    static void* operator new(size_t n, void* ptr) IF_DUSK(noexcept) {
         return ptr;
     }
 
 #if TARGET_PC
-    static void operator delete(void* ptr, size_t n, JKRHeapToken) {
+    static void operator delete(void* ptr, size_t n, JKRHeapToken) IF_DUSK(noexcept) {
         return operator delete(ptr, n);
     }
 #endif
 
-    static void operator delete(void* ptr, size_t n) {
+    static void operator delete(void* ptr, size_t n) IF_DUSK(noexcept) {
 #if PLATFORM_GCN
         JASMemPool_MultiThreaded<T>& memPool_ = getMemPool();
 #endif
@@ -452,6 +452,6 @@ private:
 template <typename T> JASMemPool_MultiThreaded<T> JASPoolAllocObject_MultiThreaded<T>::memPool_;
 #endif
 
-extern JKRSolidHeap* JASDram;
+DUSK_GAME_EXTERN JKRSolidHeap* JASDram;
 
 #endif /* JASHEAPCTRL_H */

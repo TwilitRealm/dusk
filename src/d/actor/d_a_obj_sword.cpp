@@ -10,7 +10,7 @@
 #include "d/d_com_inf_game.h"
 #include "d/d_item_data.h"
 
-static cull_box l_cull_box = {{-200.0f, 0.0f, -200.0f}, {200.0f, 100.0f, 200.0f}};
+static DUSK_CONSTEXPR cull_box l_cull_box = {{-200.0f, 0.0f, -200.0f}, {200.0f, 100.0f, 200.0f}};
 
 void daObjSword_c::initBaseMtx() {
     mpModel->setBaseScale(scale);
@@ -37,6 +37,7 @@ int daObjSword_c::Create() {
 cPhs_Step daObjSword_c::create() {
     fopAcM_ct(this, daObjSword_c);
     m_itemNo = 0x28;
+    DUSK_ITEM_CHECK_PREVIEW("ordon_sword", m_itemNo, this);
     if (fopAcM_isItem(this, getItemBit())) {
         return cPhs_ERROR_e;
     }
@@ -71,8 +72,9 @@ int daObjSword_c::initActionOrderGetDemo() {
     hide();
     fopAcM_orderItemEvent(this, 0, 0);
     eventInfo.onCondition(8);
-    mProcID = fopAcM_createItemForTrBoxDemo(&current.pos, m_itemNo, -1, fopAcM_GetRoomNo(this),
-                                            NULL, NULL);
+    mProcID =
+        fopAcM_createItemForTrBoxDemo(&current.pos, DUSK_ITEM_CHECK_EXPR("ordon_sword", 0x28, this),
+            -1, fopAcM_GetRoomNo(this), NULL, NULL DUSK_GIVE_TAG("ordon_sword"));
     setStatus(1);
     return 1;
 }
@@ -140,13 +142,13 @@ static int daObjSword_Create(daObjSword_c* param_0) {
     return param_0->create();
 }
 
-static actor_method_class l_daObjSword_Method = {
+static DUSK_CONST actor_method_class l_daObjSword_Method = {
     (process_method_func)daObjSword_Create,  (process_method_func)daObjSword_Delete,
     (process_method_func)daObjSword_Execute, 0,
     (process_method_func)daObjSword_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_Sword = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Sword = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

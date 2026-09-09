@@ -26,7 +26,7 @@ class daNpc_Moi_Param_c {
 public:
     virtual ~daNpc_Moi_Param_c() {}
 
-    static const daNpc_Moi_HIOParam m;
+    static DUSK_GAME_DATA const daNpc_Moi_HIOParam m;
 };
 
 #if DEBUG
@@ -128,7 +128,7 @@ public:
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_faceMotionSequenceData,
         int i_faceMotionStepNum,
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData, int i_motionStepNum,
-        daNpcT_evtData_c const* i_evtData, char** i_arcNames)
+        daNpcT_evtData_c const* i_evtData, char DUSK_CONST* DUSK_CONST* i_arcNames)
         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
                    i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
                    i_arcNames) {}
@@ -158,10 +158,9 @@ public:
     bool chkSFight() { return field_0x166b == 1; }
     u8 getPathID() { return (fopAcM_GetParam(this) & 0xff00) >> 8; }
 
-    static char* mCutNameList[5];
-    static cutFunc mCutList[5];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[5];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[5];
 
-private:
     /* 0x0E40 */ NPC_MOI_HIO_CLASS* mpHIO;
     /* 0x0E44 */ J3DModel* mpModel[6];
     /* 0x0E5C */ dCcD_Cyl mCyl[4];

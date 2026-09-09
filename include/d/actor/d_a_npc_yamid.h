@@ -20,7 +20,7 @@ class daNpc_yamiD_Param_c {
 public:
     virtual ~daNpc_yamiD_Param_c() {}
 
-    static daNpc_yamiD_HIOParam const m;
+    static DUSK_GAME_DATA daNpc_yamiD_HIOParam const m;
 };
 
 #if DEBUG
@@ -84,7 +84,7 @@ public:
             daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData,
             int i_motionStepNum,
             daNpcT_evtData_c const* i_evtData,
-            char** i_arcNames)
+            char DUSK_CONST* DUSK_CONST* i_arcNames)
         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
         i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
         i_arcNames) {
@@ -129,10 +129,9 @@ public:
         field_0xe44.OffTgSetBit();
     }
 
-    static char* mCutNameList[2];
-    static cutFunc mCutList[2];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[2];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[2];
 
-private:
     /* 0xE40 */ NPC_YAMID_HIO_CLASS* mpHIO;
     /* 0xE44 */ dCcD_Cyl field_0xe44;
     /* 0xF80 */ u8 mType;

@@ -52,7 +52,7 @@ static Vec const l_craw_offset[4] = {
     {0.0f, 0.0f, 95.0f},
 };
 
-s16 const daObjBm_c::M_dir_base[4] = {
+DUSK_GAME_DATA s16 const daObjBm_c::M_dir_base[4] = {
     0x0000,
     0x4000,
     -0x8000,
@@ -63,26 +63,26 @@ static const char* l_arcName = "Obj_bm";
 
 static const char* l_eye_matName = "bmEye";
 
-static char* l_head_joint = "head";
+static DUSK_CONSTEXPR char DUSK_CONST* l_head_joint = "head";
 
-static char* l_bigGear_joint = "cogRed";
+static DUSK_CONSTEXPR char DUSK_CONST* l_bigGear_joint = "cogRed";
 
-static char* l_smallGear0_joint = "cogBlue";
+static DUSK_CONSTEXPR char DUSK_CONST* l_smallGear0_joint = "cogBlue";
 
-static char* l_smallGear1_joint = "cogGreen";
+static DUSK_CONSTEXPR char DUSK_CONST* l_smallGear1_joint = "cogGreen";
 
-static char* l_smallGear2_joint = "cogYellow";
+static DUSK_CONSTEXPR char DUSK_CONST* l_smallGear2_joint = "cogYellow";
 
-static char* l_joint_table[5] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_joint_table[5] = {
     l_head_joint, l_bigGear_joint, l_smallGear0_joint, l_smallGear1_joint, l_smallGear2_joint,
 };
 
-static cull_box l_cull_box = {
+static DUSK_CONSTEXPR cull_box l_cull_box = {
     {-1200.0f, -100.0f, -1200.0f},
     {1200.0f, 400.0f, 1200.0f},
 };
 
-static dCcD_SrcSph l_sph_src = {
+static DUSK_CONSTEXPR dCcD_SrcSph l_sph_src = {
     {
         {0x0, {{0x0, 0x0, 0x0}, {0x402020, 0x11}, 0x58}},  // mObj
         {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x0},                // mGObjAt
@@ -94,7 +94,7 @@ static dCcD_SrcSph l_sph_src = {
     }  // mSphAttr
 };
 
-static dCcD_SrcCps l_cps_src = {
+static DUSK_CONSTEXPR dCcD_SrcCps l_cps_src = {
     {
         {0x0, {{0x100, 0x1, 0x1d}, {0x0, 0x0}, 0x0}},  // mObj
         {dCcD_SE_SWORD, 0x0, 0x0, 0x1, 0x0},           // mGObjAt
@@ -106,7 +106,7 @@ static dCcD_SrcCps l_cps_src = {
     }  // mCpsAttr
 };
 
-static dCcD_SrcCyl l_cyl_src = {
+static DUSK_CONSTEXPR dCcD_SrcCyl l_cyl_src = {
     {
         {0x0, {{0x0, 0x0, 0x1f}, {0x0, 0x0}, 0x79}},  // mObj
         {dCcD_SE_NONE, 0x1, 0x0, 0x0, 0x0},           // mGObjAt
@@ -1037,12 +1037,12 @@ void daObjBm_c::mode_wait() {
     }
 }
 
-const daObjBm_c::BgcSrc_c daObjBm_c::Bgc_c::M_lin5[] = {
+DUSK_GAME_DATA const daObjBm_c::BgcSrc_c daObjBm_c::Bgc_c::M_lin5[] = {
     {0.0f, 0.0f, 0.0f, 0.0f}, {-0.5f, -0.5f, -1.0f, -1.0f}, {0.5f, -0.5f, 1.0f, -1.0f},
     {0.5f, 0.5f, 1.0f, 1.0f}, {-0.5f, 0.5f, -1.0f, 1.0f},
 };
 
-const daObjBm_c::BgcSrc_c daObjBm_c::Bgc_c::M_lin20[] = {
+DUSK_GAME_DATA const daObjBm_c::BgcSrc_c daObjBm_c::Bgc_c::M_lin20[] = {
     {0.0f, 0.0f, 0.0f, 0.0f},    {-0.25f, -0.25f, 0.0f, 0.0f}, {-0.5f, -0.5f, -1.0f, -1.0f},
     {0.0f, -0.5f, 1.0f, -1.0f},  {0.0f, 0.0f, 1.0f, 1.0f},     {-0.5f, 0.0f, -1.0f, 1.0f},
     {0.25f, -0.25f, 0.0f, 0.0f}, {0.0f, -0.5f, -1.0f, -1.0f},  {0.5f, -0.5f, 1.0f, -1.0f},
@@ -1148,11 +1148,11 @@ static f32 dummy_rodata_5157() {
     return -G_CM3D_F_INF;
 }
 
-dBgS_ObjGndChk daObjBm_c::Bgc_c::M_gnd_work[23];
+DUSK_GAME_DATA dBgS_ObjGndChk daObjBm_c::Bgc_c::M_gnd_work[23];
 
-dBgS_WtrChk daObjBm_c::Bgc_c::M_wrt_work;
+DUSK_GAME_DATA dBgS_WtrChk daObjBm_c::Bgc_c::M_wrt_work;
 
-dBgS_ObjLinChk daObjBm_c::Bgc_c::M_wall_work[23];
+DUSK_GAME_DATA dBgS_ObjLinChk daObjBm_c::Bgc_c::M_wall_work[23];
 
 void daObjBm_c::Bgc_c::chk_wall_touch(const fopAc_ac_c*, const daObjBm_c::BgcSrc_c*, short) {
     static dBgS_ObjLinChk touch_work;
@@ -1943,13 +1943,13 @@ static int daObjBm_MoveBGDraw(daObjBm_c* i_this) {
     return i_this->MoveBGDraw();
 }
 
-static actor_method_class daObjBm_METHODS = {
+static DUSK_CONST actor_method_class daObjBm_METHODS = {
     (process_method_func)daObjBm_create1st,     (process_method_func)daObjBm_MoveBGDelete,
     (process_method_func)daObjBm_MoveBGExecute, 0,
     (process_method_func)daObjBm_MoveBGDraw,
 };
 
-actor_process_profile_definition g_profile_Obj_Bemos = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Bemos = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

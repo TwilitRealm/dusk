@@ -36,9 +36,20 @@ static int fopCam_Execute(camera_class* i_this) {
     fapGm_HIO_c::startCpuTimer();
     #endif
 
+    #if TARGET_PC
+    if (dusk::getSettings().game.debugFlyCam && dusk::getSettings().game.debugFlyCamLockEvents) {
+        dScnPly_c::setPauseTimer(1);
+        ret = fpcMtd_Execute((process_method_class*)i_this->submethod, i_this);
+    } else {
+        if (!dComIfGp_isPauseFlag() && !dScnPly_c::isPause()) {
+            ret = fpcMtd_Execute((process_method_class*)i_this->submethod, i_this);
+        }
+    }
+    #else
     if (!dComIfGp_isPauseFlag() && !dScnPly_c::isPause()) {
         ret = fpcMtd_Execute((process_method_class*)i_this->submethod, i_this);
     }
+    #endif
 
     #if DEBUG
     fapGm_HIO_c::stopCpuTimer("カメラ（計算処理）"); // Camera (computational processing)
@@ -90,7 +101,7 @@ static int fopCam_Create(void* i_this) {
     return ret;
 }
 
-leafdraw_method_class g_fopCam_Method = {
+DUSK_GAME_DATA leafdraw_method_class g_fopCam_Method = {
     (process_method_func)fopCam_Create,  (process_method_func)fopCam_Delete,
     (process_method_func)fopCam_Execute, (process_method_func)fopCam_IsDelete,
     (process_method_func)fopCam_Draw,

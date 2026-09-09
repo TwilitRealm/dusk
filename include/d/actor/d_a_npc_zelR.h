@@ -20,7 +20,7 @@ class daNpc_ZelR_Param_c {
 public:
     virtual ~daNpc_ZelR_Param_c() {};
 
-    static const daNpc_ZelR_HIOParam m;
+    static DUSK_GAME_DATA const daNpc_ZelR_HIOParam m;
 };
 
 #if DEBUG
@@ -83,7 +83,7 @@ public:
     daNpc_ZelR_c(daNpcT_faceMotionAnmData_c const* param_1, daNpcT_motionAnmData_c const* param_2,
                                 daNpcT_MotionSeqMngr_c::sequenceStepData_c const* param_3, int param_4,
                                 daNpcT_MotionSeqMngr_c::sequenceStepData_c const* param_5, int param_6,
-                                daNpcT_evtData_c const* param_7, char** param_8) :
+                                daNpcT_evtData_c const* param_7, char DUSK_CONST* DUSK_CONST* param_8) :
                                 daNpcT_c(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8)
                                  {}
     u16 getEyeballRMaterialNo() { return 3; }
@@ -93,10 +93,9 @@ public:
     BOOL checkChangeJoint(int param_1) { return param_1 == 3; };
     BOOL checkRemoveJoint(int param_1) { return param_1 == 13; };
 
-    static char* mCutNameList;
-    static EventFn mCutList[1];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList;
+    static DUSK_GAME_DATA EventFn mCutList[1];
 
-private:
     /* 0xE40 */ NPC_ZELR_HIO_CLASS* mpHIO;
     /* 0xE44 */ dCcD_Cyl mCyl;
     /* 0xF80 */ u8 mType;

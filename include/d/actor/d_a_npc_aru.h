@@ -17,7 +17,7 @@ class daNpc_Aru_Param_c {
 public:
     virtual ~daNpc_Aru_Param_c() {}
 
-    static daNpc_Aru_HIOParam const m;
+    static DUSK_GAME_DATA daNpc_Aru_HIOParam const m;
 };
 
 #if DEBUG
@@ -149,7 +149,7 @@ public:
             int i_faceMotionStepNum,
             daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData,
             int i_motionStepNum,
-            daNpcT_evtData_c const* i_evtData, char** i_arcNames)
+            daNpcT_evtData_c const* i_evtData, char DUSK_CONST* DUSK_CONST* i_arcNames)
         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
         i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
         i_arcNames) {
@@ -171,10 +171,9 @@ public:
     u8 getPathID() { return (fopAcM_GetParam(this) & 0xFF00) >> 8; }
     void setLastIn() { mLastGoatIn = true; }
 
-    static char* mCutNameList[7];
-    static cutFunc mCutList[7];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[7];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[7];
 
-private:
     /* 0xE40 */ NPC_ARU_HIO_CLASS* mpHIO;
     /* 0xE44 */ dCcD_Cyl mCyl;
     /* 0xF80 */ u8 mType;

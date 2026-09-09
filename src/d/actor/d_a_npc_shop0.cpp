@@ -8,15 +8,19 @@
 #include "d/actor/d_a_npc_shop0.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "helpers/string.hpp"
+#endif
+
 static int createHeapCallBack(fopAc_ac_c* i_this) {
     return static_cast<daNpc_Shop0_c*>(i_this)->createHeap();
 }
 
-static char* l_resName = "Shop0";
+static DUSK_CONSTEXPR char DUSK_CONST* l_resName = "Shop0";
 
-static char* l_bmdFileName = "grA_a.bmd";
+static DUSK_CONSTEXPR char DUSK_CONST* l_bmdFileName = "grA_a.bmd";
 
-static char* l_bckFileNameTBL = "grA_wait_a";
+static DUSK_CONSTEXPR char DUSK_CONST* l_bckFileNameTBL = "grA_wait_a";
 
 daNpc_Shop0_c::~daNpc_Shop0_c() {
     dComIfG_resLoad(&mPhaseReq, getResName());
@@ -37,7 +41,7 @@ int daNpc_Shop0_c::create() {
     return phase_step;
 }
 
-dCcD_SrcCyl const daNpc_Shop0_c::mCylDat = {
+DUSK_GAME_DATA dCcD_SrcCyl const daNpc_Shop0_c::mCylDat = {
     {
         {
             0x0, // mFlags
@@ -60,7 +64,7 @@ dCcD_SrcCyl const daNpc_Shop0_c::mCylDat = {
     }
 };
 
-daNpc_Shop0_Param_c::param const daNpc_Shop0_Param_c::mParam = {
+DUSK_GAME_DATA daNpc_Shop0_Param_c::param const daNpc_Shop0_Param_c::mParam = {
     0x44480000, 
     0x44480000,
     0x41F00000,
@@ -133,7 +137,7 @@ int daNpc_Shop0_c::draw() {
     return 1;
 }
 
-char* daNpc_Shop0_c::getResName() {
+char DUSK_CONST* daNpc_Shop0_c::getResName() {
     return l_resName;
 }
 
@@ -183,9 +187,9 @@ int daNpc_Shop0_c::init() {
 
 static char l_fileName[21];
 
-J3DAnmTransform* daNpc_Shop0_c::getTrnsfrmAnmP(int i_fileIndex, char** i_fileName) {
-    strcpy(l_fileName, i_fileName[i_fileIndex]);
-    strcat(l_fileName, ".bck");
+J3DAnmTransform* daNpc_Shop0_c::getTrnsfrmAnmP(int i_fileIndex, char DUSK_CONST* DUSK_CONST* i_fileName) {
+    SAFE_STRCPY(l_fileName, i_fileName[i_fileIndex]);
+    SAFE_STRCAT(l_fileName, ".bck");
     return (J3DAnmTransform*) dComIfG_getObjectRes(getResName(), l_fileName);
 }
 
@@ -346,11 +350,11 @@ static int daNpc_Shop0_IsDelete(void*) {
     return true;
 }
 
-static actor_method_class daNpc_Shop0_MethodTable = {
+static DUSK_CONST actor_method_class daNpc_Shop0_MethodTable = {
     daNpc_Shop0_Create, daNpc_Shop0_Delete, daNpc_Shop0_Execute, daNpc_Shop0_IsDelete, daNpc_Shop0_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_SHOP0 = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_SHOP0 = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

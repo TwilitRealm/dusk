@@ -11,12 +11,15 @@
 #include <types.h>
 
 u32 mDoLib_setResTimgObj(ResTIMG const* i_img, TGXTexObj* o_texObj, u32 tlut_name,
-                        GXTlutObj* o_tlutObj) {
+                         TGXTlutObj* o_tlutObj) {
 #ifdef TARGET_PC
     o_texObj->reset();
 #endif
     if (i_img->indexTexture) {
         JUT_ASSERT(44, o_tlutObj != NULL);
+#ifdef TARGET_PC
+        o_tlutObj->reset();
+#endif
         GXInitTlutObj(o_tlutObj, (void*)((u8*)i_img + i_img->paletteOffset),
                       (GXTlutFmt)i_img->colorFormat, (u16)i_img->numColors);
         GXInitTexObjCI(o_texObj, (void*)((u8*)i_img + i_img->imageOffset), i_img->width, i_img->height,
@@ -35,11 +38,11 @@ u32 mDoLib_setResTimgObj(ResTIMG const* i_img, TGXTexObj* o_texObj, u32 tlut_nam
     return i_img->indexTexture;
 }
 
-J3DUClipper mDoLib_clipper::mClipper;
+DUSK_GAME_DATA J3DUClipper mDoLib_clipper::mClipper;
 
-f32 mDoLib_clipper::mSystemFar;
+DUSK_GAME_DATA f32 mDoLib_clipper::mSystemFar;
 
-f32 mDoLib_clipper::mFovyRate;
+DUSK_GAME_DATA f32 mDoLib_clipper::mFovyRate;
 
 void mDoLib_clipper::setup(f32 fovy, f32 aspect, f32 near_, f32 far_) {
     mClipper.setFovy(fovy);

@@ -12,7 +12,7 @@
 #include "JSystem/J3DGraphAnimator/J3DMaterialAnm.h"
 
 class daNpcF_ActorMngr_c {
-private:
+public:
     /* 0x0 */ fpc_ProcID mActorID;
 
 public:
@@ -52,7 +52,7 @@ BOOL daNpcF_chkPassed(cXyz i_pos, dPnt* i_points, u16 i_idx, u16 i_num, BOOL i_i
 BOOL daNpcF_chkDoBtnEqSpeak(fopAc_ac_c* i_actor_p);
 
 class daNpcF_SPCurve_c {
-private:
+public:
     /* 0x00 */ u16 mNurbs;
     /* 0x02 */ u16 field_0x02;
     /* 0x04 */ u8 mIsReversed;
@@ -119,7 +119,7 @@ public:
 };  // Size: 0x630
 
 class daNpcF_MatAnm_c : public J3DMaterialAnm {
-private:
+public:
     /* 0x0F4 */ mutable f32 field_0xF4;
     /* 0x0F8 */ mutable f32 field_0xF8;
     /* 0x0FC */ f32 mNowOffsetX;
@@ -138,7 +138,7 @@ public:
 };
 
 class daNpcF_Lookat_c {
-private:
+public:
     /* 0x00 */ cXyz mJointPos[4];
     /* 0x30 */ cXyz* mAttnPos_p;
     /* 0x34 */ csXyz mAngularMoveDis[4];
@@ -311,10 +311,10 @@ public:
     static void* srchActor(void*, void*);
 
     void initialize();
-    J3DAnmTransformKey* getTrnsfrmKeyAnmP(char*, int);
-    J3DAnmTexPattern* getTexPtrnAnmP(char*, int);
-    J3DAnmTextureSRTKey* getTexSRTKeyAnmP(char*, int);
-    J3DAnmTevRegKey* getTevRegKeyAnmP(char*, int);
+    J3DAnmTransformKey* getTrnsfrmKeyAnmP(DUSK_CONST char*, int);
+    J3DAnmTexPattern* getTexPtrnAnmP(DUSK_CONST char*, int);
+    J3DAnmTextureSRTKey* getTexSRTKeyAnmP(DUSK_CONST char*, int);
+    J3DAnmTevRegKey* getTevRegKeyAnmP(DUSK_CONST char*, int);
     BOOL setMcaMorfAnm(J3DAnmTransformKey* i_anm, f32 i_rate, f32 i_morf, int i_attr,
                                       int i_start, int i_end);
     BOOL setBckAnm(J3DAnmTransform* i_bck, f32 i_rate, int i_attr, int i_start,
@@ -336,8 +336,8 @@ public:
     BOOL hitChk2(dCcD_Cyl*, BOOL, BOOL);
     void setDamage(int, int, int);
     int ctrlMsgAnm(int&, int&, fopAc_ac_c*, BOOL);
-    void orderEvent(int, char*, u16, u16, u8, u16);
-    void changeEvent(char*, char*, u16, u16);
+    void orderEvent(int, DUSK_CONST char*, u16, u16, u8, u16);
+    void changeEvent(DUSK_CONST char*, DUSK_CONST char*, u16, u16);
     BOOL chkActorInSight(fopAc_ac_c*, f32);
     BOOL chkActorInArea(fopAc_ac_c*, cXyz, cXyz, s16);
     BOOL chkActorInAttnArea(fopAc_ac_c*, fopAc_ac_c*, int);
@@ -394,19 +394,18 @@ public:
     void onHide() { mHide = true; }
     void offHide() { mHide = false; }
 
-    static dCcD_SrcGObjInf const mCcDObjInfo;
-    static dCcD_SrcCyl mCcDCyl;
-    static dCcD_SrcSph mCcDSph;
-    static fopAc_ac_c* mFindActorPList[100];
-    static s32 mFindCount;
-    static s16 mSrchActorName;
-    static char mFileNameBuf[0x15];
+    static DUSK_GAME_DATA dCcD_SrcGObjInf const mCcDObjInfo;
+    static DUSK_GAME_DATA dCcD_SrcCyl mCcDCyl;
+    static DUSK_GAME_DATA dCcD_SrcSph mCcDSph;
+    static DUSK_GAME_DATA fopAc_ac_c* mFindActorPList[100];
+    static DUSK_GAME_DATA s32 mFindCount;
+    static DUSK_GAME_DATA s16 mSrchActorName;
+    static DUSK_GAME_DATA char mFileNameBuf[0x15];
 };
 
 STATIC_ASSERT(sizeof(daNpcF_c) == 0xB48);
 
 class daNpcF_MoveBgActor_c : public daNpcF_c {
-private:
 public:
     // these functions are inferred based on daBaseNpc_moveBgActor_c -
     // defining them in this order fixes weak function order for this class in d_a_npc

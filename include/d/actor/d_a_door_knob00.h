@@ -29,11 +29,11 @@ public:
 
     typedef int (daKnob20_c::*actionFunc)();
 
-    char* getAlwaysArcName();
-    char* getEvArcName();
-    char* getDzb();
-    char* getDummyBmd();
-    char* getBmd();
+    DUSK_CONST char* getAlwaysArcName();
+    DUSK_CONST char* getEvArcName();
+    DUSK_CONST char* getDzb();
+    DUSK_CONST char* getDummyBmd();
+    DUSK_CONST char* getBmd();
     J3DModelData* getDoorModelData();
     int CreateHeap();
     void calcMtx();
@@ -73,7 +73,6 @@ public:
     void onFlag(u16 flag) { field_0x60c |= flag; }
     int checkFlag(u16 flag) { return field_0x60c & flag; }
 
-private:
     /* 0x568 */ request_of_phase_process_class mPhase1;
     /* 0x570 */ request_of_phase_process_class mPhase2;
     /* 0x578 */ J3DModel* mModel1;

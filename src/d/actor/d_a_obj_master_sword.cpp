@@ -1,6 +1,6 @@
 /**
  * @file d_a_obj_master_sword.cpp
- * 
+ *
 */
 
 #include "d/dolzel_rel.h" // IWYU pragma: keep
@@ -10,7 +10,14 @@
 #include "d/d_com_inf_game.h"
 #include "d/d_meter2_info.h"
 
-daObjMasterSword_Attr_c const daObjMasterSword_c::mAttr = {1.0f};
+#if TARGET_PC
+#include "dusk/mods/item.hpp"
+#include "mods/items.h"
+
+#include "d/d_item.h"
+#endif
+
+DUSK_GAME_DATA daObjMasterSword_Attr_c const daObjMasterSword_c::mAttr = {1.0f};
 
 void daObjMasterSword_c::initBaseMtx() {
     fopAcM_SetMtx(this, mpModel->getBaseTRMtx());
@@ -54,7 +61,7 @@ int daObjMasterSword_c::createHeapCallBack(fopAc_ac_c* i_this) {
     return static_cast<daObjMasterSword_c*>(i_this)->CreateHeap();
 }
 
-static char* l_arcName = "MstrSword";
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcName = "MstrSword";
 
 int daObjMasterSword_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 5);
@@ -80,7 +87,7 @@ static int daObjMasterSword_Create(fopAc_ac_c* i_this) {
     return static_cast<daObjMasterSword_c*>(i_this)->create();
 }
 
-actionFunc daObjMasterSword_c::ActionTable[] = {
+DUSK_GAME_DATA actionFunc daObjMasterSword_c::ActionTable[] = {
     &daObjMasterSword_c::initWait, &daObjMasterSword_c::executeWait,
 };
 
@@ -186,11 +193,39 @@ int daObjMasterSword_c::execute() {
     mBrk.play();
 
     if (dComIfGs_isTmpBit(dSv_event_tmp_flag_c::tempBitLabels[73])) {
+#if TARGET_PC
+        const auto masterSword = dusk::mods::item_check_commit(
+            ITEM_CHECK_MASTER_SWORD, dItemNo_MASTER_SWORD_e, this);
+        if (!masterSword.was_resolved) {
+            dComIfGs_onItemFirstBit(dItemNo_MASTER_SWORD_e);
+            dMeter2Info_setSword(dItemNo_MASTER_SWORD_e, false);
+            dComIfGs_setSelectEquipSword(dItemNo_MASTER_SWORD_e);
+            dusk::mods::item_check_complete(masterSword, this);
+        } else if (masterSword.itemNo == dItemNo_NONE_e) {
+            dusk::mods::item_check_complete(masterSword, this);
+        } else {
+            dusk::mods::item_check_enqueue(masterSword, dusk::mods::ItemGiveMode::Demo);
+        }
+
+        dComIfGp_setItemLifeCount(dComIfGs_getMaxLife(), 0);
+
+        const auto shadowCrystal = dusk::mods::item_check_commit(
+            ITEM_CHECK_SHADOW_CRYSTAL, dItemNo_SHADOW_CRYSTAL_e, this);
+        if (!shadowCrystal.was_resolved) {
+            execItemGet(shadowCrystal.itemNo, shadowCrystal.tag, this);
+        } else if (shadowCrystal.itemNo == dItemNo_NONE_e) {
+            dusk::mods::item_check_complete(shadowCrystal, this);
+        } else {
+            dusk::mods::item_check_enqueue(shadowCrystal, dusk::mods::ItemGiveMode::Demo);
+        }
+
+#else
         dComIfGs_onItemFirstBit(dItemNo_MASTER_SWORD_e);
         dMeter2Info_setSword(dItemNo_MASTER_SWORD_e, false);
         dComIfGs_setSelectEquipSword(dItemNo_MASTER_SWORD_e);
 
         dComIfGp_setItemLifeCount(dComIfGs_getMaxLife(), 0);
+#endif
         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[getFlagNo()]);
         fopAcM_delete(this);
     }
@@ -236,7 +271,7 @@ static int daObjMasterSword_IsDelete(daObjMasterSword_c* param_0) {
     return 1;
 }
 
-static actor_method_class l_daObjMasterSword_Method = {
+static DUSK_CONST actor_method_class l_daObjMasterSword_Method = {
     (process_method_func)daObjMasterSword_Create,
     (process_method_func)daObjMasterSword_Delete,
     (process_method_func)daObjMasterSword_Execute,
@@ -244,7 +279,7 @@ static actor_method_class l_daObjMasterSword_Method = {
     (process_method_func)daObjMasterSword_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_MasterSword = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_MasterSword = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

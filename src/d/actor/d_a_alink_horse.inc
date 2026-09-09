@@ -73,19 +73,19 @@ int daAlink_c::getReinRideDirection() {
     return DIR_RIGHT;
 }
 
-Vec const daAlink_c::m_handLeftOutSidePos = {
+DUSK_GAME_DATA Vec const daAlink_c::m_handLeftOutSidePos = {
     9.0f, -5.0f, 3.0f
 };
 
-Vec const daAlink_c::m_handRightOutSidePos = {
+DUSK_GAME_DATA Vec const daAlink_c::m_handRightOutSidePos = {
     9.0f, -5.0f, -3.0f
 };
 
-Vec const daAlink_c::m_handLeftInSidePos = {
+DUSK_GAME_DATA Vec const daAlink_c::m_handLeftInSidePos = {
     9.0f, 5.0f, 3.0f
 };
 
-Vec const daAlink_c::m_handRightInSidePos = {
+DUSK_GAME_DATA Vec const daAlink_c::m_handRightInSidePos = {
     9.0f, 5.0f, -3.0f
 };
 
@@ -1270,7 +1270,7 @@ int daAlink_c::procHorseRideInit() {
 
     daAlink_ANM anm;
     MtxP rideMtx;
-    Vec* localRidePos_p;
+    Vec DUSK_CONST* localRidePos_p;
     u32 mode;
     if (fopAcM_GetName(field_0x27f4) == fpcNm_HORSE_e) {
         daHorse_c* horse = (daHorse_c*)field_0x27f4;

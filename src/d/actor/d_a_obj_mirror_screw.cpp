@@ -11,7 +11,7 @@
 
 static char const* l_arcName = "MR-Screw";
 
-daObjMirrorScrew_c::attr const daObjMirrorScrew_c::M_attr = {
+DUSK_GAME_DATA daObjMirrorScrew_c::attr const daObjMirrorScrew_c::M_attr = {
     -2710.0f,  // mDownDist
     0.6f,      // mRotSpeedThreshold
     45,        // mSpinCount
@@ -20,7 +20,7 @@ daObjMirrorScrew_c::attr const daObjMirrorScrew_c::M_attr = {
     -3.375f,   // mDownSpeed
 };
 
-daObjMirrorScrew_actionFunc daObjMirrorScrew_c::ActionTable[2][2] = {
+DUSK_GAME_DATA daObjMirrorScrew_actionFunc daObjMirrorScrew_c::ActionTable[2][2] = {
     {
         &daObjMirrorScrew_c::initWait,
         &daObjMirrorScrew_c::executeWait,
@@ -252,13 +252,13 @@ int daObjMirrorScrew_c::Delete() {
     return 1;
 }
 
-static actor_method_class l_daObjMirrorScrew_Method = {
+static DUSK_CONST actor_method_class l_daObjMirrorScrew_Method = {
     (process_method_func)daObjMirrorScrew_Create,  (process_method_func)daObjMirrorScrew_Delete,
     (process_method_func)daObjMirrorScrew_Execute, (process_method_func)daObjMirrorScrew_IsDelete,
     (process_method_func)daObjMirrorScrew_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_MirrorScrew = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_MirrorScrew = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

@@ -14,8 +14,8 @@
 class daSCannon_c : public fopAc_ac_c, public request_of_phase_process_class {
 public:
     struct demoTable_s {
-        /* 0x0 */ void (daSCannon_c::*(*demo_proc_table)[2])();
-        /* 0x4 */ char** cut_table;
+        /* 0x0 */ void (daSCannon_c::*DUSK_CONST (*demo_proc_table)[2])();
+        /* 0x4 */ char DUSK_CONST* DUSK_CONST* cut_table;
         /* 0x8 */ int cut_num;
     };
 
@@ -76,14 +76,13 @@ public:
     int getSw1() { return fopAcM_GetParamBit(this, 0, 8); }
     int getSw2() { return fopAcM_GetParamBit(this, 8, 8); }
 
-    static const demoTable_s s_demoTable[];
-    static void (daSCannon_c::*s_exeProc[])();
-    static void (daSCannon_c::*s_demoExeProc_WarpEnd[][2])();
-    static void (daSCannon_c::*s_demoExeProc_FireTks[][2])();
-    static void (daSCannon_c::*s_demoExeProc_FireFirst[][2])();
-    static void (daSCannon_c::*s_demoExeProc_FireSecond[][2])();
+    static DUSK_GAME_DATA const demoTable_s s_demoTable[];
+    static DUSK_GAME_DATA void (daSCannon_c::*DUSK_CONST s_exeProc[])();
+    static DUSK_GAME_DATA void (daSCannon_c::*DUSK_CONST s_demoExeProc_WarpEnd[][2])();
+    static DUSK_GAME_DATA void (daSCannon_c::*DUSK_CONST s_demoExeProc_FireTks[][2])();
+    static DUSK_GAME_DATA void (daSCannon_c::*DUSK_CONST s_demoExeProc_FireFirst[][2])();
+    static DUSK_GAME_DATA void (daSCannon_c::*DUSK_CONST s_demoExeProc_FireSecond[][2])();
 
-private:
     /* 0x574 */ request_of_phase_process_class mZevPhase;
     /* 0x57C */ request_of_phase_process_class mPtlPhase;
     /* 0x584 */ mDoExt_bckAnm mBck;

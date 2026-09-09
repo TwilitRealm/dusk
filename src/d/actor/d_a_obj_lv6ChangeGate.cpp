@@ -28,14 +28,14 @@ daLv6ChangeGate_HIO_c::daLv6ChangeGate_HIO_c() {
 
 static daLv6ChangeGate_HIO_c l_HIO;
 
-const dCcD_SrcGObjInf daLv6ChangeGate_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daLv6ChangeGate_c::mCcDObjInfo = {
     {0, {{0, 0, 0}, {0x400, 0x11}, {0x79}}},
     {dCcD_SE_SWORD, 0, 0, 0, 0},
     {dCcD_SE_STONE, 0, 0, 0, 0},
     {0},
 };
 
-dCcD_SrcCyl daLv6ChangeGate_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daLv6ChangeGate_c::mCcDCyl = {
     mCcDObjInfo,
     {
         {{0.0f, 0.0f, 0.0f}, 0.0f, 0.0f}
@@ -302,7 +302,7 @@ static int daLv6ChangeGate_Create(fopAc_ac_c* i_this) {
     return ((daLv6ChangeGate_c*)i_this)->create();
 }
 
-static actor_method_class l_daLv6ChangeGate_Method = {
+static DUSK_CONST actor_method_class l_daLv6ChangeGate_Method = {
     (process_method_func)daLv6ChangeGate_Create,
     (process_method_func)daLv6ChangeGate_Delete,
     (process_method_func)daLv6ChangeGate_Execute,
@@ -310,7 +310,7 @@ static actor_method_class l_daLv6ChangeGate_Method = {
     (process_method_func)daLv6ChangeGate_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_Lv6ChgGate = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_Lv6ChgGate = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

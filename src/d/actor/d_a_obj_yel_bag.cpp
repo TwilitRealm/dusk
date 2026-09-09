@@ -20,14 +20,14 @@ static int l_loadRes_YBAG0[3] = {
     0, -1, -1,
 };
 
-static int* l_loadRes_list[2] = {
+static DUSK_CONSTEXPR int DUSK_CONST* l_loadRes_list[2] = {
     l_loadRes_YBAG0,
     l_loadRes_YBAG0,
 };
 
-static char* l_resNames[] = {"yel_bag"};
+static DUSK_CONSTEXPR char DUSK_CONST* l_resNames[] = {"yel_bag"};
 
-dCcD_SrcCyl daObj_YBag_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daObj_YBag_c::mCcDCyl = {
     daNpcT_c::mCcDObjData,
     {
         {{0.0f, 0.0f, 0.0f}, 0.0f, 0.0f}
@@ -69,14 +69,14 @@ daObj_YBag_c::~daObj_YBag_c() {
 #endif
 }
 
-const dCcD_SrcGObjInf daObj_YBag_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daObj_YBag_c::mCcDObjInfo = {
     {0, {{0, 0, 0}, {0, 0x00}, {0x79}}},
     {dCcD_SE_NONE, 0, 0, 0, 0},
     {dCcD_SE_NONE, 0, 0, 0, 0},
     {0},
 };
 
-daObj_YBag_HIOParam const daObj_YBag_Param_c::m = {
+DUSK_GAME_DATA daObj_YBag_HIOParam const daObj_YBag_Param_c::m = {
     0.0f, -4.0f, 1.0f, 400.0f, 255.0f, 10.0f, 4.0f, 10.0f, 
     41.0f, 32.0f, 3.0f,
 };
@@ -534,7 +534,7 @@ static int daObj_YBag_IsDelete(void* i_this) {
     return 1;
 }
 
-static actor_method_class daObj_YBag_MethodTable = {
+static DUSK_CONST actor_method_class daObj_YBag_MethodTable = {
     (process_method_func)daObj_YBag_Create,
     (process_method_func)daObj_YBag_Delete,
     (process_method_func)daObj_YBag_Execute,
@@ -542,7 +542,7 @@ static actor_method_class daObj_YBag_MethodTable = {
     (process_method_func)daObj_YBag_Draw,
 };
 
-actor_process_profile_definition g_profile_OBJ_YBAG = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_OBJ_YBAG = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 8,
     /* List Prio    */ fpcPi_CURRENT_e,

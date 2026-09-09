@@ -20,14 +20,14 @@ daOnsTaru_HIO_c::daOnsTaru_HIO_c() {
 
 static daOnsTaru_HIO_c l_HIO;
 
-const dCcD_SrcGObjInf daOnsTaru_c::mCcDObjInfo = {
+DUSK_GAME_DATA const dCcD_SrcGObjInf daOnsTaru_c::mCcDObjInfo = {
     {0, {{8, 0, 0x1F}, {0xD8FADDAF, 0x1F}, {0x79}}},
     {dCcD_SE_NONE, 0, 1, 0, 0},
     {dCcD_SE_NONE, 0, 0, 0, 2},
     {0},
 };
 
-dCcD_SrcCyl daOnsTaru_c::mCcDCyl = {
+DUSK_GAME_DATA dCcD_SrcCyl daOnsTaru_c::mCcDCyl = {
     daOnsTaru_c::mCcDObjInfo,
     {
         {
@@ -384,13 +384,13 @@ static int daOnsTaru_Create(fopAc_ac_c* i_this) {
     return ((daOnsTaru_c*)i_this)->create();
 }
 
-static actor_method_class l_daOnsTaru_Method = {
+static DUSK_CONST actor_method_class l_daOnsTaru_Method = {
     (process_method_func)daOnsTaru_Create,  (process_method_func)daOnsTaru_Delete,
     (process_method_func)daOnsTaru_Execute, (process_method_func)NULL,
     (process_method_func)daOnsTaru_Draw,
 };
 
-actor_process_profile_definition g_profile_Obj_OnsenTaru = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_OnsenTaru = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

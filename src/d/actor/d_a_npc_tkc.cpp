@@ -99,34 +99,34 @@ void daNpcTkc_HIO_c::genMessage(JORMContext* ctx) {
 }
 #endif
 
-static daNpc_GetParam3 l_bckGetParamList[3] = {
+static DUSK_CONSTEXPR daNpc_GetParam3 l_bckGetParamList[3] = {
     {-1, J3DFrameCtrl::EMode_LOOP},
     {BCK_TKC_F_TALK_A, J3DFrameCtrl::EMode_NONE},
     {BCK_TKC_FLY, J3DFrameCtrl::EMode_LOOP},
 };
 
-static daNpc_GetParam3 l_btpGetParamList[1] = {
+static DUSK_CONSTEXPR daNpc_GetParam3 l_btpGetParamList[1] = {
     {BTP_TKC, J3DFrameCtrl::EMode_LOOP},
 };
 
-static daNpc_GetParam3 l_btkGetParamList[1] = {
+static DUSK_CONSTEXPR daNpc_GetParam3 l_btkGetParamList[1] = {
     {BTK_TKC, J3DFrameCtrl::EMode_LOOP},
 };
 
-static char* l_evtNames[4] = {
+static DUSK_CONSTEXPR char DUSK_CONST* l_evtNames[4] = {
     "",
     "TKS_SECRET",
     "TKS_WARP",
     "TKC_WARP",
 };
 
-static char* l_arcName = "Tkc";
+static DUSK_CONSTEXPR char DUSK_CONST* l_arcName = "Tkc";
 
-static char* l_myName = "Tkc";
+static DUSK_CONSTEXPR char DUSK_CONST* l_myName = "Tkc";
 
 static NPC_TKC_HIO_CLASS l_HIO;
 
-daNpcTkc_c::evtFunc daNpcTkc_c::mEvtSeqList[4] = {
+DUSK_GAME_DATA daNpcTkc_c::evtFunc daNpcTkc_c::mEvtSeqList[4] = {
     NULL,
     &daNpcTkc_c::EvCut_TksSecretChild,
     &daNpcTkc_c::EvCut_TksWarpExit,
@@ -149,7 +149,7 @@ daNpcTkc_c::~daNpcTkc_c() {
     #endif
 }
 
-daNpcTkc_HIOParam const daNpcTkc_Param_c::m = {
+DUSK_GAME_DATA daNpcTkc_HIOParam const daNpcTkc_Param_c::m = {
     10.0f,
     0.0f,
     1.0f,
@@ -1380,7 +1380,7 @@ static int daNpcTkc_IsDelete(void* i_this) {
     return 1;
 }
 
-static actor_method_class daNpcTkc_MethodTable = {
+static DUSK_CONST actor_method_class daNpcTkc_MethodTable = {
     (process_method_func)daNpcTkc_Create,
     (process_method_func)daNpcTkc_Delete,
     (process_method_func)daNpcTkc_Execute,
@@ -1388,7 +1388,7 @@ static actor_method_class daNpcTkc_MethodTable = {
     (process_method_func)daNpcTkc_Draw,
 };
 
-actor_process_profile_definition g_profile_NPC_TKC = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_NPC_TKC = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 7,
     /* List Prio    */ fpcPi_CURRENT_e,

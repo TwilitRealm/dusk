@@ -284,7 +284,7 @@ int daAmiShutter_Create(fopAc_ac_c* i_this) {
     return static_cast<daAmiShutter_c*>(i_this)->create();
 }
 
-actor_method_class l_daAmiShutter_Method = {
+DUSK_GAME_DATA actor_method_class l_daAmiShutter_Method = {
     (process_method_func)daAmiShutter_Create,
     (process_method_func)daAmiShutter_Delete,
     (process_method_func)daAmiShutter_Execute,
@@ -293,7 +293,7 @@ actor_method_class l_daAmiShutter_Method = {
 };
 
 
-actor_process_profile_definition g_profile_Obj_AmiShutter = {
+DUSK_PROFILE actor_process_profile_definition DUSK_CONST g_profile_Obj_AmiShutter = {
     /* Layer ID     */ fpcLy_CURRENT_e,
     /* List ID      */ 3,
     /* List Prio    */ fpcPi_CURRENT_e,

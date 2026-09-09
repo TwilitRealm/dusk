@@ -16,7 +16,7 @@ class daNpc_Toby_Param_c {
 public:
     virtual ~daNpc_Toby_Param_c() {}
 
-    static const daNpc_Toby_HIOParam m;
+    static DUSK_GAME_DATA const daNpc_Toby_HIOParam m;
 };
 
 #if DEBUG
@@ -97,7 +97,7 @@ public:
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_faceMotionSequenceData,
         int i_faceMotionStepNum,
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData, int i_motionStepNum,
-        daNpcT_evtData_c const* i_evtData, char** i_arcNames)
+        daNpcT_evtData_c const* i_evtData, char DUSK_CONST* DUSK_CONST* i_arcNames)
         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
                    i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
                    i_arcNames) {
@@ -129,10 +129,9 @@ public:
     u8 getPathID() { return (fopAcM_GetParam(this) & 0xFF00) >> 8; }
     u8 getBitSW() { return (fopAcM_GetParam(this) & 0xFF0000) >> 16; }
 
-    static char* mCutNameList[7];
-    static cutFunc mCutList[7];
+    static DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST mCutNameList[7];
+    static DUSK_GAME_DATA cutFunc DUSK_CONST mCutList[7];
 
-private:
     /* 0x0E40 */ NPC_TOBY_HIO_CLASS* mpHIO;
     /* 0x0E44 */ J3DModel* mpTobyModels[1];
     /* 0x0E48 */ dCcD_Cyl mCyl1;
