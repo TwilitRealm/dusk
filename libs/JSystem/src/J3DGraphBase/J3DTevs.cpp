@@ -11,6 +11,10 @@
 #include "JSystem/J3DGraphBase/J3DTransform.h"
 #include "global.h"
 
+#if TARGET_PC
+#include "aurora/lib/gfx/texture.hpp"
+#endif
+
 static void J3DGDLoadTexMtxImm(f32 (*)[4], u32, GXTexMtxType);
 static void J3DGDLoadPostTexMtxImm(f32 (*)[4], u32);
 
@@ -280,6 +284,46 @@ u16 getTexNoReg(void* pDL) {
     return var_r31 & 0xFFFFFF;
 }
 
+#if TARGET_PC
+inline void J3DGDWrite_u64(u64 data) {
+    __GDWrite((u8)((data >> 56) & 0xFF));
+    __GDWrite((u8)((data >> 48) & 0xFF));
+    __GDWrite((u8)((data >> 40) & 0xFF));
+    __GDWrite((u8)((data >> 32) & 0xFF));
+    __GDWrite((u8)((data >> 24) & 0xFF));
+    __GDWrite((u8)((data >> 16) & 0xFF));
+    __GDWrite((u8)((data >> 8) & 0xFF));
+    __GDWrite((u8)((data >> 0) & 0xFF));
+}
+
+void J3D_emit_loaded_texobj_metadata(const GXTexObj_& obj, GXTexMapID id) {
+    GDOverflowCheck(38);
+    J3DGDWrite_u8(GX_AURORA);
+    J3DGDWrite_u16(GX_AURORA_LOAD_TEXOBJ);
+    J3DGDWrite_u8(static_cast<u8>(id));
+    J3DGDWrite_u64(reinterpret_cast<u64>(obj.data));
+    J3DGDWrite_u32(obj.width());
+    J3DGDWrite_u32(obj.height());
+    J3DGDWrite_u32(obj.format());
+    J3DGDWrite_u32(static_cast<u32>(obj.tlut));
+    J3DGDWrite_u8(static_cast<u8>(obj.has_mips()));
+    J3DGDWrite_u32(obj.texObjId);
+    J3DGDWrite_u32(obj.texDataVersion);
+}
+
+void J3D_emit_loaded_tlut_metadata(const GXTlutObj_& obj, u32 idx) {
+    GDOverflowCheck(22);
+    J3DGDWrite_u8(GX_AURORA);
+    J3DGDWrite_u16(GX_AURORA_LOAD_TLUT);
+    J3DGDWrite_u8(static_cast<u8>(idx));
+    J3DGDWrite_u64(reinterpret_cast<u64>(obj.data));
+    J3DGDWrite_u32(static_cast<u32>(obj.format));
+    J3DGDWrite_u16(obj.numEntries);
+    J3DGDWrite_u32(obj.tlutObjId);
+    J3DGDWrite_u32(obj.tlutDataVersion);
+}
+#endif
+
 void loadTexNo(u32 param_0, const u16& texNo) {
     ResTIMG* resTIMG = j3dSys.getTexture()->getResTIMG(texNo);
     J3D_ASSERT_NULLPTR(462, resTIMG != NULL);
@@ -287,6 +331,14 @@ void loadTexNo(u32 param_0, const u16& texNo) {
     J3DSys::sTexCoordScaleTable[param_0].field_0x00 = (u16)resTIMG->width;
     J3DSys::sTexCoordScaleTable[param_0].field_0x02 = (u16)resTIMG->height;
 
+#if TARGET_PC
+    J3D_emit_loaded_texobj_metadata(
+        *reinterpret_cast<GXTexObj_*>(j3dSys.getTexture()->getTexObj(texNo)), GXTexMapID(param_0));
+    if (resTIMG->indexTexture) {
+        J3D_emit_loaded_tlut_metadata(
+            *reinterpret_cast<GXTlutObj_*>(j3dSys.getTexture()->getTlutObj(texNo)), param_0);
+    }
+#else
     GDOverflowCheck(0x14);
     J3DGDSetTexImgPtr(GXTexMapID(param_0), (u8*)resTIMG + resTIMG->imageOffset);
     J3DGDSetTexImgAttr(GXTexMapID(param_0), resTIMG->width, resTIMG->height, GXTexFmt(resTIMG->format & 0x0f));
@@ -298,6 +350,7 @@ void loadTexNo(u32 param_0, const u16& texNo) {
         J3DGDLoadTlut((u8*)resTIMG + resTIMG->paletteOffset, (param_0 << 13) + 0xf0000, tlutSize);
         J3DGDSetTexTlut(GXTexMapID(param_0), (param_0 << 13) + 0xf0000, GXTlutFmt(resTIMG->colorFormat));
     }
+#endif
 }
 
 void patchTexNo_PtrToIdx(u32 texID, const u16& idx) {
