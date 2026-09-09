@@ -338,7 +338,8 @@ void loadTexNo(u32 param_0, const u16& texNo) {
         J3D_emit_loaded_tlut_metadata(
             *reinterpret_cast<GXTlutObj_*>(j3dSys.getTexture()->getTlutObj(texNo)), param_0);
     }
-#else
+#endif
+
     GDOverflowCheck(0x14);
     J3DGDSetTexImgPtr(GXTexMapID(param_0), (u8*)resTIMG + resTIMG->imageOffset);
     J3DGDSetTexImgAttr(GXTexMapID(param_0), resTIMG->width, resTIMG->height, GXTexFmt(resTIMG->format & 0x0f));
@@ -350,7 +351,6 @@ void loadTexNo(u32 param_0, const u16& texNo) {
         J3DGDLoadTlut((u8*)resTIMG + resTIMG->paletteOffset, (param_0 << 13) + 0xf0000, tlutSize);
         J3DGDSetTexTlut(GXTexMapID(param_0), (param_0 << 13) + 0xf0000, GXTlutFmt(resTIMG->colorFormat));
     }
-#endif
 }
 
 void patchTexNo_PtrToIdx(u32 texID, const u16& idx) {
