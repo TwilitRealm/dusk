@@ -316,7 +316,6 @@ template class ConfigImpl<BloomMode>;
 template class ConfigImpl<DepthOfFieldMode>;
 template class ConfigImpl<DiscVerificationState>;
 template class ConfigImpl<GameLanguage>;
-template class ConfigImpl<AudioOutputMode>;
 
 template <>
 void ConfigImpl<FrameInterpMode>::loadFromJson(
